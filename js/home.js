@@ -778,7 +778,7 @@
         try { hideModal(m); } catch(_) { m.style.display = 'none'; }
         // 恢复原 onclick（从聊天界面进入时行为不变）
         btn.onclick = orig;
-        setTimeout(backToSettings, 320);
+        setTimeout(() => window.homeScreen.backToSettings(), 320);
       };
     });
   }
@@ -1383,6 +1383,7 @@
   // 暴露 API
   window.homeScreen = {
     backToHome,
+    backToSettings,
     goToFeature,
     refreshHomeData,
     openThemePanel,
