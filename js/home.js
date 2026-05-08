@@ -779,8 +779,7 @@
       const orig = btn.onclick;
       btn.onclick = (e) => {
         e.stopImmediatePropagation();
-        // 先激活 feature-mode，防止聊天界面在关 modal 后瞬间露出来
-        if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
+
         m.style.display = 'none';
         if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
         // 恢复关闭按钮显示
@@ -817,8 +816,7 @@
     buildSettingsScreen();
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
-    // 确保 feature-mode 背景在
-    if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
+    // feature-mode 一直保持激活，不需要重新进入
     document.getElementById('settings-list-screen')?.classList.add('visible');
     showBackBtn(backToHome);
   }
@@ -826,9 +824,6 @@
   function triggerSettingsAction(action) {
     const settingsEl = document.getElementById('settings-list-screen');
     if (settingsEl) settingsEl.classList.remove('visible');
-
-    // 退出 feature-mode，让聊天界面恢复，modal 才能正常显示
-    exitFeatureMode();
 
     setTimeout(() => {
       // openModalFromSettings：打开 modal 并覆盖关闭按钮让它回设置页
