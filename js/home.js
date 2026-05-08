@@ -839,10 +839,17 @@
         const btn = document.getElementById(id);
         if (btn && !btn._homeHooked) {
           btn._homeHooked = true;
-          btn.addEventListener('click', () => setTimeout(backToHome, 300));
+          btn.addEventListener('click', () => {
+            // 恢复外观设置总览（被直接进子面板时隐藏了）
+            const navGrid = document.getElementById('appearance-nav-grid');
+            const galleryBanner = document.getElementById('gallery-banner-entry');
+            if (navGrid) navGrid.style.display = '';
+            if (galleryBanner) galleryBanner.style.display = '';
+            setTimeout(backToSettings, 300);
+          });
         }
       });
-      showBackBtn(backToHome);
+      showBackBtn(backToSettings);
     }, 200);
   }
 
