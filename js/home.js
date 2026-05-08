@@ -764,16 +764,20 @@
 
 
   function openAppearancePanel(panel) {
-    // click 触发 appearance-modal 打开
-    document.getElementById('appearance-settings')?.click();
-    // 等 modal 动画结束后，直接隐藏总览、显示子面板
+    const modal = document.getElementById('appearance-modal');
+    if (!modal) return;
+    // 直接用全局 showModal，不依赖 click()
+    showModal(modal);
     setTimeout(() => {
+      // 隐藏总览 nav-grid，直接进子面板
       const navGrid = document.getElementById('appearance-nav-grid');
       const galleryBanner = document.getElementById('gallery-banner-entry');
       if (navGrid) navGrid.style.display = 'none';
       if (galleryBanner) galleryBanner.style.display = 'none';
-      window.showAppearancePanel?.(panel);
-    }, 320);
+      // 调子面板
+      if (typeof showAppearancePanel === 'function') showAppearancePanel(panel);
+      else window.showAppearancePanel?.(panel);
+    }, 50);
   }
 
 
