@@ -388,47 +388,36 @@
       return;
     }
 
-    // 隐藏主页
+    // 隐藏主页，但不进 feature-mode——modal 必须在正常聊天环境下才能显示
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
-    enterFeatureMode();
     isOnHome = false;
-    // ★ 强制显示浮动返回按钮
-    const backBtn = document.getElementById('floating-back-home');
-    if (backBtn) {
-      backBtn.classList.add('visible');
-      backBtn.style.display = 'flex';
-      backBtn.style.zIndex = '99999';   // 确保在最上层
-    }
+    showBackBtn(backToHome);
 
-    // 打开对应功能
+    // 直接 click 原来功能按钮，走 listeners.js 已有的完整路径
     setTimeout(() => {
       switch (featureName) {
         case 'tarot':
-          if (typeof window.generateFortune === 'function') window.generateFortune();
-          openModalById('fortune-lenormand-modal');
+          document.getElementById('fortune-lenormand-function')?.click();
           break;
         case 'envelope':
-          openModalById('envelope-modal');
+          document.getElementById('envelope-function')?.click();
           break;
         case 'library':
-          openModalById('custom-replies-modal');
+          document.getElementById('custom-replies-function')?.click();
           break;
         case 'group':
-          openModalById('group-chat-modal');
+          document.getElementById('group-chat-btn')?.click();
           break;
         case 'call':
-          if (window.callFeature && typeof window.callFeature.startCall === 'function') {
-            window.callFeature.startCall(false);
-          }
+          if (window.callFeature?.startCall) window.callFeature.startCall(false);
+          else document.querySelector('#collapsed-call-btn')?.click();
           break;
         case 'music':
-          if (typeof window.initMusicPlayer === 'function') window.initMusicPlayer();
-          if (typeof window.openMusicPlayer === 'function') window.openMusicPlayer();
-          openModalById('music-player-modal');
+          document.getElementById('music-player-toggle')?.click();
           break;
       }
-    }, 200);
+    }, 100);
   }
 
   /* ============================================================
