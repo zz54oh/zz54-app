@@ -779,6 +779,8 @@
       const orig = btn.onclick;
       btn.onclick = (e) => {
         e.stopImmediatePropagation();
+        // 先激活 feature-mode，防止聊天界面在关 modal 后瞬间露出来
+        if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
         m.style.display = 'none';
         if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
         // 恢复关闭按钮显示
@@ -787,7 +789,7 @@
           if (hbtn) hbtn.style.display = '';
         });
         btn.onclick = orig;
-        setTimeout(() => window.homeScreen.backToSettings(), 50);
+        window.homeScreen.backToSettings();
       };
     });
   }
