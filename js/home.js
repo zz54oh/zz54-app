@@ -799,30 +799,31 @@
     exitFeatureMode();
 
     setTimeout(() => {
-      const click = id => document.getElementById(id)?.click();
+      // 直接用全局 showModal 打开对应 modal，不依赖隐藏元素的 click()
+      const openM = id => { const m = document.getElementById(id); if(m) showModal(m); };
       switch (action) {
-        case 'appearance':   click('appearance-settings'); break;
-        case 'theme':        openAppearancePanel('theme'); break;
-        case 'font-bg':      openAppearancePanel('font-bg'); break;
-        case 'bubble-css':   openAppearancePanel('bubble-css'); break;
-        case 'avatar':       openAppearancePanel('avatar'); break;
-        case 'chat-style':   click('chat-settings'); break;
-        case 'background':   click('appearance-settings'); break; // 进外观后再选背景
+        case 'appearance':     openM('appearance-modal'); break;
+        case 'theme':          openAppearancePanel('theme'); break;
+        case 'font-bg':        openAppearancePanel('font-bg'); break;
+        case 'bubble-css':     openAppearancePanel('bubble-css'); break;
+        case 'avatar':         openAppearancePanel('avatar'); break;
+        case 'chat-style':     openM('chat-modal'); break;
+        case 'background':     openAppearancePanel('font-bg'); break;
         case 'icon-customize': openIconCustomize(); return;
-        case 'library':     click('custom-replies-function'); break;
-        case 'tarot':       click('fortune-lenormand-function'); break;
-        case 'envelope':    click('envelope-function'); break;
-        case 'mood':        openMoodCalendar(); return;
-        case 'group':       click('group-chat-btn'); break;
-        case 'call':        if (window.callFeature?.startCall) window.callFeature.startCall(false);
-                             else click('collapsed-call-btn'); break;
-        case 'music':       click('music-player-toggle'); break;
-        case 'send-settings': click('advanced-settings'); break;
-        case 'anniversary': click('anniversary-function'); break;
-        case 'profile-me':  click('my-name'); break;
-        case 'profile-partner': click('partner-name'); break;
-        case 'data':        click('data-settings'); break;
-        default:             click('cancel-settings');
+        case 'library':        openM('custom-replies-modal'); break;
+        case 'tarot':          openM('fortune-lenormand-modal'); break;
+        case 'envelope':       openM('envelope-modal'); break;
+        case 'mood':           openMoodCalendar(); return;
+        case 'group':          openM('group-chat-modal'); break;
+        case 'call':           if (window.callFeature?.startCall) window.callFeature.startCall(false);
+                               else openM('call-modal'); break;
+        case 'music':          openM('music-player-modal'); break;
+        case 'send-settings':  openM('advanced-modal'); break;
+        case 'anniversary':    openM('anniversary-modal'); break;
+        case 'profile-me':     openM('chat-modal'); break;
+        case 'profile-partner':openM('chat-modal'); break;
+        case 'data':           openM('data-modal'); break;
+        default: break;
       }
       // 给对应关闭按钮挂回主页钩子
       const closeMap = {
