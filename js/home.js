@@ -764,26 +764,49 @@
     const settingsEl = document.getElementById('settings-list-screen');
     if (settingsEl) settingsEl.classList.remove('visible');
 
+    // 退出 feature-mode，让聊天界面恢复，modal 才能正常显示
+    exitFeatureMode();
+
     setTimeout(() => {
+      const click = id => document.getElementById(id)?.click();
       switch (action) {
-        case 'appearance': openModalById('appearance-modal'); break;
-        case 'chat-style': openModalById('chat-modal'); break;
-        case 'background': tryOpen(['#background-input']); break;
+        case 'appearance':   click('appearance-settings'); break;
+        case 'chat-style':   click('chat-settings'); break;
+        case 'background':   click('appearance-settings'); break; // 进外观后再选背景
         case 'icon-customize': openIconCustomize(); return;
-        case 'library': openModalById('custom-replies-modal'); break;
-        case 'tarot': window.generateFortune?.(); break;
-        case 'envelope': tryOpen([() => window.envelopeFeature?.open?.(), 'envelope-modal']); break;
-        case 'mood': openMoodCalendar(); return;
-        case 'group': tryOpen(['group-chat-modal', '#group-chat-btn']); break;
-        case 'call': tryOpen([() => window.callFeature?.startCall?.(false), '#collapsed-call-btn']); break;
-        case 'music': tryOpen([() => window.openMusicPlayer?.(), 'music-player-modal', '#music-btn']); break;
-        case 'send-settings': openModalById('advanced-modal'); break;
-        case 'anniversary': openModalById('anniversary-modal'); break;
-        case 'profile-me': tryOpen(['#my-name']); break;
-        case 'profile-partner': tryOpen(['#partner-name']); break;
-        case 'data': openModalById('data-modal'); break;
-        default: openModalById('settings-modal');
+        case 'library':     click('custom-replies-function'); break;
+        case 'tarot':       click('fortune-lenormand-function'); break;
+        case 'envelope':    click('envelope-function'); break;
+        case 'mood':        openMoodCalendar(); return;
+        case 'group':       click('group-chat-btn'); break;
+        case 'call':        if (window.callFeature?.startCall) window.callFeature.startCall(false);
+                             else click('collapsed-call-btn'); break;
+        case 'music':       click('music-player-toggle'); break;
+        case 'send-settings': click('advanced-settings'); break;
+        case 'anniversary': click('anniversary-function'); break;
+        case 'profile-me':  click('my-name'); break;
+        case 'profile-partner': click('partner-name'); break;
+        case 'data':        click('data-settings'); break;
+        default:             click('cancel-settings');
       }
+      // 给对应关闭按钮挂回主页钩子
+      const closeMap = {
+        appearance: ['close-appearance', 'back-appearance'],
+        'chat-style': ['back-chat'],
+        library: ['close-custom-replies'],
+        tarot: ['close-fortune', 'close-lenormand'],
+        envelope: ['cancel-envelope'],
+        group: ['close-group-chat'],
+        'send-settings': ['back-advanced'],
+        data: ['back-data'],
+      };
+      (closeMap[action] || []).forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn && !btn._homeHooked) {
+          btn._homeHooked = true;
+          btn.addEventListener('click', () => setTimeout(backToHome, 300));
+        }
+      });
       showBackBtn(backToHome);
     }, 200);
   }
