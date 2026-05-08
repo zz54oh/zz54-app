@@ -829,9 +829,9 @@
     const settingsEl = document.getElementById('settings-list-screen');
     if (settingsEl) settingsEl.classList.remove('visible');
 
-    // 用覆盖层遮住过渡，防止聊天界面闪烁
+    // 覆盖层用 feature-mode 同款渐变，过渡无缝
     const _overlay = document.createElement('div');
-    _overlay.style.cssText = 'position:fixed;inset:0;z-index:99998;background:var(--primary-bg,#fff);';
+    _overlay.style.cssText = 'position:fixed;inset:0;z-index:99998;background:radial-gradient(circle at 20% 20%,hsl(calc(var(--theme-h,280) + 15),50%,92%) 0%,transparent 50%),linear-gradient(170deg,hsl(var(--theme-h,280),40%,95%) 0%,hsl(calc(var(--theme-h,280)+30),40%,92%) 100%);';
     document.body.appendChild(_overlay);
     exitFeatureMode();
 
@@ -865,8 +865,8 @@
 
       showBackBtn(backToSettings);
       // 移除覆盖层（modal 已经在上面了，z-index 10001 > 99998 不对，所以 modal 打开后再移除）
-      requestAnimationFrame(() => setTimeout(() => _overlay.remove(), 100));
-    }, 200);
+      requestAnimationFrame(() => _overlay.remove());
+    }, 50);
   }
 
   /* ============================================================
