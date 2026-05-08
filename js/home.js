@@ -829,15 +829,9 @@
     const settingsEl = document.getElementById('settings-list-screen');
     if (settingsEl) settingsEl.classList.remove('visible');
 
-    // 覆盖层用 feature-mode 同款渐变，过渡无缝
-    const _overlay = document.createElement('div');
-    _overlay.style.cssText = 'position:fixed;inset:0;z-index:99998;background:radial-gradient(circle at 20% 20%,hsl(calc(var(--theme-h,280) + 15),50%,92%) 0%,transparent 50%),linear-gradient(170deg,hsl(var(--theme-h,280),40%,95%) 0%,hsl(calc(var(--theme-h,280)+30),40%,92%) 100%);';
-    document.body.appendChild(_overlay);
-    exitFeatureMode();
-
     setTimeout(() => {
       // openModalFromSettings：打开 modal 并覆盖关闭按钮让它回设置页
-      const oMS = (id, btns) => openModalFromSettings(id, btns);
+      const oMS = (id, btns, hide) => openModalFromSettings(id, btns, hide);
       switch (action) {
         case 'appearance':     oMS('appearance-modal', ['back-appearance'], ['close-appearance']); break;
         case 'theme':          openAppearancePanel('theme'); break;
@@ -865,7 +859,6 @@
 
       showBackBtn(backToSettings);
       // 移除覆盖层（modal 已经在上面了，z-index 10001 > 99998 不对，所以 modal 打开后再移除）
-      requestAnimationFrame(() => _overlay.remove());
     }, 50);
   }
 
@@ -1128,17 +1121,22 @@
   }
 
   function openIconCustomize() {
-    const old = document.getElementById('icon-customize-screen');
-    if (old) old.remove();
+    const existing = document.getElementById('icon-customize-screen');
+    if (existing) existing.remove();
     buildIconCustomizeScreen();
 
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
-    enterFeatureMode();
+    // feature-mode 已经激活（从设置页来），不需要重复 enter
+    if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
     isOnHome = false;
 
-    document.getElementById('icon-customize-screen')?.classList.add('visible');
-    showBackBtn(backToHome);
+    const screen = document.getElementById('icon-customize-screen');
+    if (screen) {
+      screen.classList.remove('visible');
+      requestAnimationFrame(() => screen.classList.add('visible'));
+    }
+    showBackBtn(backToSettings);
   }
 
   /* ============================================================
