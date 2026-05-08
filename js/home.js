@@ -367,14 +367,13 @@
 
     m.classList.remove('hidden');
     m.style.display = 'flex';
-    // 重置 modal-content 动画状态（兼容 core.js 的 showModal 效果）
-    requestAnimationFrame(() => {
-      const content = m.querySelector('.modal-content');
-      if (content) {
-        content.style.opacity = '1';
-        content.style.transform = 'translateY(0) scale(1)';
-      }
-    });
+    // CSS animation 运行期间优先级高于 inline style，先禁动画再强设最终状态
+    const content = m.querySelector('.modal-content');
+    if (content) {
+      content.style.animation = 'none';
+      content.style.opacity = '1';
+      content.style.transform = 'translateY(0) scale(1)';
+    }
     return true;
   }
 
