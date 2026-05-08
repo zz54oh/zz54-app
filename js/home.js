@@ -758,7 +758,11 @@
     if (home) home.classList.add('hidden');
     enterFeatureMode();
     isOnHome = false;
-    document.getElementById('settings-list-screen')?.classList.add('visible');
+    const sl = document.getElementById('settings-list-screen');
+    if (sl) {
+      sl.classList.remove('visible'); // 先 remove 再 add，确保触发 CSS
+      requestAnimationFrame(() => sl.classList.add('visible'));
+    }
     showBackBtn(backToHome);
   }
 
@@ -825,6 +829,12 @@
     const settingsEl = document.getElementById('settings-list-screen');
     if (settingsEl) settingsEl.classList.remove('visible');
 
+    // 用覆盖层遮住过渡，防止聊天界面闪烁
+    const _overlay = document.createElement('div');
+    _overlay.style.cssText = 'position:fixed;inset:0;z-index:99998;background:var(--primary-bg,#fff);';
+    document.body.appendChild(_overlay);
+    exitFeatureMode();
+
     setTimeout(() => {
       // openModalFromSettings：打开 modal 并覆盖关闭按钮让它回设置页
       const oMS = (id, btns) => openModalFromSettings(id, btns);
@@ -854,6 +864,8 @@
       // 给对应关闭按钮挂回主页钩子
 
       showBackBtn(backToSettings);
+      // 移除覆盖层（modal 已经在上面了，z-index 10001 > 99998 不对，所以 modal 打开后再移除）
+      requestAnimationFrame(() => setTimeout(() => _overlay.remove(), 100));
     }, 200);
   }
 
