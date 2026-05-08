@@ -673,16 +673,18 @@
     {
       section: '聊天与外观',
       items: [
-        { icon: 'fa-paintbrush', bg: 'icon-bg-2', title: '外观设置', desc: '应用标题、副标题、起始日期', action: 'appearance' },
-        { icon: 'fa-comment', bg: 'icon-bg-7', title: '聊天样式', desc: '气泡、字体、头像、回执', action: 'chat-style' },
-        { icon: 'fa-image', bg: 'icon-bg-5', title: '背景设置', desc: '聊天背景图、透明度', action: 'background' },
-        { icon: 'fa-icons', bg: 'icon-bg-9', title: '功能图标自定义', desc: '为每个功能上传自定义图标', action: 'icon-customize' },
+        { icon: 'fa-palette',     bg: 'icon-bg-2', title: '主题配色',   desc: '颜色方案、自定义编辑器',   action: 'theme' },
+        { icon: 'fa-image',       bg: 'icon-bg-5', title: '背景和字体', desc: '聊天背景图、字体大小', action: 'font-bg' },
+        { icon: 'fa-comment',     bg: 'icon-bg-7', title: '气泡和CSS',  desc: '气泡样式、自定义CSS',   action: 'bubble-css' },
+        { icon: 'fa-user-circle', bg: 'icon-bg-3', title: '聊天头像',   desc: '头像、头像框设置',       action: 'avatar' },
+        { icon: 'fa-comments',    bg: 'icon-bg-6', title: '聊天设置',   desc: '消息气泡、回执、输入框', action: 'chat-style' },
+        { icon: 'fa-book-open',   bg: 'icon-bg-1', title: '字卡回复库', desc: '字卡、表情、拍一拍',   action: 'library' },
+        { icon: 'fa-icons',       bg: 'icon-bg-9', title: '功能图标自定义', desc: '为每个功能上传自定义图标', action: 'icon-customize' },
       ]
     },
     {
       section: '内容与互动',
       items: [
-        { icon: 'fa-book-open', bg: 'icon-bg-1', title: '字卡回复库', desc: '字卡、表情、拍一拍', action: 'library' },
         { icon: 'fa-star-and-crescent', bg: 'icon-bg-12', title: '塔罗占卜', desc: '梦占模式、抽牌设置', action: 'tarot' },
         { icon: 'fa-envelope-open-text', bg: 'icon-bg-4', title: '信封投递', desc: '写信给梦角、延迟回信', action: 'envelope' },
         { icon: 'fa-cloud-sun', bg: 'icon-bg-3', title: '心情追踪', desc: '日历记录每日心情', action: 'mood' },
@@ -760,6 +762,23 @@
     showBackBtn(backToHome);
   }
 
+
+  function openAppearancePanel(panel) {
+    document.getElementById('appearance-settings')?.click();
+    setTimeout(() => { window.showAppearancePanel?.(panel); }, 400);
+  }
+
+
+  function backToSettings() {
+    document.querySelectorAll('.modal').forEach(m => {
+      if (m.style.display === 'flex') {
+        try { hideModal(m); } catch(e) { m.style.display = 'none'; }
+      }
+    });
+    exitFeatureMode();
+    setTimeout(openSettingsScreen, 150);
+  }
+
   function triggerSettingsAction(action) {
     const settingsEl = document.getElementById('settings-list-screen');
     if (settingsEl) settingsEl.classList.remove('visible');
@@ -771,6 +790,10 @@
       const click = id => document.getElementById(id)?.click();
       switch (action) {
         case 'appearance':   click('appearance-settings'); break;
+        case 'theme':        openAppearancePanel('theme'); break;
+        case 'font-bg':      openAppearancePanel('font-bg'); break;
+        case 'bubble-css':   openAppearancePanel('bubble-css'); break;
+        case 'avatar':       openAppearancePanel('avatar'); break;
         case 'chat-style':   click('chat-settings'); break;
         case 'background':   click('appearance-settings'); break; // 进外观后再选背景
         case 'icon-customize': openIconCustomize(); return;
