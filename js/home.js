@@ -365,12 +365,16 @@
     // 强制提到最上层，确保弹窗不被主页盖住
     m.style.zIndex = '10001';
 
-    if (typeof window.showModal === 'function') {
-      window.showModal(m);
-    } else {
-      m.classList.remove('hidden');
-      m.style.display = 'flex';
-    }
+    m.classList.remove('hidden');
+    m.style.display = 'flex';
+    // 重置 modal-content 动画状态（兼容 core.js 的 showModal 效果）
+    requestAnimationFrame(() => {
+      const content = m.querySelector('.modal-content');
+      if (content) {
+        content.style.opacity = '1';
+        content.style.transform = 'translateY(0) scale(1)';
+      }
+    });
     return true;
   }
 
