@@ -396,6 +396,23 @@
 
     // 直接 click 原来功能按钮，走 listeners.js 已有的完整路径
     setTimeout(() => {
+      // 给关闭按钮追加"回主页"钩子
+      const closeIds = {
+        tarot:    ['close-fortune', 'close-lenormand'],
+        envelope: ['cancel-envelope'],
+        library:  ['close-custom-replies'],
+        group:    ['close-group-chat'],
+      };
+      (closeIds[featureName] || []).forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn && !btn._homeHooked) {
+          btn._homeHooked = true;
+          btn.addEventListener('click', () => {
+            setTimeout(backToHome, 300); // 等 hideModal 动画结束再回主页
+          });
+        }
+      });
+
       switch (featureName) {
         case 'tarot':
           document.getElementById('fortune-lenormand-function')?.click();
