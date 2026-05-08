@@ -825,15 +825,6 @@
     const settingsEl = document.getElementById('settings-list-screen');
     if (settingsEl) settingsEl.classList.remove('visible');
 
-    // 退出 feature-mode 前先手动隐藏聊天区域，防止闪烁
-    ['header','.main-chat-area','.input-area-wrapper','#typing-indicator-wrapper'].forEach(sel => {
-      const el = sel.startsWith('#') || sel.startsWith('.')
-        ? document.querySelector(sel)
-        : document.querySelector('.' + sel);
-      if (el) el.style.display = 'none';
-    });
-    exitFeatureMode();
-
     setTimeout(() => {
       // openModalFromSettings：打开 modal 并覆盖关闭按钮让它回设置页
       const oMS = (id, btns) => openModalFromSettings(id, btns);
