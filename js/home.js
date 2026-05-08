@@ -770,9 +770,11 @@
   // 从设置页打开 modal，临时覆盖关闭按钮让它回设置页而不是别处
   function openModalFromSettings(modalId, closeBtnIds, hideCloseBtnIds) {
     const m = document.getElementById(modalId);
+    console.log('[oMFS] modalId:', modalId, 'found:', !!m, 'feature-mode:', document.body.classList.contains('feature-mode'));
     if (!m) return;
     showModal(m);
-    m.style.zIndex = '10001'; // 高于 settings-list-screen (9500)
+    m.style.zIndex = '10001';
+    console.log('[oMFS] after showModal, display:', window.getComputedStyle(m).display, 'zIndex:', m.style.zIndex);
     // 隐藏不需要的关闭按钮
     (hideCloseBtnIds || []).forEach(id => {
       const btn = document.getElementById(id);
@@ -829,9 +831,11 @@
 
   function triggerSettingsAction(action) {
     const settingsEl = document.getElementById('settings-list-screen');
+    console.log('[TSA] action:', action, 'feature-mode:', document.body.classList.contains('feature-mode'), 'visible:', settingsEl?.classList.contains('visible'));
     if (settingsEl) settingsEl.classList.remove('visible');
 
     setTimeout(() => {
+      console.log('[TSA] timeout: feature-mode:', document.body.classList.contains('feature-mode'));
       // openModalFromSettings：打开 modal 并覆盖关闭按钮让它回设置页
       const oMS = (id, btns, hide) => openModalFromSettings(id, btns, hide);
       switch (action) {
