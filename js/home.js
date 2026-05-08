@@ -361,18 +361,16 @@
   function openModalById(id) {
     const m = document.getElementById(id);
     if (!m) return false;
-
-    // 强制提到最上层，确保弹窗不被主页盖住
-    m.style.zIndex = '10001';
-
+    if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
     m.classList.remove('hidden');
-    m.style.display = 'flex';
-    // CSS animation 运行期间优先级高于 inline style，先禁动画再强设最终状态
+    m.style.setProperty('display', 'flex', 'important');
+    m.style.setProperty('z-index', '10001', 'important');
     const content = m.querySelector('.modal-content');
     if (content) {
-      content.style.animation = 'none';
-      content.style.opacity = '1';
-      content.style.transform = 'translateY(0) scale(1)';
+      content.style.setProperty('animation', 'none', 'important');
+      content.style.setProperty('opacity', '1', 'important');
+      content.style.setProperty('transform', 'translateY(0) scale(1)', 'important');
+      content.style.setProperty('transition', 'none', 'important');
     }
     return true;
   }
