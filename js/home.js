@@ -764,27 +764,36 @@
 
 
   // 从设置页打开 modal，临时覆盖关闭按钮让它回设置页而不是别处
-  function openModalFromSettings(modalId, closeBtnIds) {
+  function openModalFromSettings(modalId, closeBtnIds, hideCloseBtnIds) {
     const m = document.getElementById(modalId);
     if (!m) return;
     showModal(m);
+    // 隐藏不需要的关闭按钮
+    (hideCloseBtnIds || []).forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.style.display = 'none';
+    });
     (closeBtnIds || []).forEach(id => {
       const btn = document.getElementById(id);
       if (!btn) return;
-      const orig = btn.onclick; // 保存原 onclick
+      const orig = btn.onclick;
       btn.onclick = (e) => {
         e.stopImmediatePropagation();
-        // 关 modal
-        try { hideModal(m); } catch(_) { m.style.display = 'none'; }
-        // 恢复原 onclick（从聊天界面进入时行为不变）
+        m.style.display = 'none';
+        if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
+        // 恢复关闭按钮显示
+        (hideCloseBtnIds || []).forEach(hid => {
+          const hbtn = document.getElementById(hid);
+          if (hbtn) hbtn.style.display = '';
+        });
         btn.onclick = orig;
-        setTimeout(() => window.homeScreen.backToSettings(), 320);
+        setTimeout(() => window.homeScreen.backToSettings(), 50);
       };
     });
   }
 
   function openAppearancePanel(panel) {
-    openModalFromSettings('appearance-modal', ['back-appearance']);
+    openModalFromSettings('appearance-modal', ['back-appearance'], ['close-appearance']);
     setTimeout(() => {
       const navGrid = document.getElementById('appearance-nav-grid');
       const galleryBanner = document.getElementById('gallery-banner-entry');
@@ -797,13 +806,19 @@
 
 
   function backToSettings() {
+    // 直接隐藏所有 modal，不 exitFeatureMode（避免聊天界面闪烁）
     document.querySelectorAll('.modal').forEach(m => {
-      if (m.style.display === 'flex') {
-        try { hideModal(m); } catch(e) { m.style.display = 'none'; }
-      }
+      m.style.display = 'none';
+      if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
     });
-    exitFeatureMode();
-    setTimeout(openSettingsScreen, 150);
+    // 直接显示设置列表，不走 exit/enter feature-mode 的来回
+    buildSettingsScreen();
+    const home = document.getElementById('home-screen');
+    if (home) home.classList.add('hidden');
+    // 确保 feature-mode 背景在
+    if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
+    document.getElementById('settings-list-screen')?.classList.add('visible');
+    showBackBtn(backToHome);
   }
 
   function triggerSettingsAction(action) {
@@ -817,12 +832,12 @@
       // openModalFromSettings：打开 modal 并覆盖关闭按钮让它回设置页
       const oMS = (id, btns) => openModalFromSettings(id, btns);
       switch (action) {
-        case 'appearance':     oMS('appearance-modal', ['back-appearance']); break;
+        case 'appearance':     oMS('appearance-modal', ['back-appearance'], ['close-appearance']); break;
         case 'theme':          openAppearancePanel('theme'); break;
         case 'font-bg':        openAppearancePanel('font-bg'); break;
         case 'bubble-css':     openAppearancePanel('bubble-css'); break;
         case 'avatar':         openAppearancePanel('avatar'); break;
-        case 'chat-style':     oMS('chat-modal', ['back-chat']); break;
+        case 'chat-style':     oMS('chat-modal', ['back-chat'], ['close-chat']); break;
         case 'background':     openAppearancePanel('font-bg'); break;
         case 'icon-customize': openIconCustomize(); return;
         case 'library':        oMS('custom-replies-modal', ['close-custom-replies']); break;
@@ -834,8 +849,8 @@
         case 'music':          oMS('music-player-modal', []); break;
         case 'send-settings':  oMS('advanced-modal', ['back-advanced']); break;
         case 'anniversary':    oMS('anniversary-modal', ['close-anniversary']); break;
-        case 'profile-me':     oMS('chat-modal', ['back-chat']); break;
-        case 'profile-partner':oMS('chat-modal', ['back-chat']); break;
+        case 'profile-me':     oMS('chat-modal', ['back-chat'], ['close-chat']); break;
+        case 'profile-partner':oMS('chat-modal', ['back-chat'], ['close-chat']); break;
         case 'data':           oMS('data-modal', ['back-data']); break;
         default: break;
       }
