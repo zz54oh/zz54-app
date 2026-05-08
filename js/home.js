@@ -763,18 +763,33 @@
   }
 
 
+  // 从设置页打开 modal，临时覆盖关闭按钮让它回设置页而不是别处
+  function openModalFromSettings(modalId, closeBtnIds) {
+    const m = document.getElementById(modalId);
+    if (!m) return;
+    showModal(m);
+    (closeBtnIds || []).forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      const orig = btn.onclick; // 保存原 onclick
+      btn.onclick = (e) => {
+        e.stopImmediatePropagation();
+        // 关 modal
+        try { hideModal(m); } catch(_) { m.style.display = 'none'; }
+        // 恢复原 onclick（从聊天界面进入时行为不变）
+        btn.onclick = orig;
+        setTimeout(backToSettings, 320);
+      };
+    });
+  }
+
   function openAppearancePanel(panel) {
-    const modal = document.getElementById('appearance-modal');
-    if (!modal) return;
-    // 直接用全局 showModal，不依赖 click()
-    showModal(modal);
+    openModalFromSettings('appearance-modal', ['back-appearance']);
     setTimeout(() => {
-      // 隐藏总览 nav-grid，直接进子面板
       const navGrid = document.getElementById('appearance-nav-grid');
       const galleryBanner = document.getElementById('gallery-banner-entry');
       if (navGrid) navGrid.style.display = 'none';
       if (galleryBanner) galleryBanner.style.display = 'none';
-      // 调子面板
       if (typeof showAppearancePanel === 'function') showAppearancePanel(panel);
       else window.showAppearancePanel?.(panel);
     }, 50);
@@ -799,61 +814,33 @@
     exitFeatureMode();
 
     setTimeout(() => {
-      // 直接用全局 showModal 打开对应 modal，不依赖隐藏元素的 click()
-      const openM = id => { const m = document.getElementById(id); if(m) showModal(m); };
+      // openModalFromSettings：打开 modal 并覆盖关闭按钮让它回设置页
+      const oMS = (id, btns) => openModalFromSettings(id, btns);
       switch (action) {
-        case 'appearance':     openM('appearance-modal'); break;
+        case 'appearance':     oMS('appearance-modal', ['back-appearance']); break;
         case 'theme':          openAppearancePanel('theme'); break;
         case 'font-bg':        openAppearancePanel('font-bg'); break;
         case 'bubble-css':     openAppearancePanel('bubble-css'); break;
         case 'avatar':         openAppearancePanel('avatar'); break;
-        case 'chat-style':     openM('chat-modal'); break;
+        case 'chat-style':     oMS('chat-modal', ['back-chat']); break;
         case 'background':     openAppearancePanel('font-bg'); break;
         case 'icon-customize': openIconCustomize(); return;
-        case 'library':        openM('custom-replies-modal'); break;
-        case 'tarot':          openM('fortune-lenormand-modal'); break;
-        case 'envelope':       openM('envelope-modal'); break;
+        case 'library':        oMS('custom-replies-modal', ['close-custom-replies']); break;
+        case 'tarot':          oMS('fortune-lenormand-modal', ['close-fortune','close-lenormand']); break;
+        case 'envelope':       oMS('envelope-modal', ['cancel-envelope']); break;
         case 'mood':           openMoodCalendar(); return;
-        case 'group':          openM('group-chat-modal'); break;
-        case 'call':           if (window.callFeature?.startCall) window.callFeature.startCall(false);
-                               else openM('call-modal'); break;
-        case 'music':          openM('music-player-modal'); break;
-        case 'send-settings':  openM('advanced-modal'); break;
-        case 'anniversary':    openM('anniversary-modal'); break;
-        case 'profile-me':     openM('chat-modal'); break;
-        case 'profile-partner':openM('chat-modal'); break;
-        case 'data':           openM('data-modal'); break;
+        case 'group':          oMS('group-chat-modal', ['close-group-chat']); break;
+        case 'call':           if (window.callFeature?.startCall) window.callFeature.startCall(false); break;
+        case 'music':          oMS('music-player-modal', []); break;
+        case 'send-settings':  oMS('advanced-modal', ['back-advanced']); break;
+        case 'anniversary':    oMS('anniversary-modal', ['close-anniversary']); break;
+        case 'profile-me':     oMS('chat-modal', ['back-chat']); break;
+        case 'profile-partner':oMS('chat-modal', ['back-chat']); break;
+        case 'data':           oMS('data-modal', ['back-data']); break;
         default: break;
       }
       // 给对应关闭按钮挂回主页钩子
-      const closeMap = {
-        appearance:    ['close-appearance', 'back-appearance'],
-        theme:         ['back-appearance'],
-        'font-bg':     ['back-appearance'],
-        'bubble-css':  ['back-appearance'],
-        avatar:        ['back-appearance'],
-        'chat-style':  ['back-chat'],
-        library:       ['close-custom-replies'],
-        tarot:         ['close-fortune', 'close-lenormand'],
-        envelope:      ['cancel-envelope'],
-        group:         ['close-group-chat'],
-        'send-settings': ['back-advanced'],
-        data:          ['back-data'],
-      };
-      (closeMap[action] || []).forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn && !btn._homeHooked) {
-          btn._homeHooked = true;
-          btn.addEventListener('click', () => {
-            // 恢复外观设置总览（被直接进子面板时隐藏了）
-            const navGrid = document.getElementById('appearance-nav-grid');
-            const galleryBanner = document.getElementById('gallery-banner-entry');
-            if (navGrid) navGrid.style.display = '';
-            if (galleryBanner) galleryBanner.style.display = '';
-            setTimeout(backToSettings, 300);
-          });
-        }
-      });
+
       showBackBtn(backToSettings);
     }, 200);
   }
