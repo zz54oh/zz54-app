@@ -772,6 +772,7 @@
     const m = document.getElementById(modalId);
     if (!m) return;
     showModal(m);
+    m.style.zIndex = '10001'; // 高于 settings-list-screen (9500)
     // 隐藏不需要的关闭按钮
     (hideCloseBtnIds || []).forEach(id => {
       const btn = document.getElementById(id);
@@ -785,6 +786,7 @@
         e.stopImmediatePropagation();
 
         m.style.display = 'none';
+        m.style.zIndex = '';
         if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
         // 恢复关闭按钮显示
         (hideCloseBtnIds || []).forEach(hid => {
