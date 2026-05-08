@@ -775,6 +775,13 @@
     showModal(m);
     m.style.zIndex = '10001';
     console.log('[oMFS] after showModal, display:', window.getComputedStyle(m).display, 'zIndex:', m.style.zIndex);
+    // CSS animation 优先级高于 inline style，必须先禁掉 animation 再设 opacity
+    const _content = m.querySelector('.modal-content');
+    if (_content) {
+      _content.style.animation = 'none';
+      _content.style.opacity = '1';
+      _content.style.transform = 'translateY(0) scale(1)';
+    }
     // 隐藏不需要的关闭按钮
     (hideCloseBtnIds || []).forEach(id => {
       const btn = document.getElementById(id);
