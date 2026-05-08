@@ -764,8 +764,16 @@
 
 
   function openAppearancePanel(panel) {
+    // click 触发 appearance-modal 打开
     document.getElementById('appearance-settings')?.click();
-    setTimeout(() => { window.showAppearancePanel?.(panel); }, 400);
+    // 等 modal 动画结束后，直接隐藏总览、显示子面板
+    setTimeout(() => {
+      const navGrid = document.getElementById('appearance-nav-grid');
+      const galleryBanner = document.getElementById('gallery-banner-entry');
+      if (navGrid) navGrid.style.display = 'none';
+      if (galleryBanner) galleryBanner.style.display = 'none';
+      window.showAppearancePanel?.(panel);
+    }, 320);
   }
 
 
@@ -814,14 +822,18 @@
       }
       // 给对应关闭按钮挂回主页钩子
       const closeMap = {
-        appearance: ['close-appearance', 'back-appearance'],
-        'chat-style': ['back-chat'],
-        library: ['close-custom-replies'],
-        tarot: ['close-fortune', 'close-lenormand'],
-        envelope: ['cancel-envelope'],
-        group: ['close-group-chat'],
+        appearance:    ['close-appearance', 'back-appearance'],
+        theme:         ['back-appearance'],
+        'font-bg':     ['back-appearance'],
+        'bubble-css':  ['back-appearance'],
+        avatar:        ['back-appearance'],
+        'chat-style':  ['back-chat'],
+        library:       ['close-custom-replies'],
+        tarot:         ['close-fortune', 'close-lenormand'],
+        envelope:      ['cancel-envelope'],
+        group:         ['close-group-chat'],
         'send-settings': ['back-advanced'],
-        data: ['back-data'],
+        data:          ['back-data'],
       };
       (closeMap[action] || []).forEach(id => {
         const btn = document.getElementById(id);
