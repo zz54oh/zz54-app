@@ -19,45 +19,47 @@
   ============================================================ */
   try {
     localStorage.setItem('splashPledgeSigned_v3', '1');
-  } catch (e) {}
+  } catch (e) { }
 
   /* ============================================================
      1. 常量与状态
   ============================================================ */
   const APP_PREFIX = 'CHAT_APP_V3_';
-  const HUE_KEY      = APP_PREFIX + 'home_theme_hue';
-  const PAGE_BG_KEY  = APP_PREFIX + 'home_page_bg';
-  const HERO_BG_KEY  = APP_PREFIX + 'home_hero_bg';
-  const MOOD_KEY     = APP_PREFIX + 'home_mood_data';
-  const ICON_KEY     = APP_PREFIX + 'home_custom_icons';
+  const HUE_KEY = APP_PREFIX + 'home_theme_hue';
+  const PAGE_BG_KEY = APP_PREFIX + 'home_page_bg';
+  const HERO_BG_KEY = APP_PREFIX + 'home_hero_bg';
+  const MOOD_KEY = APP_PREFIX + 'home_mood_data';
+  const ICON_KEY = APP_PREFIX + 'home_custom_icons';
+  const RECENT_EMOJI_KEY = 'home_recent_emojis';
 
   const PRESET_COLORS = [
     { name: '紫罗兰', h: 285 },
     { name: '玫瑰粉', h: 340 },
-    { name: '樱花',   h: 355 },
-    { name: '天空',   h: 210 },
-    { name: '薄荷',   h: 155 },
-    { name: '蜜桃',   h: 20  },
-    { name: '星空',   h: 240 },
-    { name: '灰',     h: 220, s: 8 },
+    { name: '樱花', h: 355 },
+    { name: '天空', h: 210 },
+    { name: '薄荷', h: 155 },
+    { name: '蜜桃', h: 20 },
+    { name: '星空', h: 240 },
+    { name: '灰', h: 220, s: 8 },
   ];
 
   const FEATURES = [
-    { id: 'chat',     icon: 'fa-comment-dots',       label: '聊天',     bg: 'icon-bg-7'  },
-    { id: 'tarot',    icon: 'fa-star-and-crescent',  label: '塔罗占卜', bg: 'icon-bg-12' },
-    { id: 'envelope', icon: 'fa-envelope',           label: '信箱',     bg: 'icon-bg-4'  },
-    { id: 'library',  icon: 'fa-book-open',          label: '字卡库',   bg: 'icon-bg-1'  },
-    { id: 'mood',     icon: 'fa-cloud-sun',          label: '心情',     bg: 'icon-bg-3'  },
-    { id: 'group',    icon: 'fa-user-group',         label: '群聊',     bg: 'icon-bg-6'  },
-    { id: 'call',     icon: 'fa-video',              label: '通话',     bg: 'icon-bg-11' },
-    { id: 'music',    icon: 'fa-music',              label: '音乐',     bg: 'icon-bg-8'  },
+    { id: 'chat', icon: 'fa-comment-dots', label: '聊天', bg: 'icon-bg-7' },
+    { id: 'tarot', icon: 'fa-star-and-crescent', label: '塔罗占卜', bg: 'icon-bg-12' },
+    { id: 'envelope', icon: 'fa-envelope', label: '信箱', bg: 'icon-bg-4' },
+    { id: 'library', icon: 'fa-book-open', label: '字卡库', bg: 'icon-bg-1' },
+    { id: 'mood', icon: 'fa-cloud-sun', label: '心情', bg: 'icon-bg-3' },
+    { id: 'group', icon: 'fa-user-group', label: '群聊', bg: 'icon-bg-6' },
+    { id: 'call', icon: 'fa-video', label: '通话', bg: 'icon-bg-11' },
+    { id: 'music', icon: 'fa-music', label: '音乐', bg: 'icon-bg-8' },
   ];
 
-  const MOOD_EMOJIS = ['😊','😄','🥰','😌','😴','😢','😭','😠','😰','🤔','😎','🥳','🤗','😔','😍','🥺','😤','🌧️','☀️','⭐','🌙','🍃'];
+  const MOOD_EMOJIS = ['😊', '😄', '🥰', '😌', '😴', '😢', '😭', '😠', '😰', '🤔', '😎', '🥳', '🤗', '😔', '😍', '🥺', '😤', '🌧️', '☀️', '⭐', '🌙', '🍃'];
 
   let isOnHome = true;
   let activeBackHandler = null;
   let customIcons = {}; // { featureId: dataUrl }
+  let recentEmojis = [];
 
   /* ============================================================
      2. 主题色 / 背景 / 自定义图标 持久化
@@ -67,7 +69,7 @@
     try {
       if (window.localforage) localforage.setItem(HUE_KEY, h);
       localStorage.setItem(HUE_KEY, h);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function applyPageBg(dataUrl) {
@@ -76,11 +78,11 @@
     if (dataUrl) {
       bgEl.style.backgroundImage = `url(${dataUrl})`;
       bgEl.classList.add('loaded');
-      try { if (window.localforage) localforage.setItem(PAGE_BG_KEY, dataUrl); } catch (e) {}
+      try { if (window.localforage) localforage.setItem(PAGE_BG_KEY, dataUrl); } catch (e) { }
     } else {
       bgEl.style.backgroundImage = '';
       bgEl.classList.remove('loaded');
-      try { if (window.localforage) localforage.removeItem(PAGE_BG_KEY); } catch (e) {}
+      try { if (window.localforage) localforage.removeItem(PAGE_BG_KEY); } catch (e) { }
     }
   }
 
@@ -91,12 +93,12 @@
       heroBg.style.setProperty('--hero-bg-img', `url(${dataUrl})`);
       heroBg.style.backgroundImage = `url(${dataUrl})`;
       heroBg.classList.add('has-img');
-      try { if (window.localforage) localforage.setItem(HERO_BG_KEY, dataUrl); } catch (e) {}
+      try { if (window.localforage) localforage.setItem(HERO_BG_KEY, dataUrl); } catch (e) { }
     } else {
       heroBg.style.removeProperty('--hero-bg-img');
       heroBg.style.backgroundImage = '';
       heroBg.classList.remove('has-img');
-      try { if (window.localforage) localforage.removeItem(HERO_BG_KEY); } catch (e) {}
+      try { if (window.localforage) localforage.removeItem(HERO_BG_KEY); } catch (e) { }
     }
   }
 
@@ -109,13 +111,19 @@
       if (!isNaN(h)) applyHue(h);
     } catch (e) { applyHue(285); }
 
+    // 饱和度
+    try {
+      const sat = await localforage.getItem('home_theme_sat');
+      if (sat) document.documentElement.style.setProperty('--theme-s', sat + '%');
+    } catch (e) { }
+
     // 页面背景
     try {
       if (window.localforage) {
         const bg = await localforage.getItem(PAGE_BG_KEY);
         if (bg) applyPageBg(bg);
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Hero 背景
     try {
@@ -123,7 +131,7 @@
         const hbg = await localforage.getItem(HERO_BG_KEY);
         if (hbg) applyHeroBg(hbg);
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 自定义图标
     try {
@@ -134,7 +142,7 @@
           applyCustomIcons();
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function applyCustomIcons() {
@@ -248,7 +256,7 @@
     btn.innerHTML = '<i class="fas fa-house"></i>';
     btn.addEventListener('click', () => {
       if (typeof activeBackHandler === 'function') {
-        try { activeBackHandler(); return; } catch (e) {}
+        try { activeBackHandler(); return; } catch (e) { }
       }
       backToHome();
     });
@@ -279,20 +287,31 @@
   }
 
   function leaveHomeForChat() {
-    // 进入聊天界面：不加 feature-mode（保留聊天 UI）
+    exitFeatureMode();   // 确保聊天 UI 恢复显示
     const home = document.getElementById('home-screen');
-    if (home) home.classList.add('hidden');
+    if (!home) return;
+    home.classList.add('home-screen-exit');
+    setTimeout(() => {
+      home.classList.add('hidden');
+      home.classList.remove('home-screen-exit');
+    }, 220);
     isOnHome = false;
     showBackBtn(backToHome);
   }
 
   function leaveHomeForFeature() {
-    // 进入功能：加 feature-mode 隐藏所有聊天 UI
     const home = document.getElementById('home-screen');
-    if (home) home.classList.add('hidden');
+    if (!home) return;
+    home.classList.add('home-screen-exit');
+    home.addEventListener('animationend', function handler() {
+      home.removeEventListener('animationend', handler);
+      home.classList.add('hidden');
+      home.classList.remove('home-screen-exit');
+    }, { once: true });
     enterFeatureMode();
     isOnHome = false;
     showBackBtn(backToHome);
+    exitFeatureMode();
   }
 
   function backToHome() {
@@ -312,7 +331,11 @@
     exitFeatureMode();
 
     const home = document.getElementById('home-screen');
-    if (home) home.classList.remove('hidden');
+    if (home) {
+      home.classList.remove('hidden');
+      home.classList.add('home-screen-enter');
+      setTimeout(() => home.classList.remove('home-screen-enter'), 240);
+    }
 
     refreshHomeData();
     isOnHome = true;
@@ -335,87 +358,13 @@
     });
   }
 
-  /* ============================================================
-     6. 跳转到具体功能
-  ============================================================ */
-  function goToFeature(featureName) {
-    if (featureName === 'chat') {
-      // 聊天保留原有 UI
-      leaveHomeForChat();
-      return;
-    }
-
-    if (featureName === 'mood') {
-      // 心情：打开自定义心情日历全屏页
-      openMoodCalendar();
-      return;
-    }
-
-    leaveHomeForFeature();
-
-    setTimeout(() => {
-      switch (featureName) {
-        case 'tarot':
-          if (typeof window.generateFortune === 'function') {
-            window.generateFortune();
-          } else {
-            tryOpen(['fortune-lenormand-modal', '[onclick*="generateFortune"]']);
-          }
-          break;
-        case 'envelope':
-          tryOpen([
-            () => window.envelopeFeature?.open?.(),
-            'envelope-modal',
-            '#envelope-btn',
-            '[data-action="envelope"]'
-          ]);
-          break;
-        case 'library':
-          openModalById('custom-replies-modal');
-          break;
-        case 'group':
-          tryOpen([
-            'group-chat-modal',
-            () => window.openGroupChat?.(),
-            '#group-chat-btn'
-          ]);
-          break;
-        case 'call':
-          tryOpen([
-            () => window.callFeature?.startCall?.(false),
-            '#collapsed-call-btn'
-          ]);
-          break;
-        case 'music':
-          tryOpen([
-            () => window.openMusicPlayer?.(),
-            'music-player-modal',
-            '#music-btn'
-          ]);
-          break;
-      }
-    }, 220);
-  }
-
-  function tryOpen(candidates) {
-    for (const c of candidates) {
-      if (typeof c === 'function') {
-        try { c(); return true; } catch (e) {}
-      } else if (typeof c === 'string') {
-        if (c.startsWith('#') || c.startsWith('.') || c.startsWith('[')) {
-          const el = document.querySelector(c);
-          if (el) { el.click(); return true; }
-        } else {
-          if (openModalById(c)) return true;
-        }
-      }
-    }
-    return false;
-  }
-
   function openModalById(id) {
     const m = document.getElementById(id);
     if (!m) return false;
+
+    // 强制提到最上层，确保弹窗不被主页盖住
+    m.style.zIndex = '10001';
+
     if (typeof window.showModal === 'function') {
       window.showModal(m);
     } else {
@@ -426,14 +375,70 @@
   }
 
   /* ============================================================
+     6. 跳转到具体功能
+  ============================================================ */
+  function goToFeature(featureName) {
+    if (featureName === 'chat') {
+      leaveHomeForChat();
+      return;
+    }
+    if (featureName === 'mood') {
+      openMoodCalendar();
+      return;
+    }
+
+    // 隐藏主页
+    const home = document.getElementById('home-screen');
+    if (home) home.classList.add('hidden');
+    enterFeatureMode();
+    isOnHome = false;
+    // ★ 强制显示浮动返回按钮
+    const backBtn = document.getElementById('floating-back-home');
+    if (backBtn) {
+      backBtn.classList.add('visible');
+      backBtn.style.display = 'flex';
+      backBtn.style.zIndex = '99999';   // 确保在最上层
+    }
+
+    // 打开对应功能
+    setTimeout(() => {
+      switch (featureName) {
+        case 'tarot':
+          if (typeof window.generateFortune === 'function') window.generateFortune();
+          openModalById('fortune-lenormand-modal');
+          break;
+        case 'envelope':
+          openModalById('envelope-modal');
+          break;
+        case 'library':
+          openModalById('custom-replies-modal');
+          break;
+        case 'group':
+          openModalById('group-chat-modal');
+          break;
+        case 'call':
+          if (window.callFeature && typeof window.callFeature.startCall === 'function') {
+            window.callFeature.startCall(false);
+          }
+          break;
+        case 'music':
+          if (typeof window.initMusicPlayer === 'function') window.initMusicPlayer();
+          if (typeof window.openMusicPlayer === 'function') window.openMusicPlayer();
+          openModalById('music-player-modal');
+          break;
+      }
+    }, 200);
+  }
+
+  /* ============================================================
      7. 数据同步（双头像/名字/天数）
   ============================================================ */
   function refreshHomeData() {
-    syncOneSide('home-my-avatar',      'my-avatar');
+    syncOneSide('home-my-avatar', 'my-avatar');
     syncOneSide('home-partner-avatar', 'partner-avatar');
-    syncText('home-my-name',      'my-name', '我');
+    syncText('home-my-name', 'my-name', '我');
     syncText('home-partner-name', 'partner-name', '梦角');
-    syncStatus('home-my-status',      '#my-status-text');
+    syncStatus('home-my-status', '#my-status-text');
     syncStatus('home-partner-status', '#partner-status span');
     syncDays();
     applyCustomIcons();
@@ -443,9 +448,7 @@
     const target = document.getElementById(targetId);
     const src = document.getElementById(sourceId);
     if (!target || !src) return;
-
     target.style.backgroundImage = '';
-
     const img = src.querySelector('img');
     if (img && img.src) {
       target.innerHTML = `<img src="${img.src}" alt="">`;
@@ -485,7 +488,7 @@
           return;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
     const annDays = document.getElementById('anniversary-days');
     if (annDays && annDays.textContent && annDays.textContent !== '0') {
       el.textContent = `在一起第 ${annDays.textContent} 天`;
@@ -495,7 +498,7 @@
   }
 
   /* ============================================================
-     8. 主题面板（含双背景上传）
+     8. 主题面板（含双背景上传 + 饱和度滑块）
   ============================================================ */
   function openThemePanel() {
     const existing = document.getElementById('home-theme-panel');
@@ -510,6 +513,10 @@
            style="background: hsl(${p.h}, ${p.s !== undefined ? p.s : 55}%, 70%);"
            data-hue="${p.h}" title="${p.name}"></div>
     `).join('');
+
+    const currentS = parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue('--theme-s') || '35'
+    );
 
     const panel = document.createElement('div');
     panel.id = 'home-theme-panel';
@@ -527,6 +534,12 @@
         <input type="range" id="theme-hue-slider" min="0" max="360" value="${currentH}">
         <div class="theme-hue-preview" id="theme-hue-preview"
              style="background: hsl(${currentH},55%,70%);"></div>
+      </div>
+
+      <div class="theme-section-label">饱和度</div>
+      <div class="theme-hue-row">
+        <input type="range" id="theme-sat-slider" min="1" max="50" value="${currentS}">
+        <span id="theme-sat-value" style="font-size:12px;color:var(--home-text-sub);min-width:32px;">${currentS}%</span>
       </div>
 
       <div class="theme-section-label">主页背景</div>
@@ -577,7 +590,7 @@
       });
     });
 
-    // 滑条
+    // 色相滑条
     const slider = panel.querySelector('#theme-hue-slider');
     const preview = panel.querySelector('#theme-hue-preview');
     slider.addEventListener('input', () => {
@@ -586,6 +599,25 @@
       preview.style.background = `hsl(${h},55%,70%)`;
       panel.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
     });
+
+    // 饱和度滑块
+    const satSlider = panel.querySelector('#theme-sat-slider');
+    const satValue = panel.querySelector('#theme-sat-value');
+    if (satSlider && satValue) {
+      // 修改点：扩大范围到 0-100，并正确拼接 %
+      satSlider.min = 0;
+      satSlider.max = 100;
+      satSlider.value = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--theme-s')) || 35;
+
+      const updateSat = () => {
+        const val = satSlider.value;
+        document.documentElement.style.setProperty('--theme-s', val + '%');   // 关键：必须是 val + '%'
+        satValue.textContent = val + '%';
+        try { if (window.localforage) localforage.setItem('home_theme_sat', val); } catch (e) { }
+      };
+      satSlider.addEventListener('input', updateSat);
+      updateSat();
+    }
 
     // 主页背景
     bindBgUpload(panel, '#page-bg-input', '#page-bg-upload-btn', '#page-bg-clear-btn', applyPageBg);
@@ -634,37 +666,37 @@
     {
       section: '聊天与外观',
       items: [
-        { icon:'fa-paintbrush', bg:'icon-bg-2', title:'外观设置',  desc:'应用标题、副标题、起始日期', action:'appearance' },
-        { icon:'fa-comment',    bg:'icon-bg-7', title:'聊天样式',  desc:'气泡、字体、头像、回执', action:'chat-style' },
-        { icon:'fa-image',      bg:'icon-bg-5', title:'背景设置',  desc:'聊天背景图、透明度', action:'background' },
-        { icon:'fa-icons',      bg:'icon-bg-9', title:'功能图标自定义', desc:'为每个功能上传自定义图标', action:'icon-customize' },
+        { icon: 'fa-paintbrush', bg: 'icon-bg-2', title: '外观设置', desc: '应用标题、副标题、起始日期', action: 'appearance' },
+        { icon: 'fa-comment', bg: 'icon-bg-7', title: '聊天样式', desc: '气泡、字体、头像、回执', action: 'chat-style' },
+        { icon: 'fa-image', bg: 'icon-bg-5', title: '背景设置', desc: '聊天背景图、透明度', action: 'background' },
+        { icon: 'fa-icons', bg: 'icon-bg-9', title: '功能图标自定义', desc: '为每个功能上传自定义图标', action: 'icon-customize' },
       ]
     },
     {
       section: '内容与互动',
       items: [
-        { icon:'fa-book-open',         bg:'icon-bg-1',  title:'字卡回复库', desc:'字卡、表情、拍一拍', action:'library' },
-        { icon:'fa-star-and-crescent', bg:'icon-bg-12', title:'塔罗占卜',   desc:'梦占模式、抽牌设置', action:'tarot' },
-        { icon:'fa-envelope-open-text',bg:'icon-bg-4',  title:'信封投递',   desc:'写信给梦角、延迟回信', action:'envelope' },
-        { icon:'fa-cloud-sun',         bg:'icon-bg-3',  title:'心情追踪',   desc:'日历记录每日心情', action:'mood' },
-        { icon:'fa-user-group',        bg:'icon-bg-6',  title:'群聊功能',   desc:'多人聊天模式', action:'group' },
-        { icon:'fa-video',             bg:'icon-bg-11', title:'通话与视频', desc:'虚拟通话框', action:'call' },
-        { icon:'fa-music',             bg:'icon-bg-8',  title:'音乐播放器', desc:'上传音频、播放控制', action:'music' },
+        { icon: 'fa-book-open', bg: 'icon-bg-1', title: '字卡回复库', desc: '字卡、表情、拍一拍', action: 'library' },
+        { icon: 'fa-star-and-crescent', bg: 'icon-bg-12', title: '塔罗占卜', desc: '梦占模式、抽牌设置', action: 'tarot' },
+        { icon: 'fa-envelope-open-text', bg: 'icon-bg-4', title: '信封投递', desc: '写信给梦角、延迟回信', action: 'envelope' },
+        { icon: 'fa-cloud-sun', bg: 'icon-bg-3', title: '心情追踪', desc: '日历记录每日心情', action: 'mood' },
+        { icon: 'fa-user-group', bg: 'icon-bg-6', title: '群聊功能', desc: '多人聊天模式', action: 'group' },
+        { icon: 'fa-video', bg: 'icon-bg-11', title: '通话与视频', desc: '虚拟通话框', action: 'call' },
+        { icon: 'fa-music', bg: 'icon-bg-8', title: '音乐播放器', desc: '上传音频、播放控制', action: 'music' },
       ]
     },
     {
       section: '发送与回复',
       items: [
-        { icon:'fa-paper-plane',  bg:'icon-bg-9', title:'发送设置', desc:'回复比例、频率、等待时间', action:'send-settings' },
-        { icon:'fa-cake-candles', bg:'icon-bg-7', title:'纪念日',   desc:'添加纪念日提醒', action:'anniversary' },
+        { icon: 'fa-paper-plane', bg: 'icon-bg-9', title: '发送设置', desc: '回复比例、频率、等待时间', action: 'send-settings' },
+        { icon: 'fa-cake-candles', bg: 'icon-bg-7', title: '纪念日', desc: '添加纪念日提醒', action: 'anniversary' },
       ]
     },
     {
       section: '账户与数据',
       items: [
-        { icon:'fa-user-pen',       bg:'icon-bg-2',  title:'我的头像与昵称',   desc:'修改我的形象', action:'profile-me' },
-        { icon:'fa-user-astronaut', bg:'icon-bg-12', title:'梦角头像与昵称',   desc:'修改梦角的形象', action:'profile-partner' },
-        { icon:'fa-database',       bg:'icon-bg-10', title:'数据管理',         desc:'导入/导出/清空', action:'data' },
+        { icon: 'fa-user-pen', bg: 'icon-bg-2', title: '我的头像与昵称', desc: '修改我的形象', action: 'profile-me' },
+        { icon: 'fa-user-astronaut', bg: 'icon-bg-12', title: '梦角头像与昵称', desc: '修改梦角的形象', action: 'profile-partner' },
+        { icon: 'fa-database', bg: 'icon-bg-10', title: '数据管理', desc: '导入/导出/清空', action: 'data' },
       ]
     },
   ];
@@ -722,37 +754,35 @@
   }
 
   function triggerSettingsAction(action) {
-    // 关闭设置全屏页
     const settingsEl = document.getElementById('settings-list-screen');
     if (settingsEl) settingsEl.classList.remove('visible');
 
     setTimeout(() => {
       switch (action) {
-        case 'appearance':       openModalById('appearance-modal'); break;
-        case 'chat-style':       openModalById('chat-modal'); break;
-        case 'background':       tryOpen(['#background-input']); break;
-        case 'icon-customize':   openIconCustomize(); return;
-        case 'library':          openModalById('custom-replies-modal'); break;
-        case 'tarot':            window.generateFortune?.(); break;
-        case 'envelope':         tryOpen([() => window.envelopeFeature?.open?.(), 'envelope-modal']); break;
-        case 'mood':             openMoodCalendar(); return;
-        case 'group':            tryOpen(['group-chat-modal', '#group-chat-btn']); break;
-        case 'call':             tryOpen([() => window.callFeature?.startCall?.(false), '#collapsed-call-btn']); break;
-        case 'music':            tryOpen([() => window.openMusicPlayer?.(), 'music-player-modal', '#music-btn']); break;
-        case 'send-settings':    openModalById('advanced-modal'); break;
-        case 'anniversary':      openModalById('anniversary-modal'); break;
-        case 'profile-me':       tryOpen(['#my-name']); break;
-        case 'profile-partner':  tryOpen(['#partner-name']); break;
-        case 'data':             openModalById('data-modal'); break;
-        default:                 openModalById('settings-modal');
+        case 'appearance': openModalById('appearance-modal'); break;
+        case 'chat-style': openModalById('chat-modal'); break;
+        case 'background': tryOpen(['#background-input']); break;
+        case 'icon-customize': openIconCustomize(); return;
+        case 'library': openModalById('custom-replies-modal'); break;
+        case 'tarot': window.generateFortune?.(); break;
+        case 'envelope': tryOpen([() => window.envelopeFeature?.open?.(), 'envelope-modal']); break;
+        case 'mood': openMoodCalendar(); return;
+        case 'group': tryOpen(['group-chat-modal', '#group-chat-btn']); break;
+        case 'call': tryOpen([() => window.callFeature?.startCall?.(false), '#collapsed-call-btn']); break;
+        case 'music': tryOpen([() => window.openMusicPlayer?.(), 'music-player-modal', '#music-btn']); break;
+        case 'send-settings': openModalById('advanced-modal'); break;
+        case 'anniversary': openModalById('anniversary-modal'); break;
+        case 'profile-me': tryOpen(['#my-name']); break;
+        case 'profile-partner': tryOpen(['#partner-name']); break;
+        case 'data': openModalById('data-modal'); break;
+        default: openModalById('settings-modal');
       }
-      // 进入功能后保持 feature-mode
       showBackBtn(backToHome);
     }, 200);
   }
 
   /* ============================================================
-     10. 心情日历全屏页
+     10. 心情日历全屏页（含最近使用）
   ============================================================ */
   let moodData = {}; // { 'YYYY-MM-DD': '😊' }
   let moodViewYear = 0;
@@ -764,17 +794,17 @@
         const d = await localforage.getItem(MOOD_KEY);
         if (d && typeof d === 'object') moodData = d;
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   async function saveMoodData() {
     try {
       if (window.localforage) await localforage.setItem(MOOD_KEY, moodData);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function ymd(d) {
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
   function buildMoodCalendarScreen() {
@@ -798,7 +828,7 @@
             <button class="mood-cal-nav" id="mood-next"><i class="fas fa-chevron-right"></i></button>
           </div>
           <div class="mood-weekdays">
-            ${['一','二','三','四','五','六','日'].map(d => `<div class="mood-weekday">${d}</div>`).join('')}
+            ${['一', '二', '三', '四', '五', '六', '日'].map(d => `<div class="mood-weekday">${d}</div>`).join('')}
           </div>
           <div class="mood-cal-grid" id="mood-cal-grid"></div>
         </div>
@@ -828,7 +858,6 @@
 
     monthEl.textContent = `${moodViewYear}年 ${moodViewMonth + 1}月`;
 
-    // 该月第一天的星期（周一为首：0=周一）
     const firstDay = new Date(moodViewYear, moodViewMonth, 1);
     let firstWeekday = firstDay.getDay(); // 0=Sun
     firstWeekday = firstWeekday === 0 ? 6 : firstWeekday - 1; // 转为 0=Mon
@@ -861,6 +890,7 @@
   function openMoodEmojiPicker(dateKey) {
     const existing = document.getElementById('mood-emoji-picker');
     if (existing) existing.remove();
+    recentEmojis = JSON.parse(localStorage.getItem(RECENT_EMOJI_KEY) || '[]');
 
     const picker = document.createElement('div');
     picker.id = 'mood-emoji-picker';
@@ -875,6 +905,12 @@
         <span class="mood-emoji-picker-title">${dateKey} 今天心情如何？</span>
         <button class="theme-panel-close" id="mood-picker-close">&times;</button>
       </div>
+      ${recentEmojis.length ? `
+      <div class="mood-emoji-picker-head" style="margin-top:0;">最近使用</div>
+      <div class="mood-emoji-grid" id="mood-recent-grid">
+        ${recentEmojis.map(e => `<button class="mood-emoji-btn" data-emoji="${e}">${e}</button>`).join('')}
+      </div>
+      ` : ''}
       <div class="mood-emoji-grid">${emojiHTML}</div>
     `;
 
@@ -882,16 +918,22 @@
 
     picker.querySelector('#mood-picker-close').addEventListener('click', () => picker.remove());
 
-    picker.querySelectorAll('.mood-emoji-btn').forEach(b => {
-      b.addEventListener('click', async () => {
-        const e = b.dataset.emoji;
+    function bindEmoji(btn) {
+      btn.addEventListener('click', async () => {
+        const e = btn.dataset.emoji;
         if (e) moodData[dateKey] = e;
         else delete moodData[dateKey];
         await saveMoodData();
         picker.remove();
+        // 更新最近使用
+        recentEmojis = [e, ...recentEmojis.filter(x => x !== e)].slice(0, 8);
+        localStorage.setItem(RECENT_EMOJI_KEY, JSON.stringify(recentEmojis));
         renderMoodGrid();
       });
-    });
+    }
+    picker.querySelectorAll('.mood-emoji-btn').forEach(bindEmoji);
+    const recentGrid = picker.querySelector('#mood-recent-grid');
+    if (recentGrid) recentGrid.querySelectorAll('.mood-emoji-btn').forEach(bindEmoji);
   }
 
   function openMoodCalendar() {
@@ -926,8 +968,8 @@
       <div class="icon-customize-item" data-feature="${f.id}">
         <div class="icon-customize-preview" data-preview="${f.id}">
           ${customIcons[f.id]
-            ? `<img src="${customIcons[f.id]}" alt="">`
-            : `<i class="fas ${f.icon}"></i>`}
+        ? `<img src="${customIcons[f.id]}" alt="">`
+        : `<i class="fas ${f.icon}"></i>`}
         </div>
         <div class="icon-customize-info">
           <div class="icon-customize-name">${f.label}</div>
@@ -973,8 +1015,7 @@
         const reader = new FileReader();
         reader.onload = async (ev) => {
           customIcons[fid] = ev.target.result;
-          try { if (window.localforage) await localforage.setItem(ICON_KEY, customIcons); } catch (err) {}
-          // 更新预览
+          try { if (window.localforage) await localforage.setItem(ICON_KEY, customIcons); } catch (err) { }
           const preview = el.querySelector(`[data-preview="${fid}"]`);
           if (preview) preview.innerHTML = `<img src="${customIcons[fid]}" alt="">`;
           applyCustomIcons();
@@ -987,7 +1028,7 @@
       btn.addEventListener('click', async () => {
         const fid = btn.dataset.reset;
         delete customIcons[fid];
-        try { if (window.localforage) await localforage.setItem(ICON_KEY, customIcons); } catch (e) {}
+        try { if (window.localforage) await localforage.setItem(ICON_KEY, customIcons); } catch (e) { }
         const preview = el.querySelector(`[data-preview="${fid}"]`);
         const f = FEATURES.find(x => x.id === fid);
         if (preview && f) preview.innerHTML = `<i class="fas ${f.icon}"></i>`;
@@ -999,7 +1040,6 @@
   }
 
   function openIconCustomize() {
-    // 销毁旧节点重建（确保预览状态最新）
     const old = document.getElementById('icon-customize-screen');
     if (old) old.remove();
     buildIconCustomizeScreen();
@@ -1014,8 +1054,40 @@
   }
 
   /* ============================================================
-     12. 事件绑定
+     12. 事件绑定（含爱心粒子、双击震动）
   ============================================================ */
+  function spawnHeartParticles(x, y) {
+    const count = 12;
+    const container = document.body;
+    const hue = getComputedStyle(document.documentElement).getPropertyValue('--theme-h').trim();
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement('span');
+      particle.textContent = '♥';
+      particle.style.cssText = `
+        position: fixed;
+        left: ${x}px;
+        top: ${y}px;
+        font-size: ${10 + Math.random() * 16}px;
+        color: hsl(${hue}, 65%, 70%);
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+      `;
+      container.appendChild(particle);
+      const angle = Math.random() * 2 * Math.PI;
+      const dist = 40 + Math.random() * 70;
+      particle.animate([
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist - 30}px)) scale(0.3)`, opacity: 0 }
+      ], {
+        duration: 1200 + Math.random() * 800,
+        easing: 'ease-out',
+        fill: 'forwards'
+      });
+      particle.addEventListener('finish', () => particle.remove());
+    }
+  }
+
   function bindEvents() {
     document.querySelectorAll('.home-feature').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -1031,6 +1103,27 @@
     document.getElementById('dock-theme')?.addEventListener('click', (e) => {
       e.stopPropagation();
       openThemePanel();
+    });
+
+    // 爱心粒子效果（点击爱心分隔符）
+    const heartDivider = document.querySelector('.profile-divider i');
+    if (heartDivider) {
+      heartDivider.addEventListener('click', (e) => {
+        spawnHeartParticles(e.clientX, e.clientY);
+      });
+    }
+
+    // 双击头像震动
+    ['home-my-avatar', 'home-partner-avatar'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('dblclick', (e) => {
+          e.preventDefault();
+          el.classList.add('avatar-shake');
+          setTimeout(() => el.classList.remove('avatar-shake'), 600);
+          spawnHeartParticles(e.clientX, e.clientY);
+        });
+      }
     });
   }
 
@@ -1048,9 +1141,21 @@
   }
 
   /* ============================================================
-     14. 初始化
+     14. 初始化（含进度条、暂停动画）
   ============================================================ */
   async function init() {
+    // 加载进度条
+    const progressBar = document.createElement('div');
+    progressBar.id = 'home-loading-bar';
+    progressBar.style.cssText = `
+      position: fixed; top: 0; left: 0; height: 2px; width: 0;
+      background: hsl(var(--theme-h), 55%, 65%); z-index: 9999;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 8px hsla(var(--theme-h), 55%, 65%, 0.6);
+    `;
+    document.body.appendChild(progressBar);
+    progressBar.style.width = '60%';
+
     // 立即隐藏前置引言/欢迎动画
     ['splash-declaration', 'welcome-animation'].forEach(id => {
       const e = document.getElementById(id);
@@ -1079,18 +1184,31 @@
 
     // WhatsApp 风格 + 按钮菜单
     setupChatPlusMenu();
+
+    // 进度条完成
+    progressBar.style.width = '100%';
+    setTimeout(() => {
+      progressBar.style.opacity = '0';
+      progressBar.style.transition = 'opacity 0.4s';
+      setTimeout(() => progressBar.remove(), 400);
+    }, 200);
+
+    // 页面隐藏时暂停动画
+    document.addEventListener('visibilitychange', () => {
+      document.body.classList.toggle('pause-animations', document.hidden);
+    });
   }
 
   /* ============================================================
      14a. WhatsApp 风格 + 按钮菜单
   ============================================================ */
   const CHAT_PLUS_ITEMS = [
-    { id: 'poke',     icon: 'fa-hand-sparkles',  label: '拍一拍',    bg: 'icon-bg-1'  },
-    { id: 'call',     icon: 'fa-video',          label: '视频通话',  bg: 'icon-bg-11' },
-    { id: 'chat-cfg', icon: 'fa-comment',        label: '聊天设置',  bg: 'icon-bg-7'  },
-    { id: 'data',     icon: 'fa-database',       label: '数据管理',  bg: 'icon-bg-10' },
-    { id: 'appear',   icon: 'fa-paintbrush',     label: '外观功能',  bg: 'icon-bg-2'  },
-    { id: 'session',  icon: 'fa-comments',       label: '会话管理',  bg: 'icon-bg-12' },
+    { id: 'poke', icon: 'fa-hand-sparkles', label: '拍一拍', bg: 'icon-bg-1' },
+    { id: 'call', icon: 'fa-video', label: '视频通话', bg: 'icon-bg-11' },
+    { id: 'chat-cfg', icon: 'fa-comment', label: '聊天设置', bg: 'icon-bg-7' },
+    { id: 'data', icon: 'fa-database', label: '数据管理', bg: 'icon-bg-10' },
+    { id: 'appear', icon: 'fa-paintbrush', label: '外观功能', bg: 'icon-bg-2' },
+    { id: 'session', icon: 'fa-comments', label: '会话管理', bg: 'icon-bg-12' },
   ];
 
   function setupChatPlusMenu() {
@@ -1098,7 +1216,6 @@
     if (!inputArea) return;
     if (document.getElementById('chat-plus-btn')) return;
 
-    // 注入 + 按钮（在 message-input 前）
     const btn = document.createElement('button');
     btn.id = 'chat-plus-btn';
     btn.title = '更多功能';
@@ -1111,7 +1228,6 @@
       inputArea.appendChild(btn);
     }
 
-    // 注入弹出菜单
     const menu = document.createElement('div');
     menu.id = 'chat-plus-menu';
     menu.innerHTML = `
@@ -1149,7 +1265,6 @@
       });
     });
 
-    // 点外部关闭
     document.addEventListener('click', (ev) => {
       if (!menu.classList.contains('visible')) return;
       if (menu.contains(ev.target) || btn.contains(ev.target)) return;
@@ -1160,11 +1275,9 @@
   function triggerChatPlusAction(action) {
     switch (action) {
       case 'poke':
-        // 触发现有 combo-btn（内含拍一拍 tab）
         if (!tryOpen(['#combo-btn'])) {
           tryOpen(['poke-modal']);
         }
-        // 自动切到 poke tab（如果存在）
         setTimeout(() => {
           const pokeTab = document.querySelector('.combo-tab-btn[data-tab="poke"]');
           if (pokeTab) pokeTab.click();
