@@ -289,6 +289,9 @@
             if (c) { c.style.animation = 'none'; c.style.opacity = '1'; c.style.transform = 'none'; }
           }
           document.getElementById('close-fortune')?.style.setProperty('display', 'none', 'important');
+          document.getElementById('close-lenormand')?.style.setProperty('display', 'none', 'important');
+          document.getElementById('close-tarot-divination')?.style.setProperty('display', 'none', 'important');
+          document.getElementById('close-divihistory')?.style.setProperty('display', 'none', 'important');
           document.getElementById('fortune-lenormand-function')?.click();
         },
         envelope: () => {
