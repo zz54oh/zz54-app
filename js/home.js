@@ -1,29 +1,11 @@
 /**
- * home.js — 主页系统（重写版 v3）
- * - 双头像 Hero 卡（我 + 梦角）
- * - 4 列紧凑图标网格 + iOS 风格 Dock
- * - body.feature-mode 切换：进入功能时隐藏聊天 UI
- * - 主页背景 / Hero 背景分别上传
- * - 心情日历全屏页（emoji 选择器）
- * - 图标自定义全屏页
- * - 浮动返回主页按钮
- * - 自动跳过引言 / 欢迎动画
- * - PWA Service Worker 注册
+ * home.js — 最终修复版（解决设置子功能空白页）
  */
-
 (function () {
   'use strict';
 
-  /* ============================================================
-     0. 立即跳过引言（在 onboarding.js 检查之前）
-  ============================================================ */
-  try {
-    localStorage.setItem('splashPledgeSigned_v3', '1');
-  } catch (e) { }
+  try { localStorage.setItem('splashPledgeSigned_v3', '1'); } catch (e) { }
 
-  /* ============================================================
-     1. 常量与状态
-  ============================================================ */
   const APP_PREFIX = 'CHAT_APP_V3_';
   const HUE_KEY = APP_PREFIX + 'home_theme_hue';
   const PAGE_BG_KEY = APP_PREFIX + 'home_page_bg';
@@ -33,14 +15,9 @@
   const RECENT_EMOJI_KEY = 'home_recent_emojis';
 
   const PRESET_COLORS = [
-    { name: '紫罗兰', h: 285 },
-    { name: '玫瑰粉', h: 340 },
-    { name: '樱花', h: 355 },
-    { name: '天空', h: 210 },
-    { name: '薄荷', h: 155 },
-    { name: '蜜桃', h: 20 },
-    { name: '星空', h: 240 },
-    { name: '灰', h: 220, s: 8 },
+    { name: '紫罗兰', h: 285 }, { name: '玫瑰粉', h: 340 }, { name: '樱花', h: 355 },
+    { name: '天空', h: 210 }, { name: '薄荷', h: 155 }, { name: '蜜桃', h: 20 },
+    { name: '星空', h: 240 }, { name: '灰', h: 220, s: 8 }
   ];
 
   const FEATURES = [
@@ -51,25 +28,24 @@
     { id: 'mood', icon: 'fa-cloud-sun', label: '心情', bg: 'icon-bg-3' },
     { id: 'group', icon: 'fa-user-group', label: '群聊', bg: 'icon-bg-6' },
     { id: 'call', icon: 'fa-video', label: '通话', bg: 'icon-bg-11' },
-    { id: 'music', icon: 'fa-music', label: '音乐', bg: 'icon-bg-8' },
+    { id: 'music', icon: 'fa-music', label: '音乐', bg: 'icon-bg-8' }
   ];
 
   const MOOD_EMOJIS = ['😊', '😄', '🥰', '😌', '😴', '😢', '😭', '😠', '😰', '🤔', '😎', '🥳', '🤗', '😔', '😍', '🥺', '😤', '🌧️', '☀️', '⭐', '🌙', '🍃'];
 
   let isOnHome = true;
   let activeBackHandler = null;
-  let customIcons = {}; // { featureId: dataUrl }
+  let customIcons = {};
   let recentEmojis = [];
+  let currentContext = 'home';
 
-  /* ============================================================
-     2. 主题色 / 背景 / 自定义图标 持久化
-  ============================================================ */
+  function setContext(ctx) { currentContext = ctx; }
+  function getBackTarget() { return currentContext === 'settings' ? backToSettings : backToHome; }
+
+  // ---------- 主题/背景持久化 ----------
   function applyHue(h) {
     document.documentElement.style.setProperty('--theme-h', h);
-    try {
-      if (window.localforage) localforage.setItem(HUE_KEY, h);
-      localStorage.setItem(HUE_KEY, h);
-    } catch (e) { }
+    try { if (window.localforage) localforage.setItem(HUE_KEY, h); localStorage.setItem(HUE_KEY, h); } catch (e) { }
   }
 
   function applyPageBg(dataUrl) {
@@ -103,39 +79,22 @@
   }
 
   async function loadStoredPrefs() {
-    // 主题色
     try {
       let h = null;
       if (window.localforage) h = await localforage.getItem(HUE_KEY);
-      if (h === null || h === undefined) h = parseInt(localStorage.getItem(HUE_KEY) || '285', 10);
+      if (h === null) h = parseInt(localStorage.getItem(HUE_KEY) || '285', 10);
       if (!isNaN(h)) applyHue(h);
     } catch (e) { applyHue(285); }
-
-    // 饱和度
     try {
       const sat = await localforage.getItem('home_theme_sat');
       if (sat) document.documentElement.style.setProperty('--theme-s', sat + '%');
     } catch (e) { }
-
-    // 页面背景
     try {
       if (window.localforage) {
         const bg = await localforage.getItem(PAGE_BG_KEY);
         if (bg) applyPageBg(bg);
-      }
-    } catch (e) { }
-
-    // Hero 背景
-    try {
-      if (window.localforage) {
         const hbg = await localforage.getItem(HERO_BG_KEY);
         if (hbg) applyHeroBg(hbg);
-      }
-    } catch (e) { }
-
-    // 自定义图标
-    try {
-      if (window.localforage) {
         const icons = await localforage.getItem(ICON_KEY);
         if (icons && typeof icons === 'object') {
           customIcons = icons;
@@ -146,300 +105,195 @@
   }
 
   function applyCustomIcons() {
+    // 1. 更新 8 个主功能图标（chat, tarot, envelope...）
     document.querySelectorAll('.home-feature').forEach(btn => {
       const fid = btn.dataset.feature;
       const iconWrap = btn.querySelector('.home-feature-icon');
       if (!iconWrap) return;
       if (customIcons[fid]) {
-        iconWrap.innerHTML = `<img src="${customIcons[fid]}" alt="">`;
+        iconWrap.innerHTML = `<img src="${customIcons[fid]}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
       } else {
         const f = FEATURES.find(x => x.id === fid);
         if (f) iconWrap.innerHTML = `<i class="fas ${f.icon}"></i>`;
       }
     });
+
+    // 2. 更新 Dock 栏的“设置”和“主题”图标
+    const dockSettings = document.getElementById('dock-settings');
+    const dockTheme = document.getElementById('dock-theme');
+
+    function updateDockIcon(btn, key, defaultIconClass) {
+      if (!btn) return;
+      const iconWrap = btn.querySelector('.home-feature-icon');
+      if (!iconWrap) return;
+      if (customIcons[key]) {
+        iconWrap.innerHTML = `<img src="${customIcons[key]}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
+      } else {
+        iconWrap.innerHTML = `<i class="fas ${defaultIconClass}"></i>`;
+      }
+    }
+
+    updateDockIcon(dockSettings, 'dock-settings', 'fa-sliders');
+    updateDockIcon(dockTheme, 'dock-theme', 'fa-palette');
   }
 
-  /* ============================================================
-     3. 主页 DOM 构建
-  ============================================================ */
+  // ---------- 主页 DOM ----------
   function buildHomeDOM() {
     const el = document.createElement('div');
     el.id = 'home-screen';
-
     const featuresHTML = FEATURES.map(f => `
       <button class="home-feature" data-feature="${f.id}">
-        <div class="home-feature-icon ${f.bg}">
-          <i class="fas ${f.icon}"></i>
-        </div>
+        <div class="home-feature-icon ${f.bg}"><i class="fas ${f.icon}"></i></div>
         <span class="home-feature-label">${f.label}</span>
       </button>
     `).join('');
-
     el.innerHTML = `
-      <div id="home-bg">
-        <div id="home-bg-image"></div>
-        <div id="home-bg-overlay"></div>
-      </div>
-
+      <div id="home-bg"><div id="home-bg-image"></div><div id="home-bg-overlay"></div></div>
       <div id="home-content">
-
-        <!-- 顶部 Hero 卡片：双头像 -->
         <div class="home-hero">
-          <div class="home-hero-bg"></div>
-          <div class="home-hero-overlay"></div>
+          <div class="home-hero-bg"></div><div class="home-hero-overlay"></div>
           <div class="home-hero-content">
             <div class="dual-profile">
-
               <div class="profile-side me">
-                <div class="profile-avatar-ring">
-                  <div class="profile-avatar-img" id="home-my-avatar">
-                    <i class="fas fa-user"></i>
-                  </div>
-                  <div class="profile-online-dot"></div>
-                </div>
-                <div class="profile-name" id="home-my-name">我</div>
-                <div class="profile-status" id="home-my-status">在线</div>
+                <div class="profile-avatar-ring"><div class="profile-avatar-img" id="home-my-avatar"><i class="fas fa-user"></i></div><div class="profile-online-dot"></div></div>
+                <div class="profile-name" id="home-my-name">我</div><div class="profile-status" id="home-my-status">在线</div>
               </div>
-
-              <div class="profile-divider">
-                <i class="fas fa-heart"></i>
-              </div>
-
+              <div class="profile-divider"><i class="fas fa-heart"></i></div>
               <div class="profile-side partner">
-                <div class="profile-avatar-ring">
-                  <div class="profile-avatar-img" id="home-partner-avatar">
-                    <i class="fas fa-user"></i>
-                  </div>
-                  <div class="profile-online-dot"></div>
-                </div>
-                <div class="profile-name" id="home-partner-name">梦角</div>
-                <div class="profile-status" id="home-partner-status">在线</div>
+                <div class="profile-avatar-ring"><div class="profile-avatar-img" id="home-partner-avatar"><i class="fas fa-user"></i></div><div class="profile-online-dot"></div></div>
+                <div class="profile-name" id="home-partner-name">梦角</div><div class="profile-status" id="home-partner-status">在线</div>
               </div>
-
             </div>
-
-            <div class="home-love-pill">
-              <i class="fas fa-heart"></i>
-              <span id="home-love-days">记录我们的故事</span>
-            </div>
+            <div class="home-love-pill"><i class="fas fa-heart"></i><span id="home-love-days">记录我们的故事</span></div>
           </div>
         </div>
-
-        <!-- 4 列功能图标网格 -->
         <div class="home-grid">${featuresHTML}</div>
-
-        <!-- iOS 风格 Dock -->
         <div class="home-dock">
-          <button class="home-dock-btn" id="dock-settings">
-            <i class="fas fa-sliders"></i>
-            <span>设置</span>
-          </button>
-          <button class="home-dock-btn" id="dock-theme">
-            <i class="fas fa-palette"></i>
-            <span>主题</span>
-          </button>
+           <button class="home-dock-btn" id="dock-settings">
+             <div class="home-feature-icon icon-bg-2"><i class="fas fa-sliders"></i></div>
+             <span class="home-feature-label">设置</span>
+           </button>
+           <button class="home-dock-btn" id="dock-theme">
+             <div class="home-feature-icon icon-bg-3"><i class="fas fa-palette"></i></div>
+             <span class="home-feature-label">主题</span>
+           </button>
         </div>
-
       </div>
     `;
     return el;
   }
 
-  /* ============================================================
-     4. 浮动返回主页按钮
-  ============================================================ */
+  // ---------- 浮动返回按钮 ----------
   function ensureFloatingBackBtn() {
     if (document.getElementById('floating-back-home')) return;
     const btn = document.createElement('button');
     btn.id = 'floating-back-home';
-    btn.title = '返回主页';
     btn.innerHTML = '<i class="fas fa-house"></i>';
     btn.addEventListener('click', () => {
-      if (typeof activeBackHandler === 'function') {
-        try { activeBackHandler(); return; } catch (e) { }
-      }
       backToHome();
     });
     document.body.appendChild(btn);
   }
+  function showBackBtn(handler) { activeBackHandler = handler; document.getElementById('floating-back-home')?.classList.add('visible'); }
+  function hideBackBtn() { activeBackHandler = null; document.getElementById('floating-back-home')?.classList.remove('visible'); }
 
-  function showBackBtn(handler) {
-    activeBackHandler = handler || null;
-    const btn = document.getElementById('floating-back-home');
-    if (btn) btn.classList.add('visible');
-  }
-
-  function hideBackBtn() {
-    activeBackHandler = null;
-    const btn = document.getElementById('floating-back-home');
-    if (btn) btn.classList.remove('visible');
-  }
-
-  /* ============================================================
-     5. 进入功能 / 返回主页（含 feature-mode 切换）
-  ============================================================ */
-  function enterFeatureMode() {
-    document.body.classList.add('feature-mode');
-  }
-
-  function exitFeatureMode() {
-    document.body.classList.remove('feature-mode');
-  }
-
-  function leaveHomeForChat() {
-    exitFeatureMode();   // 确保聊天 UI 恢复显示
-    const home = document.getElementById('home-screen');
-    if (!home) return;
-    home.classList.add('home-screen-exit');
-    setTimeout(() => {
-      home.classList.add('hidden');
-      home.classList.remove('home-screen-exit');
-    }, 220);
-    isOnHome = false;
-    showBackBtn(backToHome);
-  }
-
-  function leaveHomeForFeature() {
-    const home = document.getElementById('home-screen');
-    if (!home) return;
-    home.classList.add('home-screen-exit');
-    home.addEventListener('animationend', function handler() {
-      home.removeEventListener('animationend', handler);
-      home.classList.add('hidden');
-      home.classList.remove('home-screen-exit');
-    }, { once: true });
-    enterFeatureMode();
-    isOnHome = false;
-    showBackBtn(backToHome);
-    exitFeatureMode();
-  }
+  // ---------- 主页进出及上下文 ----------
+  function enterFeatureMode() { document.body.classList.add('feature-mode'); }
+  function exitFeatureMode() { document.body.classList.remove('feature-mode'); }
 
   function backToHome() {
     closeAllFeatureModals();
-
     ['settings-list-screen', 'mood-calendar-screen', 'icon-customize-screen'].forEach(id => {
       const s = document.getElementById(id);
       if (s) s.classList.remove('visible');
     });
-
     const themePanel = document.getElementById('home-theme-panel');
     if (themePanel) themePanel.remove();
-
     const moodPicker = document.getElementById('mood-emoji-picker');
     if (moodPicker) moodPicker.remove();
-
     exitFeatureMode();
-
     const home = document.getElementById('home-screen');
     if (home) {
       home.classList.remove('hidden');
       home.classList.add('home-screen-enter');
       setTimeout(() => home.classList.remove('home-screen-enter'), 240);
     }
-
     refreshHomeData();
     isOnHome = true;
+    setContext('home');
     hideBackBtn();
   }
 
+  function backToSettings() {
+    document.querySelectorAll('.modal').forEach(m => {
+      m.style.display = 'none';
+      if (m._hideTimeout) clearTimeout(m._hideTimeout);
+    });
+    buildSettingsScreen();
+    const home = document.getElementById('home-screen');
+    if (home) home.classList.add('hidden');
+    if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
+    const sl = document.getElementById('settings-list-screen');
+    if (sl) sl.classList.add('visible');
+    setContext('settings');
+    showBackBtn(backToHome);
+  }
+
   function closeAllFeatureModals() {
-    const modalIds = [
-      'custom-replies-modal', 'fortune-lenormand-modal', 'envelope-modal',
-      'mood-modal', 'group-chat-modal', 'settings-modal',
-      'appearance-modal', 'chat-modal', 'advanced-modal', 'data-modal',
-      'anniversary-modal', 'music-player-modal'
-    ];
-    modalIds.forEach(id => {
+    const ids = ['custom-replies-modal', 'fortune-lenormand-modal', 'envelope-modal', 'mood-modal', 'group-chat-modal', 'settings-modal', 'appearance-modal', 'chat-modal', 'advanced-modal', 'data-modal', 'anniversary-modal', 'music-player-modal'];
+    ids.forEach(id => {
       const m = document.getElementById(id);
-      if (m) {
-        m.classList.add('hidden');
-        m.style.display = 'none';
-      }
+      if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
     });
   }
 
   function openModalById(id) {
     const m = document.getElementById(id);
     if (!m) return false;
-    if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
+    if (m._hideTimeout) clearTimeout(m._hideTimeout);
     m.classList.remove('hidden');
-    m.style.setProperty('display', 'flex', 'important');
-    m.style.setProperty('z-index', '10001', 'important');
+    m.style.display = 'flex';
+    m.style.zIndex = '10001';
     const content = m.querySelector('.modal-content');
     if (content) {
-      content.style.setProperty('animation', 'none', 'important');
-      content.style.setProperty('opacity', '1', 'important');
-      content.style.setProperty('transform', 'translateY(0) scale(1)', 'important');
-      content.style.setProperty('transition', 'none', 'important');
+      content.style.animation = 'none';
+      content.style.opacity = '1';
+      content.style.transform = 'translateY(0) scale(1)';
     }
     return true;
   }
 
-  /* ============================================================
-     6. 跳转到具体功能
-  ============================================================ */
+  // ---------- 主页功能跳转 ----------
   function goToFeature(featureName) {
     if (featureName === 'chat') {
-      leaveHomeForChat();
+      const home = document.getElementById('home-screen');
+      if (home) home.classList.add('hidden');
+      isOnHome = false;
+      setContext('home');
+      showBackBtn(backToHome);
+      exitFeatureMode();
       return;
     }
-    if (featureName === 'mood') {
-      openMoodCalendar();
-      return;
-    }
-
-    // 隐藏主页，但不进 feature-mode——modal 必须在正常聊天环境下才能显示
+    if (featureName === 'mood') { openMoodCalendar(); return; }
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
     isOnHome = false;
+    setContext('home');
     showBackBtn(backToHome);
-
-    // 直接 click 原来功能按钮，走 listeners.js 已有的完整路径
     setTimeout(() => {
-      // 给关闭按钮追加"回主页"钩子
-      const closeIds = {
-        tarot:    ['close-fortune', 'close-lenormand'],
-        envelope: ['cancel-envelope'],
-        library:  ['close-custom-replies'],
-        group:    ['close-group-chat'],
+      const handlers = {
+        tarot: () => document.getElementById('fortune-lenormand-function')?.click(),
+        envelope: () => document.getElementById('envelope-function')?.click(),
+        library: () => document.getElementById('custom-replies-function')?.click(),
+        group: () => document.getElementById('group-chat-btn')?.click(),
+        call: () => { if (window.callFeature?.startCall) window.callFeature.startCall(false); else document.querySelector('#collapsed-call-btn')?.click(); },
+        music: () => document.getElementById('music-player-toggle')?.click()
       };
-      (closeIds[featureName] || []).forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn && !btn._homeHooked) {
-          btn._homeHooked = true;
-          btn.addEventListener('click', () => {
-            setTimeout(backToHome, 300); // 等 hideModal 动画结束再回主页
-          });
-        }
-      });
-
-      switch (featureName) {
-        case 'tarot':
-          document.getElementById('fortune-lenormand-function')?.click();
-          break;
-        case 'envelope':
-          document.getElementById('envelope-function')?.click();
-          break;
-        case 'library':
-          document.getElementById('custom-replies-function')?.click();
-          break;
-        case 'group':
-          document.getElementById('group-chat-btn')?.click();
-          break;
-        case 'call':
-          if (window.callFeature?.startCall) window.callFeature.startCall(false);
-          else document.querySelector('#collapsed-call-btn')?.click();
-          break;
-        case 'music':
-          document.getElementById('music-player-toggle')?.click();
-          break;
-      }
+      if (handlers[featureName]) handlers[featureName]();
     }, 100);
   }
 
-  /* ============================================================
-     7. 数据同步（双头像/名字/天数）
-  ============================================================ */
+  // ---------- 主页数据同步 ----------
   function refreshHomeData() {
     syncOneSide('home-my-avatar', 'my-avatar');
     syncOneSide('home-partner-avatar', 'partner-avatar');
@@ -450,38 +304,27 @@
     syncDays();
     applyCustomIcons();
   }
-
   function syncOneSide(targetId, sourceId) {
     const target = document.getElementById(targetId);
     const src = document.getElementById(sourceId);
     if (!target || !src) return;
     target.style.backgroundImage = '';
     const img = src.querySelector('img');
-    if (img && img.src) {
-      target.innerHTML = `<img src="${img.src}" alt="">`;
-      return;
-    }
+    if (img && img.src) { target.innerHTML = `<img src="${img.src}" alt="">`; return; }
     const bg = src.style.backgroundImage;
-    if (bg && bg !== 'none' && bg !== '') {
-      target.style.backgroundImage = bg;
-      target.innerHTML = '';
-      return;
-    }
+    if (bg && bg !== 'none' && bg !== '') { target.style.backgroundImage = bg; target.innerHTML = ''; return; }
     target.innerHTML = '<i class="fas fa-user"></i>';
   }
-
   function syncText(targetId, sourceId, fallback) {
     const t = document.getElementById(targetId);
     const s = document.getElementById(sourceId);
     if (t) t.textContent = (s?.textContent || fallback).trim();
   }
-
   function syncStatus(targetId, sourceSelector) {
     const t = document.getElementById(targetId);
     const s = document.querySelector(sourceSelector);
     if (t && s) t.textContent = (s.textContent || '在线').trim();
   }
-
   function syncDays() {
     const el = document.getElementById('home-love-days');
     if (!el) return;
@@ -490,266 +333,99 @@
       if (loveDate) {
         const start = new Date(loveDate);
         const diff = Math.floor((Date.now() - start) / 86400000);
-        if (!isNaN(diff) && diff >= 0) {
-          el.textContent = `在一起第 ${diff + 1} 天`;
-          return;
-        }
+        if (!isNaN(diff) && diff >= 0) { el.textContent = `在一起第 ${diff + 1} 天`; return; }
       }
     } catch (e) { }
     const annDays = document.getElementById('anniversary-days');
-    if (annDays && annDays.textContent && annDays.textContent !== '0') {
-      el.textContent = `在一起第 ${annDays.textContent} 天`;
-    } else {
-      el.textContent = '记录我们的故事';
-    }
+    if (annDays && annDays.textContent && annDays.textContent !== '0') el.textContent = `在一起第 ${annDays.textContent} 天`;
+    else el.textContent = '记录我们的故事';
   }
 
-  /* ============================================================
-     8. 主题面板（含双背景上传 + 饱和度滑块）
-  ============================================================ */
+  // ---------- 主题面板 ----------
   function openThemePanel() {
-    const existing = document.getElementById('home-theme-panel');
-    if (existing) { existing.remove(); return; }
-
-    const currentH = parseInt(
-      getComputedStyle(document.documentElement).getPropertyValue('--theme-h') || '285'
-    );
-
-    const swatchHTML = PRESET_COLORS.map(p => `
-      <div class="theme-swatch ${p.h === currentH ? 'active' : ''}"
-           style="background: hsl(${p.h}, ${p.s !== undefined ? p.s : 55}%, 70%);"
-           data-hue="${p.h}" title="${p.name}"></div>
-    `).join('');
-
-    const currentS = parseInt(
-      getComputedStyle(document.documentElement).getPropertyValue('--theme-s') || '35'
-    );
-
+    if (document.getElementById('home-theme-panel')) return;
+    const currentH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--theme-h') || '285');
+    const swatchHTML = PRESET_COLORS.map(p => `<div class="theme-swatch ${p.h === currentH ? 'active' : ''}" style="background:hsl(${p.h},${p.s !== undefined ? p.s : 55}%,70%)" data-hue="${p.h}" title="${p.name}"></div>`).join('');
+    const currentS = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--theme-s') || '35');
     const panel = document.createElement('div');
     panel.id = 'home-theme-panel';
     panel.innerHTML = `
-      <div class="theme-panel-head">
-        <span class="theme-panel-title"><i class="fas fa-palette"></i>主题外观</span>
-        <button class="theme-panel-close" id="theme-panel-close">&times;</button>
-      </div>
-
-      <div class="theme-section-label">预设颜色</div>
-      <div class="theme-color-swatches">${swatchHTML}</div>
-
-      <div class="theme-section-label">自定义色相</div>
-      <div class="theme-hue-row">
-        <input type="range" id="theme-hue-slider" min="0" max="360" value="${currentH}">
-        <div class="theme-hue-preview" id="theme-hue-preview"
-             style="background: hsl(${currentH},55%,70%);"></div>
-      </div>
-
-      <div class="theme-section-label">饱和度</div>
-      <div class="theme-hue-row">
-        <input type="range" id="theme-sat-slider" min="1" max="50" value="${currentS}">
-        <span id="theme-sat-value" style="font-size:12px;color:var(--home-text-sub);min-width:32px;">${currentS}%</span>
-      </div>
-
-      <div class="theme-section-label">主页背景</div>
-      <div class="bg-upload-row">
-        <input type="file" id="page-bg-input" accept="image/*" style="display:none">
-        <button class="bg-upload-btn" id="page-bg-upload-btn">
-          <i class="fas fa-cloud-arrow-up"></i> 上传主页背景
-        </button>
-        <button class="bg-clear-btn" id="page-bg-clear-btn" title="清除">
-          <i class="fas fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="theme-section-label">顶部卡片背景</div>
-      <div class="bg-upload-row">
-        <input type="file" id="hero-bg-input" accept="image/*" style="display:none">
-        <button class="bg-upload-btn" id="hero-bg-upload-btn">
-          <i class="fas fa-cloud-arrow-up"></i> 上传卡片背景
-        </button>
-        <button class="bg-clear-btn" id="hero-bg-clear-btn" title="清除">
-          <i class="fas fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="theme-section-label">主页设置</div>
-      <div class="bg-upload-row">
-        <button class="bg-upload-btn" id="open-icon-customize-btn">
-          <i class="fas fa-icons"></i> 自定义功能图标
-        </button>
-      </div>
+      <div class="theme-panel-head"><span class="theme-panel-title"><i class="fas fa-palette"></i>主题外观</span><button class="theme-panel-close" id="theme-panel-close">&times;</button></div>
+      <div class="theme-section-label">预设颜色</div><div class="theme-color-swatches">${swatchHTML}</div>
+      <div class="theme-section-label">自定义色相</div><div class="theme-hue-row"><input type="range" id="theme-hue-slider" min="0" max="360" value="${currentH}"><div class="theme-hue-preview" id="theme-hue-preview" style="background:hsl(${currentH},55%,70%)"></div></div>
+      <div class="theme-section-label">饱和度</div><div class="theme-hue-row"><input type="range" id="theme-sat-slider" min="0" max="100" value="${currentS}"><span id="theme-sat-value" style="font-size:12px">${currentS}%</span></div>
+      <div class="theme-section-label">主页背景</div><div class="bg-upload-row"><input type="file" id="page-bg-input" accept="image/*" style="display:none"><button class="bg-upload-btn" id="page-bg-upload-btn"><i class="fas fa-cloud-arrow-up"></i> 上传主页背景</button><button class="bg-clear-btn" id="page-bg-clear-btn"><i class="fas fa-xmark"></i></button></div>
+      <div class="theme-section-label">顶部卡片背景</div><div class="bg-upload-row"><input type="file" id="hero-bg-input" accept="image/*" style="display:none"><button class="bg-upload-btn" id="hero-bg-upload-btn"><i class="fas fa-cloud-arrow-up"></i> 上传卡片背景</button><button class="bg-clear-btn" id="hero-bg-clear-btn"><i class="fas fa-xmark"></i></button></div>
+      <div class="theme-section-label">主页设置</div><div class="bg-upload-row"><button class="bg-upload-btn" id="open-icon-customize-btn"><i class="fas fa-icons"></i> 自定义功能图标</button></div>
     `;
-
     document.body.appendChild(panel);
-
     panel.querySelector('#theme-panel-close').addEventListener('click', () => panel.remove());
-
-    // 色板
-    panel.querySelectorAll('.theme-swatch').forEach(s => {
-      s.addEventListener('click', () => {
-        const h = parseInt(s.dataset.hue);
-        applyHue(h);
-        panel.querySelectorAll('.theme-swatch').forEach(x => x.classList.remove('active'));
-        s.classList.add('active');
-        const slider = panel.querySelector('#theme-hue-slider');
-        const prev = panel.querySelector('#theme-hue-preview');
-        if (slider) slider.value = h;
-        if (prev) prev.style.background = `hsl(${h},55%,70%)`;
-      });
-    });
-
-    // 色相滑条
-    const slider = panel.querySelector('#theme-hue-slider');
-    const preview = panel.querySelector('#theme-hue-preview');
-    slider.addEventListener('input', () => {
-      const h = parseInt(slider.value);
-      applyHue(h);
-      preview.style.background = `hsl(${h},55%,70%)`;
-      panel.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
-    });
-
-    // 饱和度滑块
+    panel.querySelectorAll('.theme-swatch').forEach(s => s.addEventListener('click', () => {
+      const h = parseInt(s.dataset.hue); applyHue(h);
+      panel.querySelectorAll('.theme-swatch').forEach(x => x.classList.remove('active')); s.classList.add('active');
+      panel.querySelector('#theme-hue-slider').value = h;
+      panel.querySelector('#theme-hue-preview').style.background = `hsl(${h},55%,70%)`;
+    }));
+    const hueSlider = panel.querySelector('#theme-hue-slider');
+    hueSlider.addEventListener('input', () => { const h = parseInt(hueSlider.value); applyHue(h); panel.querySelector('#theme-hue-preview').style.background = `hsl(${h},55%,70%)`; panel.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active')); });
     const satSlider = panel.querySelector('#theme-sat-slider');
-    const satValue = panel.querySelector('#theme-sat-value');
-    if (satSlider && satValue) {
-      // 修改点：扩大范围到 0-100，并正确拼接 %
-      satSlider.min = 0;
-      satSlider.max = 100;
-      satSlider.value = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--theme-s')) || 35;
-
-      const updateSat = () => {
-        const val = satSlider.value;
-        document.documentElement.style.setProperty('--theme-s', val + '%');   // 关键：必须是 val + '%'
-        satValue.textContent = val + '%';
-        try { if (window.localforage) localforage.setItem('home_theme_sat', val); } catch (e) { }
-      };
-      satSlider.addEventListener('input', updateSat);
-      updateSat();
+    const satVal = panel.querySelector('#theme-sat-value');
+    satSlider.addEventListener('input', () => { const v = satSlider.value; document.documentElement.style.setProperty('--theme-s', v + '%'); satVal.textContent = v + '%'; localforage?.setItem('home_theme_sat', v); });
+    function bindBgUpload(panel, inputSel, uploadSel, clearSel, applyFn) {
+      const input = panel.querySelector(inputSel), upload = panel.querySelector(uploadSel), clear = panel.querySelector(clearSel);
+      if (!input || !upload || !clear) return;
+      upload.addEventListener('click', () => input.click());
+      input.addEventListener('change', e => { const file = e.target.files[0]; if (!file) return; if (file.size > 5 * 1024 * 1024) { alert('图片不能超过5MB'); return; } const reader = new FileReader(); reader.onload = ev => applyFn(ev.target.result); reader.readAsDataURL(file); });
+      clear.addEventListener('click', () => applyFn(null));
     }
-
-    // 主页背景
     bindBgUpload(panel, '#page-bg-input', '#page-bg-upload-btn', '#page-bg-clear-btn', applyPageBg);
-    // Hero 背景
     bindBgUpload(panel, '#hero-bg-input', '#hero-bg-upload-btn', '#hero-bg-clear-btn', applyHeroBg);
-
-    // 图标自定义入口
-    panel.querySelector('#open-icon-customize-btn').addEventListener('click', () => {
-      panel.remove();
-      openIconCustomize();
-    });
-
-    // 点外部关闭
-    setTimeout(() => {
-      const handler = (ev) => {
-        if (!panel.contains(ev.target) && ev.target.id !== 'dock-theme') {
-          panel.remove();
-          document.removeEventListener('click', handler);
-        }
-      };
-      document.addEventListener('click', handler);
-    }, 100);
+    panel.querySelector('#open-icon-customize-btn').addEventListener('click', () => { panel.remove(); openIconCustomize(); });
+    setTimeout(() => { const handler = (ev) => { if (!panel.contains(ev.target) && ev.target.id !== 'dock-theme') { panel.remove(); document.removeEventListener('click', handler); } }; document.addEventListener('click', handler); }, 100);
   }
 
-  function bindBgUpload(panel, inputSel, uploadSel, clearSel, applyFn) {
-    const input = panel.querySelector(inputSel);
-    const uploadBtn = panel.querySelector(uploadSel);
-    const clearBtn = panel.querySelector(clearSel);
-    if (!input || !uploadBtn || !clearBtn) return;
-    uploadBtn.addEventListener('click', () => input.click());
-    input.addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (file.size > 5 * 1024 * 1024) { alert('图片不能超过 5MB'); return; }
-      const reader = new FileReader();
-      reader.onload = ev => applyFn(ev.target.result);
-      reader.readAsDataURL(file);
-    });
-    clearBtn.addEventListener('click', () => applyFn(null));
-  }
-
-  /* ============================================================
-     9. 设置全屏页
-  ============================================================ */
+  // ---------- 设置页面 ----------
   const SETTINGS_ITEMS = [
     {
-      section: '聊天与外观',
-      items: [
-        { icon: 'fa-palette',     bg: 'icon-bg-2', title: '主题配色',   desc: '颜色方案、自定义编辑器',   action: 'theme' },
-        { icon: 'fa-image',       bg: 'icon-bg-5', title: '背景和字体', desc: '聊天背景图、字体大小', action: 'font-bg' },
-        { icon: 'fa-comment',     bg: 'icon-bg-7', title: '气泡和CSS',  desc: '气泡样式、自定义CSS',   action: 'bubble-css' },
-        { icon: 'fa-user-circle', bg: 'icon-bg-3', title: '聊天头像',   desc: '头像、头像框设置',       action: 'avatar' },
-        { icon: 'fa-comments',    bg: 'icon-bg-6', title: '聊天设置',   desc: '消息气泡、回执、输入框', action: 'chat-style' },
-        { icon: 'fa-book-open',   bg: 'icon-bg-1', title: '字卡回复库', desc: '字卡、表情、拍一拍',   action: 'library' },
-        { icon: 'fa-icons',       bg: 'icon-bg-9', title: '功能图标自定义', desc: '为每个功能上传自定义图标', action: 'icon-customize' },
+      section: '聊天与外观', items: [
+        { icon: 'fa-palette', bg: 'icon-bg-2', title: '外观配色', desc: '聊天界面、塔罗、信封等界面颜色自定义', action: 'theme' },
+        { icon: 'fa-image', bg: 'icon-bg-5', title: '背景和字体', desc: '聊天背景图、字体大小', action: 'font-bg' },
+        { icon: 'fa-comment', bg: 'icon-bg-7', title: '气泡和CSS', desc: '气泡样式、自定义CSS', action: 'bubble-css' },
+        { icon: 'fa-user-circle', bg: 'icon-bg-3', title: '聊天头像', desc: '头像、头像框设置', action: 'avatar' },
+        { icon: 'fa-comments', bg: 'icon-bg-6', title: '聊天设置', desc: '消息气泡、回执、输入框', action: 'chat-style' },
+        { icon: 'fa-book-open', bg: 'icon-bg-1', title: '字卡回复库', desc: '字卡、表情、拍一拍', action: 'library' },
+        { icon: 'fa-icons', bg: 'icon-bg-9', title: '功能图标自定义', desc: '为每个功能上传自定义图标', action: 'icon-customize' }
       ]
     },
     {
-      section: '内容与互动',
-      items: [
-        { icon: 'fa-star-and-crescent', bg: 'icon-bg-12', title: '塔罗占卜', desc: '梦占模式、抽牌设置', action: 'tarot' },
-        { icon: 'fa-envelope-open-text', bg: 'icon-bg-4', title: '信封投递', desc: '写信给梦角、延迟回信', action: 'envelope' },
-        { icon: 'fa-cloud-sun', bg: 'icon-bg-3', title: '心情追踪', desc: '日历记录每日心情', action: 'mood' },
-        { icon: 'fa-user-group', bg: 'icon-bg-6', title: '群聊功能', desc: '多人聊天模式', action: 'group' },
-        { icon: 'fa-video', bg: 'icon-bg-11', title: '通话与视频', desc: '虚拟通话框', action: 'call' },
-        { icon: 'fa-music', bg: 'icon-bg-8', title: '音乐播放器', desc: '上传音频、播放控制', action: 'music' },
+      section: '高级功能', items: [
+        { icon: 'fa-cloud-sun', bg: 'icon-bg-3', title: '心晴手帐', desc: '记录每日心情，回顾时光', action: 'mood' },
+        { icon: 'fa-balance-scale', bg: 'icon-bg-10', title: '抉择', desc: '抛硬币、抽签，帮你做决定', action: 'decision' },
+        { icon: 'fa-cake-candles', bg: 'icon-bg-7', title: '重要日', desc: '纪念日、倒数日提醒', action: 'anniversary' }
       ]
     },
     {
-      section: '发送与回复',
-      items: [
-        { icon: 'fa-paper-plane', bg: 'icon-bg-9', title: '发送设置', desc: '回复比例、频率、等待时间', action: 'send-settings' },
-        { icon: 'fa-cake-candles', bg: 'icon-bg-7', title: '纪念日', desc: '添加纪念日提醒', action: 'anniversary' },
-      ]
-    },
-    {
-      section: '账户与数据',
-      items: [
-        { icon: 'fa-user-pen', bg: 'icon-bg-2', title: '我的头像与昵称', desc: '修改我的形象', action: 'profile-me' },
-        { icon: 'fa-user-astronaut', bg: 'icon-bg-12', title: '梦角头像与昵称', desc: '修改梦角的形象', action: 'profile-partner' },
+      section: '账户与数据', items: [
         { icon: 'fa-database', bg: 'icon-bg-10', title: '数据管理', desc: '导入/导出/清空', action: 'data' },
+        { icon: 'fa-chart-bar', bg: 'icon-bg-10', title: '消息统计', desc: '聊天统计、词云、收藏搜索', action: 'stats' }
       ]
-    },
+    }
   ];
 
   function buildSettingsScreen() {
     if (document.getElementById('settings-list-screen')) return;
     const el = document.createElement('div');
     el.id = 'settings-list-screen';
-
     const sectionsHTML = SETTINGS_ITEMS.map(sec => `
       <div class="settings-section-title">${sec.section}</div>
       <div class="settings-group">
-        ${sec.items.map(it => `
-          <button class="settings-row" data-action="${it.action}">
-            <div class="settings-row-icon ${it.bg}"><i class="fas ${it.icon}"></i></div>
-            <div class="settings-row-info">
-              <div class="settings-row-title">${it.title}</div>
-              <div class="settings-row-desc">${it.desc}</div>
-            </div>
-            <i class="fas fa-chevron-right settings-row-arrow"></i>
-          </button>
-        `).join('')}
+        ${sec.items.map(it => `<button class="settings-row" data-action="${it.action}"><div class="settings-row-icon ${it.bg}"><i class="fas ${it.icon}"></i></div><div class="settings-row-info"><div class="settings-row-title">${it.title}</div><div class="settings-row-desc">${it.desc}</div></div><i class="fas fa-chevron-right settings-row-arrow"></i></button>`).join('')}
       </div>
     `).join('');
-
-    el.innerHTML = `
-      <div class="fs-header">
-        <button class="fs-back-btn" id="settings-back-btn">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <span class="fs-title">设置</span>
-      </div>
-      <div class="fs-body">${sectionsHTML}</div>
-    `;
-
+    el.innerHTML = `<div class="fs-header"><button class="fs-back-btn" id="settings-back-btn"><i class="fas fa-arrow-left"></i></button><span class="fs-title">设置</span></div><div class="fs-body">${sectionsHTML}</div>`;
     document.body.appendChild(el);
-
     el.querySelector('#settings-back-btn').addEventListener('click', backToHome);
-
-    el.querySelectorAll('.settings-row').forEach(row => {
-      row.addEventListener('click', () => {
-        triggerSettingsAction(row.dataset.action);
-      });
-    });
+    el.querySelectorAll('.settings-row').forEach(row => row.addEventListener('click', () => triggerSettingsAction(row.dataset.action)));
   }
 
   function openSettingsScreen() {
@@ -758,208 +434,127 @@
     if (home) home.classList.add('hidden');
     enterFeatureMode();
     isOnHome = false;
+    setContext('settings');
     const sl = document.getElementById('settings-list-screen');
-    if (sl) {
-      sl.classList.remove('visible'); // 先 remove 再 add，确保触发 CSS
-      requestAnimationFrame(() => sl.classList.add('visible'));
-    }
+    if (sl) { sl.classList.remove('visible'); requestAnimationFrame(() => sl.classList.add('visible')); }
     showBackBtn(backToHome);
   }
 
+  // ***** 核心修复：使用全局 showAppearancePanel 确保内容显示 *****
+  // ========== 设置子功能面板显示（修复空白）==========
+  function openAppearanceSubPanel(panel) {
+    const modal = document.getElementById('appearance-modal');
+    if (!modal) return;
 
-  // 从设置页打开 modal，临时覆盖关闭按钮让它回设置页而不是别处
-  function openModalFromSettings(modalId, closeBtnIds, hideCloseBtnIds) {
-    const m = document.getElementById(modalId);
-    console.log('[oMFS] modalId:', modalId, 'found:', !!m, 'feature-mode:', document.body.classList.contains('feature-mode'));
-    if (!m) return;
-    showModal(m);
-    m.style.zIndex = '10001';
-    console.log('[oMFS] after showModal, display:', window.getComputedStyle(m).display, 'zIndex:', m.style.zIndex);
-    // CSS animation 优先级高于 inline style，必须先禁掉 animation 再设 opacity
-    const _content = m.querySelector('.modal-content');
-    if (_content) {
-      _content.style.animation = 'none';
-      _content.style.opacity = '1';
-      _content.style.transform = 'translateY(0) scale(1)';
+    // 1. 强制移除所有内联 onclick 属性（避免旧事件冲突）
+    const oldClose = document.getElementById('close-appearance');
+    const oldBack = document.getElementById('back-appearance');
+    if (oldClose) oldClose.removeAttribute('onclick');
+    if (oldBack) oldBack.removeAttribute('onclick');
+
+    // 2. 停止任何正在进行的动画/过渡，强制显示
+    modal.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; z-index: 10001 !important; transform: scale(1) !important; animation: none !important; transition: none !important;';
+    modal.classList.remove('hidden');
+
+    // 3. 同样强制模态框内容容器
+    const content = modal.querySelector('.modal-content');
+    if (content) {
+      content.style.cssText = 'opacity: 1 !important; transform: scale(1) !important; animation: none !important; transition: none !important;';
     }
-    // 隐藏不需要的关闭按钮
-    (hideCloseBtnIds || []).forEach(id => {
-      const btn = document.getElementById(id);
-      if (btn) btn.style.display = 'none';
+
+    // 4. 隐藏导航和画廊入口
+    const navGrid = document.getElementById('appearance-nav-grid');
+    const galleryBanner = document.getElementById('gallery-banner-entry');
+    if (navGrid) navGrid.style.display = 'none';
+    if (galleryBanner) galleryBanner.style.display = 'none';
+
+    // 5. 显示面板容器
+    const container = document.getElementById('appearance-panel-container');
+    if (container) container.style.display = 'block';
+
+    // 6. 子面板映射
+    const panels = {
+      'theme': 'appearance-panel-theme',
+      'font-bg': 'appearance-panel-font',
+      'bubble-css': 'appearance-panel-bubble',
+      'avatar': 'appearance-panel-avatar'
+    };
+    const titles = {
+      'theme': '主题配色',
+      'font-bg': '背景 & 字体',
+      'bubble-css': '气泡 & CSS',
+      'avatar': '聊天头像'
+    };
+    const targetId = panels[panel];
+    if (!targetId) return;
+
+    // 7. 隐藏所有子面板
+    Object.values(panels).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
     });
-    (closeBtnIds || []).forEach(id => {
-      const btn = document.getElementById(id);
-      if (!btn) return;
-      const orig = btn.onclick;
-      btn.onclick = (e) => {
-        e.stopImmediatePropagation();
 
-        m.style.display = 'none';
-        m.style.zIndex = '';
-        if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
-        // 恢复关闭按钮显示
-        (hideCloseBtnIds || []).forEach(hid => {
-          const hbtn = document.getElementById(hid);
-          if (hbtn) hbtn.style.display = '';
-        });
-        btn.onclick = orig;
-        window.homeScreen.backToSettings();
-      };
-    });
+    // 8. 显示目标子面板
+    const targetPanel = document.getElementById(targetId);
+    if (targetPanel) targetPanel.style.display = 'block';
+
+    // 9. 更新标题
+    const titleSpan = document.getElementById('appearance-panel-title');
+    if (titleSpan && titles[panel]) titleSpan.textContent = titles[panel];
+
+    // 10. 重新绑定按钮（使用新的事件，完全取代旧的）
+    const closeBtn = document.getElementById('close-appearance');
+    const backBtn = document.getElementById('back-appearance');
+
+    // 定义统一返回设置页的函数
+    const returnToSettings = () => {
+      modal.style.display = 'none';
+      if (typeof backToSettings === 'function') backToSettings();
+      else if (window.homeScreen && window.homeScreen.backToSettings) window.homeScreen.backToSettings();
+      else backToHome();
+    };
+
+    // 移除所有已有的事件监听器（通过替换克隆节点是最干净的方式）
+    if (closeBtn) {
+      const newClose = closeBtn.cloneNode(true);
+      closeBtn.parentNode.replaceChild(newClose, closeBtn);
+      newClose.onclick = returnToSettings;
+      // 隐藏关闭按钮（如你所需）
+      newClose.style.display = 'none';
+    }
+    if (backBtn) {
+      const newBack = backBtn.cloneNode(true);
+      backBtn.parentNode.replaceChild(newBack, backBtn);
+      newBack.onclick = returnToSettings;
+    }
+
+    console.log(`✅ 打开 ${panel} 面板，模态框已稳定显示`);
   }
 
-  function openAppearancePanel(panel) {
-    openModalFromSettings('appearance-modal', ['back-appearance'], ['close-appearance']);
-    setTimeout(() => {
-      const navGrid = document.getElementById('appearance-nav-grid');
-      const galleryBanner = document.getElementById('gallery-banner-entry');
-      if (navGrid) navGrid.style.display = 'none';
-      if (galleryBanner) galleryBanner.style.display = 'none';
-      if (typeof showAppearancePanel === 'function') showAppearancePanel(panel);
-      else window.showAppearancePanel?.(panel);
-    }, 50);
-  }
-
-
-  function backToSettings() {
-    // 直接隐藏所有 modal，不 exitFeatureMode（避免聊天界面闪烁）
-    document.querySelectorAll('.modal').forEach(m => {
-      m.style.display = 'none';
-      if (m._hideTimeout) { clearTimeout(m._hideTimeout); m._hideTimeout = null; }
-    });
-    // 直接显示设置列表，不走 exit/enter feature-mode 的来回
-    buildSettingsScreen();
-    const home = document.getElementById('home-screen');
-    if (home) home.classList.add('hidden');
-    // feature-mode 一直保持激活，不需要重新进入
-    document.getElementById('settings-list-screen')?.classList.add('visible');
-    showBackBtn(backToHome);
-  }
-
-  function triggerSettingsAction(action) {
-    const settingsEl = document.getElementById('settings-list-screen');
-    console.log('[TSA] action:', action, 'feature-mode:', document.body.classList.contains('feature-mode'), 'visible:', settingsEl?.classList.contains('visible'));
-    if (settingsEl) settingsEl.classList.remove('visible');
-
-    setTimeout(() => {
-      console.log('[TSA] timeout: feature-mode:', document.body.classList.contains('feature-mode'));
-      // openModalFromSettings：打开 modal 并覆盖关闭按钮让它回设置页
-      const oMS = (id, btns, hide) => openModalFromSettings(id, btns, hide);
-      switch (action) {
-        case 'appearance':     oMS('appearance-modal', ['back-appearance'], ['close-appearance']); break;
-        case 'theme':          openAppearancePanel('theme'); break;
-        case 'font-bg':        openAppearancePanel('font-bg'); break;
-        case 'bubble-css':     openAppearancePanel('bubble-css'); break;
-        case 'avatar':         openAppearancePanel('avatar'); break;
-        case 'chat-style':     oMS('chat-modal', ['back-chat'], ['close-chat']); break;
-        case 'background':     openAppearancePanel('font-bg'); break;
-        case 'icon-customize': openIconCustomize(); return;
-        case 'library':        oMS('custom-replies-modal', ['close-custom-replies']); break;
-        case 'tarot':          oMS('fortune-lenormand-modal', ['close-fortune','close-lenormand']); break;
-        case 'envelope':       oMS('envelope-modal', ['cancel-envelope']); break;
-        case 'mood':           openMoodCalendar(); return;
-        case 'group':          oMS('group-chat-modal', ['close-group-chat']); break;
-        case 'call':           if (window.callFeature?.startCall) window.callFeature.startCall(false); break;
-        case 'music':          oMS('music-player-modal', []); break;
-        case 'send-settings':  oMS('advanced-modal', ['back-advanced']); break;
-        case 'anniversary':    oMS('anniversary-modal', ['close-anniversary']); break;
-        case 'profile-me':     oMS('chat-modal', ['back-chat'], ['close-chat']); break;
-        case 'profile-partner':oMS('chat-modal', ['back-chat'], ['close-chat']); break;
-        case 'data':           oMS('data-modal', ['back-data']); break;
-        default: break;
-      }
-      // 给对应关闭按钮挂回主页钩子
-
-      showBackBtn(backToSettings);
-      // 移除覆盖层（modal 已经在上面了，z-index 10001 > 99998 不对，所以 modal 打开后再移除）
-    }, 50);
-  }
-
-  /* ============================================================
-     10. 心情日历全屏页（含最近使用）
-  ============================================================ */
-  let moodData = {}; // { 'YYYY-MM-DD': '😊' }
-  let moodViewYear = 0;
-  let moodViewMonth = 0; // 0-11
-
-  async function loadMoodData() {
-    try {
-      if (window.localforage) {
-        const d = await localforage.getItem(MOOD_KEY);
-        if (d && typeof d === 'object') moodData = d;
-      }
-    } catch (e) { }
-  }
-
-  async function saveMoodData() {
-    try {
-      if (window.localforage) await localforage.setItem(MOOD_KEY, moodData);
-    } catch (e) { }
-  }
-
-  function ymd(d) {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  }
-
+  // ---------- 心情日历 ----------
+  let moodData = {}, moodViewYear = 0, moodViewMonth = 0;
+  async function loadMoodData() { try { if (window.localforage) { const d = await localforage.getItem(MOOD_KEY); if (d && typeof d === 'object') moodData = d; } } catch (e) { } }
+  async function saveMoodData() { try { if (window.localforage) await localforage.setItem(MOOD_KEY, moodData); } catch (e) { } }
+  function ymd(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
   function buildMoodCalendarScreen() {
-    let el = document.getElementById('mood-calendar-screen');
-    if (el) return el;
-
-    el = document.createElement('div');
+    if (document.getElementById('mood-calendar-screen')) return;
+    const el = document.createElement('div');
     el.id = 'mood-calendar-screen';
-    el.innerHTML = `
-      <div class="fs-header">
-        <button class="fs-back-btn" id="mood-back-btn">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <span class="fs-title">心情日历</span>
-      </div>
-      <div class="fs-body">
-        <div class="mood-calendar-wrap">
-          <div class="mood-cal-head">
-            <button class="mood-cal-nav" id="mood-prev"><i class="fas fa-chevron-left"></i></button>
-            <span class="mood-cal-month" id="mood-cal-month">2026年 5月</span>
-            <button class="mood-cal-nav" id="mood-next"><i class="fas fa-chevron-right"></i></button>
-          </div>
-          <div class="mood-weekdays">
-            ${['一', '二', '三', '四', '五', '六', '日'].map(d => `<div class="mood-weekday">${d}</div>`).join('')}
-          </div>
-          <div class="mood-cal-grid" id="mood-cal-grid"></div>
-        </div>
-      </div>
-    `;
+    el.innerHTML = `<div class="fs-header"><button class="fs-back-btn" id="mood-back-btn"><i class="fas fa-arrow-left"></i></button><span class="fs-title">心情日历</span></div><div class="fs-body"><div class="mood-calendar-wrap"><div class="mood-cal-head"><button class="mood-cal-nav" id="mood-prev"><i class="fas fa-chevron-left"></i></button><span class="mood-cal-month" id="mood-cal-month"></span><button class="mood-cal-nav" id="mood-next"><i class="fas fa-chevron-right"></i></button></div><div class="mood-weekdays">${['一', '二', '三', '四', '五', '六', '日'].map(d => `<div class="mood-weekday">${d}</div>`).join('')}</div><div class="mood-cal-grid" id="mood-cal-grid"></div></div></div>`;
     document.body.appendChild(el);
-
-    el.querySelector('#mood-back-btn').addEventListener('click', backToHome);
-    el.querySelector('#mood-prev').addEventListener('click', () => {
-      moodViewMonth--;
-      if (moodViewMonth < 0) { moodViewMonth = 11; moodViewYear--; }
-      renderMoodGrid();
-    });
-    el.querySelector('#mood-next').addEventListener('click', () => {
-      moodViewMonth++;
-      if (moodViewMonth > 11) { moodViewMonth = 0; moodViewYear++; }
-      renderMoodGrid();
-    });
-
-    return el;
+    el.querySelector('#mood-back-btn').addEventListener('click', () => getBackTarget()());
+    el.querySelector('#mood-prev').addEventListener('click', () => { moodViewMonth--; if (moodViewMonth < 0) { moodViewMonth = 11; moodViewYear--; } renderMoodGrid(); });
+    el.querySelector('#mood-next').addEventListener('click', () => { moodViewMonth++; if (moodViewMonth > 11) { moodViewMonth = 0; moodViewYear++; } renderMoodGrid(); });
   }
-
   function renderMoodGrid() {
     const monthEl = document.getElementById('mood-cal-month');
     const grid = document.getElementById('mood-cal-grid');
-    if (!monthEl || !grid) return;
-
+    if (!monthEl) return;
     monthEl.textContent = `${moodViewYear}年 ${moodViewMonth + 1}月`;
-
     const firstDay = new Date(moodViewYear, moodViewMonth, 1);
-    let firstWeekday = firstDay.getDay(); // 0=Sun
-    firstWeekday = firstWeekday === 0 ? 6 : firstWeekday - 1; // 转为 0=Mon
-
+    let firstWeekday = firstDay.getDay(); firstWeekday = firstWeekday === 0 ? 6 : firstWeekday - 1;
     const daysInMonth = new Date(moodViewYear, moodViewMonth + 1, 0).getDate();
-    const today = new Date();
-    const todayKey = ymd(today);
-
+    const today = new Date(), todayKey = ymd(today);
     let html = '';
     for (let i = 0; i < firstWeekday; i++) html += '<div class="mood-cell empty"></div>';
     for (let d = 1; d <= daysInMonth; d++) {
@@ -967,470 +562,595 @@
       const key = ymd(date);
       const mood = moodData[key];
       const isToday = key === todayKey;
-      html += `
-        <button class="mood-cell ${mood ? 'has-mood' : ''} ${isToday ? 'today' : ''}" data-date="${key}">
-          <span class="mood-cell-day">${d}</span>
-          ${mood ? `<span class="mood-cell-emoji">${mood}</span>` : ''}
-        </button>
-      `;
+      html += `<button class="mood-cell ${mood ? 'has-mood' : ''} ${isToday ? 'today' : ''}" data-date="${key}"><span class="mood-cell-day">${d}</span>${mood ? `<span class="mood-cell-emoji">${mood}</span>` : ''}</button>`;
     }
     grid.innerHTML = html;
-
-    grid.querySelectorAll('.mood-cell[data-date]').forEach(c => {
-      c.addEventListener('click', () => openMoodEmojiPicker(c.dataset.date));
-    });
+    grid.querySelectorAll('.mood-cell[data-date]').forEach(c => c.addEventListener('click', () => openMoodEmojiPicker(c.dataset.date)));
   }
-
   function openMoodEmojiPicker(dateKey) {
     const existing = document.getElementById('mood-emoji-picker');
     if (existing) existing.remove();
     recentEmojis = JSON.parse(localStorage.getItem(RECENT_EMOJI_KEY) || '[]');
-
     const picker = document.createElement('div');
     picker.id = 'mood-emoji-picker';
     picker.className = 'mood-emoji-picker';
-
-    const emojiHTML = MOOD_EMOJIS.map(e =>
-      `<button class="mood-emoji-btn" data-emoji="${e}">${e}</button>`
-    ).join('') + `<button class="mood-emoji-btn clear" data-emoji="">清除</button>`;
-
-    picker.innerHTML = `
-      <div class="mood-emoji-picker-head">
-        <span class="mood-emoji-picker-title">${dateKey} 今天心情如何？</span>
-        <button class="theme-panel-close" id="mood-picker-close">&times;</button>
-      </div>
-      ${recentEmojis.length ? `
-      <div class="mood-emoji-picker-head" style="margin-top:0;">最近使用</div>
-      <div class="mood-emoji-grid" id="mood-recent-grid">
-        ${recentEmojis.map(e => `<button class="mood-emoji-btn" data-emoji="${e}">${e}</button>`).join('')}
-      </div>
-      ` : ''}
-      <div class="mood-emoji-grid">${emojiHTML}</div>
-    `;
-
+    const emojiHTML = MOOD_EMOJIS.map(e => `<button class="mood-emoji-btn" data-emoji="${e}">${e}</button>`).join('') + '<button class="mood-emoji-btn clear" data-emoji="">清除</button>';
+    picker.innerHTML = `<div class="mood-emoji-picker-head"><span class="mood-emoji-picker-title">${dateKey} 今天心情如何？</span><button class="theme-panel-close" id="mood-picker-close">&times;</button></div>${recentEmojis.length ? `<div class="mood-emoji-picker-head" style="margin-top:0;">最近使用</div><div class="mood-emoji-grid" id="mood-recent-grid">${recentEmojis.map(e => `<button class="mood-emoji-btn" data-emoji="${e}">${e}</button>`).join('')}</div>` : ''}<div class="mood-emoji-grid">${emojiHTML}</div>`;
     document.body.appendChild(picker);
-
     picker.querySelector('#mood-picker-close').addEventListener('click', () => picker.remove());
-
-    function bindEmoji(btn) {
-      btn.addEventListener('click', async () => {
-        const e = btn.dataset.emoji;
-        if (e) moodData[dateKey] = e;
-        else delete moodData[dateKey];
-        await saveMoodData();
-        picker.remove();
-        // 更新最近使用
-        recentEmojis = [e, ...recentEmojis.filter(x => x !== e)].slice(0, 8);
-        localStorage.setItem(RECENT_EMOJI_KEY, JSON.stringify(recentEmojis));
-        renderMoodGrid();
-      });
-    }
-    picker.querySelectorAll('.mood-emoji-btn').forEach(bindEmoji);
+    const bind = btn => btn.addEventListener('click', async () => {
+      const e = btn.dataset.emoji;
+      if (e) moodData[dateKey] = e; else delete moodData[dateKey];
+      await saveMoodData();
+      picker.remove();
+      recentEmojis = [e, ...recentEmojis.filter(x => x !== e)].slice(0, 8);
+      localStorage.setItem(RECENT_EMOJI_KEY, JSON.stringify(recentEmojis));
+      renderMoodGrid();
+    });
+    picker.querySelectorAll('.mood-emoji-btn').forEach(bind);
     const recentGrid = picker.querySelector('#mood-recent-grid');
-    if (recentGrid) recentGrid.querySelectorAll('.mood-emoji-btn').forEach(bindEmoji);
+    if (recentGrid) recentGrid.querySelectorAll('.mood-emoji-btn').forEach(bind);
   }
-
-  function openMoodCalendar() {
+  function openMoodCalendar(fromSettings = false) {
     buildMoodCalendarScreen();
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
     enterFeatureMode();
     isOnHome = false;
-
-    if (!moodViewYear) {
-      const now = new Date();
-      moodViewYear = now.getFullYear();
-      moodViewMonth = now.getMonth();
-    }
+    setContext(fromSettings ? 'settings' : 'home');
+    if (!moodViewYear) { const now = new Date(); moodViewYear = now.getFullYear(); moodViewMonth = now.getMonth(); }
     renderMoodGrid();
-
     document.getElementById('mood-calendar-screen')?.classList.add('visible');
-    showBackBtn(backToHome);
+    showBackBtn(() => getBackTarget()());
   }
 
-  /* ============================================================
-     11. 图标自定义全屏页
-  ============================================================ */
-  function buildIconCustomizeScreen() {
-    let el = document.getElementById('icon-customize-screen');
-    if (el) return el;
-
-    el = document.createElement('div');
+  // ---------- 图标自定义 ----------
+  function buildIconCustomizeScreen(fromSettings = false) {
+    const isFromSettings = fromSettings;
+    if (document.getElementById('icon-customize-screen')) return;
+    const el = document.createElement('div');
     el.id = 'icon-customize-screen';
-
-    const itemsHTML = FEATURES.map(f => `
-      <div class="icon-customize-item" data-feature="${f.id}">
-        <div class="icon-customize-preview" data-preview="${f.id}">
-          ${customIcons[f.id]
-        ? `<img src="${customIcons[f.id]}" alt="">`
-        : `<i class="fas ${f.icon}"></i>`}
-        </div>
-        <div class="icon-customize-info">
-          <div class="icon-customize-name">${f.label}</div>
-          <div class="icon-customize-tip">点击上传自定义图标（建议正方形）</div>
-        </div>
-        <div class="icon-customize-actions">
-          <input type="file" accept="image/*" style="display:none" data-file="${f.id}">
-          <button class="icon-customize-btn" data-upload="${f.id}">上传</button>
-          <button class="icon-customize-btn reset" data-reset="${f.id}">还原</button>
-        </div>
-      </div>
-    `).join('');
-
-    el.innerHTML = `
-      <div class="fs-header">
-        <button class="fs-back-btn" id="icon-back-btn">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <span class="fs-title">功能图标自定义</span>
-      </div>
-      <div class="fs-body">
-        <div class="icon-customize-list">${itemsHTML}</div>
-      </div>
-    `;
-
+    // 定义 Dock 按钮的自定义列表
+    const dockItems = [
+      { id: 'dock-settings', label: '设置', defaultIcon: 'fa-sliders' },
+      { id: 'dock-theme', label: '主题', defaultIcon: 'fa-palette' }
+    ];
+    const featuresHTML = FEATURES.map(f => `<div class="icon-customize-item" data-feature="${f.id}">
+    <div class="icon-customize-preview" data-preview="${f.id}">${customIcons[f.id] ? `<img src="${customIcons[f.id]}" alt="">` : `<i class="fas ${f.icon}"></i>`}</div>
+    <div class="icon-customize-info">
+        <div class="icon-customize-name">${f.label}</div>
+        <div class="icon-customize-tip">点击上传自定义图标（建议正方形）</div>
+    </div>
+    <div class="icon-customize-actions">
+        <input type="file" accept="image/*" style="display:none" data-file="${f.id}">
+        <button class="icon-customize-btn" data-upload="${f.id}">上传</button>
+        <button class="icon-customize-btn reset" data-reset="${f.id}">还原</button>
+    </div>
+</div>`).join('');
+    const dockHTML = dockItems.map(item => `<div class="icon-customize-item" data-feature="${item.id}">
+    <div class="icon-customize-preview" data-preview="${item.id}">${customIcons[item.id] ? `<img src="${customIcons[item.id]}" alt="">` : `<i class="fas ${item.defaultIcon}"></i>`}</div>
+    <div class="icon-customize-info">
+        <div class="icon-customize-name">${item.label}（Dock栏）</div>
+        <div class="icon-customize-tip">点击上传自定义图标（建议正方形）</div>
+    </div>
+    <div class="icon-customize-actions">
+        <input type="file" accept="image/*" style="display:none" data-file="${item.id}">
+        <button class="icon-customize-btn" data-upload="${item.id}">上传</button>
+        <button class="icon-customize-btn reset" data-reset="${item.id}">还原</button>
+    </div>
+</div>`).join('');
+    const itemsHTML = featuresHTML + dockHTML;
+    el.innerHTML = `<div class="fs-header"><button class="fs-back-btn" id="icon-back-btn"><i class="fas fa-arrow-left"></i></button><span class="fs-title">功能图标自定义</span></div><div class="fs-body"><div class="icon-customize-list">${itemsHTML}</div></div>`;
     document.body.appendChild(el);
+    el.querySelector('#icon-back-btn').addEventListener('click', () => {
+      const screen = document.getElementById('icon-customize-screen');
+      if (screen) screen.classList.remove('visible');
 
-    el.querySelector('#icon-back-btn').addEventListener('click', backToHome);
-
-    el.querySelectorAll('[data-upload]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const fid = btn.dataset.upload;
-        el.querySelector(`[data-file="${fid}"]`)?.click();
-      });
+      if (isFromSettings) {
+        // 从设置页进入 -> 返回设置页
+        backToSettings();
+      } else {
+        // 从主页进入 -> 直接返回主页，不走 backToHome 避免再次隐藏
+        const homeScreen = document.getElementById('home-screen');
+        if (homeScreen) {
+          homeScreen.classList.remove('hidden');
+          homeScreen.style.display = '';
+          homeScreen.style.opacity = '';
+        }
+        document.body.classList.remove('feature-mode');
+        refreshHomeData();
+        setContext('home');
+        hideBackBtn();
+        // 清理残留面板
+        const themePanel = document.getElementById('home-theme-panel');
+        if (themePanel) themePanel.remove();
+        const moodPicker = document.getElementById('mood-emoji-picker');
+        if (moodPicker) moodPicker.remove();
+        closeAllFeatureModals();
+      }
     });
-
-    el.querySelectorAll('[data-file]').forEach(input => {
-      input.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 2 * 1024 * 1024) { alert('图标不能超过 2MB'); return; }
-        const fid = input.dataset.file;
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
-          customIcons[fid] = ev.target.result;
-          try { if (window.localforage) await localforage.setItem(ICON_KEY, customIcons); } catch (err) { }
-          const preview = el.querySelector(`[data-preview="${fid}"]`);
-          if (preview) preview.innerHTML = `<img src="${customIcons[fid]}" alt="">`;
-          applyCustomIcons();
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-
+    el.querySelectorAll('[data-upload]').forEach(btn => btn.addEventListener('click', () => { const fid = btn.dataset.upload; el.querySelector(`[data-file="${fid}"]`).click(); }));
+    el.querySelectorAll('[data-file]').forEach(input => input.addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file || file.size > 2 * 1024 * 1024) { if (file) alert('图标不能超过2MB'); return; }
+      const fid = input.dataset.file;
+      const reader = new FileReader();
+      reader.onload = async (ev) => { customIcons[fid] = ev.target.result; await localforage?.setItem(ICON_KEY, customIcons); const preview = el.querySelector(`[data-preview="${fid}"]`); if (preview) preview.innerHTML = `<img src="${customIcons[fid]}" alt="">`; applyCustomIcons(); };
+      reader.readAsDataURL(file);
+    }));
     el.querySelectorAll('[data-reset]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const fid = btn.dataset.reset;
+        console.log(`还原图标: ${fid}`);
         delete customIcons[fid];
-        try { if (window.localforage) await localforage.setItem(ICON_KEY, customIcons); } catch (e) { }
-        const preview = el.querySelector(`[data-preview="${fid}"]`);
-        const f = FEATURES.find(x => x.id === fid);
-        if (preview && f) preview.innerHTML = `<i class="fas ${f.icon}"></i>`;
+        if (window.localforage) await localforage.setItem(ICON_KEY, customIcons);
+
+        // 方式1：通过父级 .icon-customize-item 查找 .icon-customize-preview
+        const itemDiv = btn.closest('.icon-customize-item');
+        const previewDiv = itemDiv ? itemDiv.querySelector('.icon-customize-preview') : null;
+
+        if (previewDiv) {
+          // 根据 fid 确定默认图标的 HTML
+          let defaultHtml = '';
+          const isFeature = FEATURES.some(f => f.id === fid);
+          if (isFeature) {
+            const f = FEATURES.find(f => f.id === fid);
+            if (f) defaultHtml = `<i class="fas ${f.icon}"></i>`;
+          } else {
+            if (fid === 'dock-settings') defaultHtml = `<i class="fas fa-sliders"></i>`;
+            else if (fid === 'dock-theme') defaultHtml = `<i class="fas fa-palette"></i>`;
+            else defaultHtml = `<i class="fas fa-cog"></i>`;
+          }
+          previewDiv.innerHTML = defaultHtml;
+          console.log(`预览已更新为默认图标: ${fid}`);
+        } else {
+          console.warn(`未找到预览元素: ${fid}`);
+        }
+
+        // 更新主页图标
         applyCustomIcons();
       });
     });
-
-    return el;
   }
-
-  function openIconCustomize() {
-    const existing = document.getElementById('icon-customize-screen');
-    if (existing) existing.remove();
-    buildIconCustomizeScreen();
-
+  function openIconCustomize(fromSettings = false) {
+    buildIconCustomizeScreen(fromSettings);
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
-    // feature-mode 已经激活（从设置页来），不需要重复 enter
     if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
     isOnHome = false;
-
+    setContext(fromSettings ? 'settings' : 'home');
     const screen = document.getElementById('icon-customize-screen');
-    if (screen) {
-      screen.classList.remove('visible');
-      requestAnimationFrame(() => screen.classList.add('visible'));
-    }
-    showBackBtn(backToSettings);
+    if (screen) { screen.classList.remove('visible'); requestAnimationFrame(() => screen.classList.add('visible')); }
+    showBackBtn(() => getBackTarget()());
   }
 
-  /* ============================================================
-     12. 事件绑定（含爱心粒子、双击震动）
-  ============================================================ */
+  // ---------- 辅助功能（爱心粒子等）----------
   function spawnHeartParticles(x, y) {
-    const count = 12;
-    const container = document.body;
-    const hue = getComputedStyle(document.documentElement).getPropertyValue('--theme-h').trim();
+    const count = 12, hue = getComputedStyle(document.documentElement).getPropertyValue('--theme-h').trim();
     for (let i = 0; i < count; i++) {
-      const particle = document.createElement('span');
-      particle.textContent = '♥';
-      particle.style.cssText = `
-        position: fixed;
-        left: ${x}px;
-        top: ${y}px;
-        font-size: ${10 + Math.random() * 16}px;
-        color: hsl(${hue}, 65%, 70%);
-        pointer-events: none;
-        z-index: 9999;
-        transform: translate(-50%, -50%);
-      `;
-      container.appendChild(particle);
-      const angle = Math.random() * 2 * Math.PI;
-      const dist = 40 + Math.random() * 70;
-      particle.animate([
-        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-        { transform: `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist - 30}px)) scale(0.3)`, opacity: 0 }
-      ], {
-        duration: 1200 + Math.random() * 800,
-        easing: 'ease-out',
-        fill: 'forwards'
-      });
-      particle.addEventListener('finish', () => particle.remove());
+      const p = document.createElement('span');
+      p.textContent = '♥';
+      p.style.cssText = `position:fixed; left:${x}px; top:${y}px; font-size:${10 + Math.random() * 16}px; color:hsl(${hue},65%,70%); pointer-events:none; z-index:9999; transform:translate(-50%,-50%);`;
+      document.body.appendChild(p);
+      const angle = Math.random() * 2 * Math.PI, dist = 40 + Math.random() * 70;
+      p.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist - 30}px)) scale(0.3)`, opacity: 0 }], { duration: 1200 + Math.random() * 800, easing: 'ease-out', fill: 'forwards' });
+      p.addEventListener('finish', () => p.remove());
     }
   }
 
   function bindEvents() {
-    document.querySelectorAll('.home-feature').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        goToFeature(btn.dataset.feature);
-      });
-    });
-
-    document.getElementById('dock-settings')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openSettingsScreen();
-    });
-    document.getElementById('dock-theme')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openThemePanel();
-    });
-
-    // 爱心粒子效果（点击爱心分隔符）
-    const heartDivider = document.querySelector('.profile-divider i');
-    if (heartDivider) {
-      heartDivider.addEventListener('click', (e) => {
-        spawnHeartParticles(e.clientX, e.clientY);
-      });
-    }
-
-    // 双击头像震动
+    document.querySelectorAll('.home-feature').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); goToFeature(btn.dataset.feature); }));
+    document.getElementById('dock-settings')?.addEventListener('click', e => { e.stopPropagation(); openSettingsScreen(); });
+    document.getElementById('dock-theme')?.addEventListener('click', e => { e.stopPropagation(); openThemePanel(); });
+    document.querySelector('.profile-divider i')?.addEventListener('click', e => spawnHeartParticles(e.clientX, e.clientY));
     ['home-my-avatar', 'home-partner-avatar'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) {
-        el.addEventListener('dblclick', (e) => {
-          e.preventDefault();
-          el.classList.add('avatar-shake');
-          setTimeout(() => el.classList.remove('avatar-shake'), 600);
-          spawnHeartParticles(e.clientX, e.clientY);
-        });
-      }
+      if (el) el.addEventListener('dblclick', e => { e.preventDefault(); el.classList.add('avatar-shake'); setTimeout(() => el.classList.remove('avatar-shake'), 600); spawnHeartParticles(e.clientX, e.clientY); });
     });
   }
 
-  /* ============================================================
-     13. PWA Service Worker 注册
-  ============================================================ */
-  function registerSW() {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-          .then(() => console.log('[PWA] SW 注册成功'))
-          .catch(e => console.warn('[PWA] SW 注册失败:', e));
-      });
+  // ========== 设置页面跳转核心修复 ==========
+  function triggerSettingsAction(action) {
+    if (!action) return;
+
+    // 隐藏设置列表屏幕
+    const settingsScreen = document.getElementById('settings-list-screen');
+    if (settingsScreen) settingsScreen.classList.remove('visible');
+
+    // 隐藏主页（完全不可见）
+    const homeScreen = document.getElementById('home-screen');
+    if (homeScreen) homeScreen.classList.add('hidden');
+
+    // 确保不在 feature-mode（避免干扰模态框）
+    document.body.classList.remove('feature-mode');
+
+    // 设置上下文和返回按钮
+    setContext('settings');
+    showBackBtn(backToSettings);
+
+    switch (action) {
+      // ========== 外观类：打开 appearance-modal 对应子面板 ==========
+      case 'theme':
+        openAppearanceSubPanel('theme');
+        break;
+      case 'font-bg':
+        openAppearanceSubPanel('font-bg');
+        break;
+      case 'bubble-css':
+        openAppearanceSubPanel('bubble-css');
+        break;
+      case 'avatar':
+        openAppearanceSubPanel('avatar');
+        break;
+      case 'decision':
+        // 打开抉择菜单（抛硬币/抽签）
+        const decisionModal = document.getElementById('decision-menu-modal');
+        if (decisionModal) {
+          openModalWithSettingsBack('decision-menu-modal');
+        } else {
+          // 如果找不到模态框，尝试通过原有按钮触发
+          const decisionBtn = document.getElementById('decision-function');
+          if (decisionBtn) decisionBtn.click();
+          else showNotification('抉择功能暂不可用', 'info');
+        }
+        break;
+
+      // ========== 独立全屏功能 ==========
+      case 'icon-customize':
+        openIconCustomize(true);
+        break;
+      case 'mood':
+        // 打开心晴手帐模态框（mood-modal），而不是全屏心情日历
+        openModalWithSettingsBack('mood-modal');
+        break;
+      case 'library':
+        openModalWithSettingsBack('custom-replies-modal');
+        break;
+      case 'tarot':
+        openModalWithSettingsBack('fortune-lenormand-modal');
+        break;
+      case 'envelope':
+        openModalWithSettingsBack('envelope-modal');
+        break;
+      case 'group':
+        openModalWithSettingsBack('group-chat-modal');
+        break;
+      case 'call':
+        if (window.callFeature?.startCall) window.callFeature.startCall(false);
+        else document.querySelector('#collapsed-call-btn')?.click();
+        break;
+      case 'music':
+        document.getElementById('music-player-toggle')?.click();
+        break;
+
+      // ========== 聊天设置 ==========
+      case 'send-settings':
+      case 'chat-style':
+        openModalWithSettingsBack('chat-modal');
+        break;
+
+      // ========== 纪念日 ==========
+      case 'anniversary':
+        openModalWithSettingsBack('anniversary-modal');
+        break;
+
+      // ========== 个人资料 ==========
+      case 'profile-me':
+        openProfileEditor('me');
+        break;
+      case 'profile-partner':
+        openProfileEditor('partner');
+        break;
+
+      // ========== 数据管理 ==========
+      case 'stats':
+        openModalWithSettingsBack('stats-modal');
+        break;
+      case 'data':
+        openModalWithSettingsBack('data-modal');
+        setTimeout(() => {
+          const modal = document.getElementById('data-modal');
+          if (!modal) return;
+
+          // 重新绑定关闭按钮
+          const closeBtn = document.getElementById('close-data');
+          if (closeBtn) {
+            const newBtn = closeBtn.cloneNode(true);
+            closeBtn.parentNode.replaceChild(newBtn, closeBtn);
+            newBtn.onclick = (e) => {
+              e.stopPropagation();
+              modal.style.display = 'none';
+              backToSettings();
+            };
+          }
+
+          // 隐藏左上角箭头（假设箭头在 .d-topbar-left 内）
+          const leftArea = modal.querySelector('.d-topbar-left');
+          if (leftArea) leftArea.style.display = 'none';
+
+          // 删除“重放新手引导”和“声明与致谢”
+          const allRows = modal.querySelectorAll('.d-row-card, .db-body > div');
+          allRows.forEach(row => {
+            const text = row.innerText;
+            if (text.includes('重放新手引导') || text.includes('声明与致谢')) {
+              row.remove();
+            }
+          });
+
+          // 简化存储用量
+          const storageCard = modal.querySelector('.d-storage-card');
+          if (storageCard) {
+            const originalText = storageCard.innerText;
+            const match = originalText.match(/\d+(?:\.\d+)?\s*[KMGT]?B/);
+            if (match) {
+              storageCard.innerHTML = `<div style="padding: 10px;">📦 已用存储：${match[0]}</div>`;
+            }
+          }
+        }, 150);
+        break;
+
+      default:
+        console.warn('未处理的设置动作:', action);
+        backToSettings();
+        break;
     }
   }
 
-  /* ============================================================
-     14. 初始化（含进度条、暂停动画）
-  ============================================================ */
-  async function init() {
-    // 加载进度条
-    const progressBar = document.createElement('div');
-    progressBar.id = 'home-loading-bar';
-    progressBar.style.cssText = `
-      position: fixed; top: 0; left: 0; height: 2px; width: 0;
-      background: hsl(var(--theme-h), 55%, 65%); z-index: 9999;
-      transition: width 0.3s ease;
-      box-shadow: 0 0 8px hsla(var(--theme-h), 55%, 65%, 0.6);
-    `;
-    document.body.appendChild(progressBar);
-    progressBar.style.width = '60%';
+  // ---------- 辅助函数：打开任意模态框，并确保关闭后回到设置页 ----------
+  function openModalWithSettingsBack(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+      console.error(`找不到模态框: ${modalId}`);
+      backToSettings();
+      return;
+    }
 
-    // 立即隐藏前置引言/欢迎动画
-    ['splash-declaration', 'welcome-animation'].forEach(id => {
-      const e = document.getElementById(id);
-      if (e) { e.style.display = 'none'; e.classList.add('hidden'); }
+    // 显示 modal
+    modal.style.display = 'flex';
+    modal.style.transition = 'none';
+    modal.style.animation = 'none';
+    modal.classList.remove('hidden');
+    modal.style.zIndex = '10001';
+
+    // 保证模态框内容可以滚动/交互（某些 modal 需要重置动画）
+    const content = modal.querySelector('.modal-content');
+    if (content) {
+      content.style.animation = 'none';
+      content.style.opacity = '1';
+      content.style.transform = 'translateY(0) scale(1)';
+    }
+
+    // 劫持模态框内所有“关闭/返回”类按钮，使其返回设置页而不退回主页
+    const closeSelectors = [
+      '#close-' + modalId.replace('-modal', ''),
+      '.modal-btn-secondary:last-child',
+      '.modal-btn:contains("关闭")',
+      '.modal-btn:contains("取消")'
+    ];
+    // 更可靠的方法：遍历所有可能关闭模态框的按钮
+    const allBtns = modal.querySelectorAll('.modal-btn, .env-close-btn, .close-btn, [onclick*="hideModal"]');
+    allBtns.forEach(btn => {
+      // 避免重复绑定，标记已处理
+      if (btn._settingsPatched) return;
+      btn._settingsPatched = true;
+      const oldClick = btn.onclick;
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        // 隐藏当前模态框
+        modal.style.display = 'none';
+        // 回到设置列表页
+        backToSettings();
+        // 如果原有点击事件存在且不是我们刚设置的，可以尝试执行原逻辑（但通常原事件也会隐藏 modal）
+        if (oldClick && typeof oldClick === 'function') {
+          try { oldClick.call(btn, e); } catch (e) { console.warn(e); }
+        }
+      };
     });
 
+    // 特殊处理 back-appearance / close-appearance 等已绑定的情况，直接覆盖
+    const backAppearance = document.getElementById('back-appearance');
+    if (backAppearance) {
+      backAppearance.onclick = (e) => {
+        e.stopPropagation();
+        modal.style.display = 'none';
+        backToSettings();
+      };
+    }
+    const closeAppearance = document.getElementById('close-appearance');
+    if (closeAppearance) {
+      closeAppearance.onclick = (e) => {
+        e.stopPropagation();
+        modal.style.display = 'none';
+        backToSettings();
+      };
+    }
+    // ========== 专门处理 data-modal ==========
+    if (modalId === 'data-modal') {
+      const closeX = document.getElementById('close-data');
+      if (closeX) {
+        const newClose = closeX.cloneNode(true);
+        closeX.parentNode.replaceChild(newClose, closeX);
+        newClose.onclick = (e) => {
+          e.stopPropagation();
+          modal.style.display = 'none';
+          backToSettings();
+        };
+      }
+
+      // 无闪烁修改存储用量标签
+      const storageObserver = new MutationObserver(() => {
+        const totalLabel = document.getElementById('dm-storage-total');
+        if (totalLabel && totalLabel.innerText.includes('/')) {
+          totalLabel.innerText = totalLabel.innerText.split('/')[0].trim();
+          storageObserver.disconnect();
+        }
+      });
+      storageObserver.observe(modal, { childList: true, subtree: true });
+
+      // 延迟隐藏箭头和删除条目（不会闪烁）
+      setTimeout(() => {
+        const backBtn = modal.querySelector('.dm-topbar-back');
+        if (backBtn) backBtn.style.display = 'none';
+
+        const tutorialRow = document.getElementById('replay-tutorial-btn-row');
+        if (tutorialRow) tutorialRow.remove();
+        const creditsRow = document.getElementById('open-credits-row');
+        if (creditsRow) creditsRow.remove();
+      }, 300);
+    }
+  }
+
+  // 打开“我的/梦角”资料编辑器（昵称+头像）
+  function openProfileEditor(target) {
+    if (target === 'me') {
+      // 触发原有编辑我的头像/昵称的交互（双击头像或点击编辑名称）
+      const myAvatar = document.getElementById('my-avatar');
+      if (myAvatar) myAvatar.dispatchEvent(new Event('dblclick'));  // 双击头像触发上传
+      // 同时弹出昵称编辑框（复用 edit-modal）
+      setTimeout(() => {
+        const editModal = document.getElementById('edit-modal');
+        if (editModal) {
+          const titleSpan = editModal.querySelector('#edit-modal-title');
+          const nameInput = editModal.querySelector('#name-input');
+          const saveBtn = editModal.querySelector('#save-name');
+          if (titleSpan) titleSpan.textContent = '修改我的昵称';
+          if (nameInput) {
+            const currentName = document.getElementById('my-name')?.textContent || '我';
+            nameInput.value = currentName;
+            nameInput.oninput = () => { if (saveBtn) saveBtn.disabled = !nameInput.value.trim(); };
+          }
+          if (saveBtn) {
+            saveBtn.onclick = () => {
+              const newName = nameInput.value.trim();
+              if (newName && typeof settings !== 'undefined') {
+                settings.myName = newName;
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+                if (typeof updateUI === 'function') updateUI();
+                refreshHomeData();
+                showNotification('我的昵称已更新', 'success');
+              }
+              editModal.style.display = 'none';
+              backToSettings();   // 保存后返回设置页
+            };
+          }
+          const cancelBtn = document.getElementById('cancel-edit');
+          if (cancelBtn) {
+            cancelBtn.onclick = () => {
+              editModal.style.display = 'none';
+              backToSettings();
+            };
+          }
+          editModal.style.display = 'flex';
+        }
+      }, 50);
+    } else if (target === 'partner') {
+      // 编辑梦角资料
+      const partnerAvatar = document.getElementById('partner-avatar');
+      if (partnerAvatar) partnerAvatar.dispatchEvent(new Event('dblclick'));
+      setTimeout(() => {
+        const editModal = document.getElementById('edit-modal');
+        if (editModal) {
+          const titleSpan = editModal.querySelector('#edit-modal-title');
+          const nameInput = editModal.querySelector('#name-input');
+          const saveBtn = editModal.querySelector('#save-name');
+          if (titleSpan) titleSpan.textContent = '修改梦角昵称';
+          if (nameInput) {
+            const currentName = document.getElementById('partner-name')?.textContent || '梦角';
+            nameInput.value = currentName;
+            nameInput.oninput = () => { if (saveBtn) saveBtn.disabled = !nameInput.value.trim(); };
+          }
+          if (saveBtn) {
+            saveBtn.onclick = () => {
+              const newName = nameInput.value.trim();
+              if (newName && typeof settings !== 'undefined') {
+                settings.partnerName = newName;
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+                if (typeof updateUI === 'function') updateUI();
+                refreshHomeData();
+                showNotification('梦角昵称已更新', 'success');
+              }
+              editModal.style.display = 'none';
+              backToSettings();
+            };
+          }
+          const cancelBtn = document.getElementById('cancel-edit');
+          if (cancelBtn) {
+            cancelBtn.onclick = () => {
+              editModal.style.display = 'none';
+              backToSettings();
+            };
+          }
+          editModal.style.display = 'flex';
+        }
+      }, 50);
+    }
+  }
+
+  // 简单通知 (若全局无 showNotification 则备用)
+  function showNotification(msg, type = 'info') {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(msg, type);
+    } else {
+      alert(msg);
+    }
+  }
+
+  // ---------- PWA + 初始化 ----------
+  function registerSW() { if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(e => console.warn(e))); }
+
+  async function init() {
+    const progressBar = document.createElement('div');
+    progressBar.id = 'home-loading-bar';
+    progressBar.style.cssText = 'position:fixed;top:0;left:0;height:2px;width:0;background:hsl(var(--theme-h),55%,65%);z-index:9999;transition:width0.3s;box-shadow:0 0 8px hsla(var(--theme-h),55%,65%,0.6)';
+    document.body.appendChild(progressBar);
+    progressBar.style.width = '60%';
+    ['splash-declaration', 'welcome-animation'].forEach(id => { const e = document.getElementById(id); if (e) { e.style.display = 'none'; e.classList.add('hidden'); } });
     await loadStoredPrefs();
     await loadMoodData();
     registerSW();
-
     const homeEl = buildHomeDOM();
     document.body.appendChild(homeEl);
-
     ensureFloatingBackBtn();
     bindEvents();
     applyCustomIcons();
-
-    // 直接显示主页（不等欢迎动画）
-    setTimeout(() => {
-      refreshHomeData();
-      isOnHome = true;
-    }, 100);
-
-    // 监听头像/昵称变化（聊天页修改后同步到主页）
+    setTimeout(() => { refreshHomeData(); isOnHome = true; }, 100);
     setupSyncObservers();
-
-    // WhatsApp 风格 + 按钮菜单
-    setupChatPlusMenu();
-
-    // 进度条完成
     progressBar.style.width = '100%';
-    setTimeout(() => {
-      progressBar.style.opacity = '0';
-      progressBar.style.transition = 'opacity 0.4s';
-      setTimeout(() => progressBar.remove(), 400);
-    }, 200);
-
-    // 页面隐藏时暂停动画
-    document.addEventListener('visibilitychange', () => {
-      document.body.classList.toggle('pause-animations', document.hidden);
-    });
-  }
-
-  /* ============================================================
-     14a. WhatsApp 风格 + 按钮菜单
-  ============================================================ */
-  const CHAT_PLUS_ITEMS = [
-    { id: 'poke', icon: 'fa-hand-sparkles', label: '拍一拍', bg: 'icon-bg-1' },
-    { id: 'call', icon: 'fa-video', label: '视频通话', bg: 'icon-bg-11' },
-    { id: 'chat-cfg', icon: 'fa-comment', label: '聊天设置', bg: 'icon-bg-7' },
-    { id: 'data', icon: 'fa-database', label: '数据管理', bg: 'icon-bg-10' },
-    { id: 'appear', icon: 'fa-paintbrush', label: '外观功能', bg: 'icon-bg-2' },
-    { id: 'session', icon: 'fa-comments', label: '会话管理', bg: 'icon-bg-12' },
-  ];
-
-  function setupChatPlusMenu() {
-    const inputArea = document.querySelector('.input-area');
-    if (!inputArea) return;
-    if (document.getElementById('chat-plus-btn')) return;
-
-    const btn = document.createElement('button');
-    btn.id = 'chat-plus-btn';
-    btn.title = '更多功能';
-    btn.innerHTML = '<i class="fas fa-plus"></i>';
-
-    const messageInput = document.getElementById('message-input');
-    if (messageInput && messageInput.parentNode === inputArea) {
-      inputArea.insertBefore(btn, messageInput);
-    } else {
-      inputArea.appendChild(btn);
-    }
-
-    const menu = document.createElement('div');
-    menu.id = 'chat-plus-menu';
-    menu.innerHTML = `
-      <div class="chat-plus-grid">
-        ${CHAT_PLUS_ITEMS.map(it => `
-          <button class="chat-plus-item" data-plus="${it.id}">
-            <div class="chat-plus-icon ${it.bg}"><i class="fas ${it.icon}"></i></div>
-            <span class="chat-plus-label">${it.label}</span>
-          </button>
-        `).join('')}
-      </div>
-    `;
-    document.body.appendChild(menu);
-
-    function closeMenu() {
-      menu.classList.remove('visible');
-      btn.classList.remove('open');
-    }
-    function openMenu() {
-      menu.classList.add('visible');
-      btn.classList.add('open');
-    }
-
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (menu.classList.contains('visible')) closeMenu();
-      else openMenu();
-    });
-
-    menu.querySelectorAll('.chat-plus-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeMenu();
-        triggerChatPlusAction(item.dataset.plus);
-      });
-    });
-
-    document.addEventListener('click', (ev) => {
-      if (!menu.classList.contains('visible')) return;
-      if (menu.contains(ev.target) || btn.contains(ev.target)) return;
-      closeMenu();
-    });
-  }
-
-  function triggerChatPlusAction(action) {
-    switch (action) {
-      case 'poke':
-        if (!tryOpen(['#combo-btn'])) {
-          tryOpen(['poke-modal']);
-        }
-        setTimeout(() => {
-          const pokeTab = document.querySelector('.combo-tab-btn[data-tab="poke"]');
-          if (pokeTab) pokeTab.click();
-        }, 80);
-        break;
-      case 'call':
-        tryOpen([
-          () => window.callFeature?.startCall?.(false),
-          '#collapsed-call-btn'
-        ]);
-        break;
-      case 'chat-cfg':
-        tryOpen(['chat-modal', '#settings-btn']);
-        break;
-      case 'data':
-        openModalById('data-modal');
-        break;
-      case 'appear':
-        openModalById('appearance-modal');
-        break;
-      case 'session':
-        tryOpen(['#session-manager-btn']);
-        break;
-    }
+    setTimeout(() => { progressBar.style.opacity = '0'; setTimeout(() => progressBar.remove(), 400); }, 200);
+    document.addEventListener('visibilitychange', () => document.body.classList.toggle('pause-animations', document.hidden));
   }
 
   function setupSyncObservers() {
-    const targets = ['my-avatar', 'partner-avatar', 'my-name', 'partner-name'];
-    targets.forEach(id => {
+    ['my-avatar', 'partner-avatar', 'my-name', 'partner-name'].forEach(id => {
       const el = document.getElementById(id);
-      if (!el) return;
-      const obs = new MutationObserver(() => {
-        if (isOnHome) refreshHomeData();
-      });
-      obs.observe(el, { attributes: true, childList: true, subtree: true, characterData: true });
+      if (el) new MutationObserver(() => { if (isOnHome) refreshHomeData(); }).observe(el, { attributes: true, childList: true, subtree: true, characterData: true });
     });
   }
 
-  // 暴露 API
-  window.homeScreen = {
-    backToHome,
-    backToSettings,
-    goToFeature,
-    refreshHomeData,
-    openThemePanel,
-    openSettingsScreen,
-    openMoodCalendar,
-    openIconCustomize,
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
+  window.homeScreen = { backToHome, backToSettings, goToFeature, refreshHomeData, openThemePanel, openSettingsScreen, openMoodCalendar, openIconCustomize };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
+
+// 简单主题应用函数（如果全局不存在）
+if (typeof window.applyThemeColor !== 'function') {
+  window.applyThemeColor = function (theme) {
+    const colors = {
+      gold: { h: 45, s: 70 },
+      blue: { h: 210, s: 70 },
+      purple: { h: 270, s: 70 },
+      green: { h: 120, s: 60 },
+      pink: { h: 340, s: 70 },
+      'black-white': { h: 0, s: 0 },
+      pastel: { h: 0, s: 80 },
+      sunset: { h: 25, s: 80 },
+      forest: { h: 140, s: 50 },
+      ocean: { h: 200, s: 70 }
+    };
+    const c = colors[theme];
+    if (c) {
+      document.documentElement.style.setProperty('--theme-h', c.h);
+      document.documentElement.style.setProperty('--theme-s', c.s + '%');
+      if (typeof applyHue === 'function') applyHue(c.h);
+      if (typeof saveThemePreference === 'function') saveThemePreference();
+    }
+  };
+}

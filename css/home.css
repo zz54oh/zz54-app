@@ -74,7 +74,8 @@ body.feature-mode {
 #home-screen.hidden {
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.96);
+  transform: scale(0.98);
+  transition: none !important;
 }
 
 /* ============ 背景 ============ */
@@ -487,11 +488,7 @@ body.feature-mode {
   -webkit-backdrop-filter: blur(35px);
   border: 1px solid var(--glass-border);
   border-radius: 26px;
-  box-shadow:
-    var(--glass-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.04);
-  align-items: center;
+  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(0, 0, 0, 0.04);
   width: 70%;
   max-width: 400px;
   margin-left: auto;
@@ -499,47 +496,58 @@ body.feature-mode {
   padding: 10px 0;
   display: flex;
   justify-content: center;
-  gap: 89px;
-}
-
-[data-theme="dark"] .home-dock {
-  box-shadow:
-    var(--glass-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  gap: 30px;
+  /* 调整两个按钮之间的间距 */
 }
 
 .home-dock-btn {
-  flex: none;
-  width: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 0;
   background: none;
   border: none;
   cursor: pointer;
   font-family: inherit;
-  color: var(--home-text);
-  border-radius: 14px;
-  transition: background 0.15s, transform 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .home-dock-btn:active {
-  background: hsla(var(--theme-h), 30%, 70%, 0.18);
-  transform: scale(0.95);
+  transform: scale(0.92);
 }
 
-.home-dock-btn i {
-  font-size: 17px;
+.home-dock-btn .home-feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--glass-bg-icon);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
   color: var(--theme-primary-deep);
+  box-shadow: var(--glass-shadow);
+  transition: box-shadow 0.25s ease;
 }
 
-.home-dock-btn span {
-  font-size: 10.5px;
+.home-dock-btn .home-feature-icon:hover {
+  box-shadow: 0 8px 24px hsla(var(--theme-h), 40%, 40%, 0.18);
+}
+
+.home-dock-btn .home-feature-label {
+  font-size: 11px;
   font-weight: 500;
+  color: var(--home-text);
   letter-spacing: 0.4px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .home-dock-btn .home-feature-label {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 /* ============ 浮动返回主页按钮 ============ */
@@ -1309,19 +1317,67 @@ body.pause-animations *::after {
   animation-delay: 0s !important;
   transition-duration: 0s !important;
 }
+
 /* ============ 主页进出动画 ============ */
 @keyframes homeScreenExit {
-  from { opacity: 1; transform: scale(1); }
-  to   { opacity: 0; transform: scale(1.04); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.04);
+  }
 }
+
 @keyframes homeScreenEnter {
-  from { opacity: 0; transform: scale(0.97); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
+
 .home-screen-exit {
   animation: homeScreenExit 0.2s ease-out forwards;
   pointer-events: none;
 }
+
 .home-screen-enter {
   animation: homeScreenEnter 0.22s ease-out forwards;
+}
+
+#appearance-panel-container button .fa-arrow-left {
+  display: none !important;
+}
+
+/* 同时隐藏该按钮的文本“返回”所在的父级 */
+#appearance-panel-container button:has(.fa-arrow-left) {
+  display: none !important;
+}
+
+/* 隐藏聊天设置模态框中的“关闭”按钮，只保留“返回”按钮 */
+#close-chat {
+  display: none !important;
+}
+
+/* 将聊天设置模态框底部的返回按钮右对齐 */
+#chat-modal .modal-buttons {
+  justify-content: flex-end !important;
+}
+
+/* 如果按钮容器只有一个按钮，移除默认的边距 */
+#chat-modal .modal-buttons .modal-btn:only-child {
+  margin-right: 0;
+}
+
+/* 聊天设置底部的返回按钮右对齐 */
+#back-chat {
+  margin-left: auto !important;
+  margin-right: 0 !important;
 }
