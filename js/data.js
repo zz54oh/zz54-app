@@ -22,7 +22,7 @@
         + '<div class="dm-storage-card">'
         + '<div class="dm-storage-header">'
         + '<span class="dm-storage-title"><i class="fas fa-database" style="margin-right:5px;opacity:0.55"></i>存储用量</span>'
-        + '<span class="dm-storage-label" id="dm-storage-total">计算中…</span>'
+        + '<span class="dm-storage-label" id="dm-storage-total"></span>'
         + '</div>'
         + '<div class="dm-stats-grid">'
         + '<div class="dm-stat-block"><div class="dm-stat-block-icon" style="color:var(--accent-color)"><i class="fas fa-comments"></i></div><div class="dm-stat-pill-val" id="dm-stat-msgs">—</div><div class="dm-stat-pill-key">聊天记录</div></div>'
@@ -60,15 +60,6 @@
         + '<div class="dm-row-info"><div class="dm-row-title">后台消息推送</div><div class="dm-row-desc" id="notif-status-text">收到新消息时弹出提醒</div></div>'
         + '<label class="dm-toggle-pill"><input type="checkbox" id="notif-permission-toggle" onchange="handleNotifToggle(this)"><span class="dm-toggle-slider"></span></label>'
         + '</div>'
-        + '<div class="dm-row-item" id="replay-tutorial-btn-row" style="cursor:pointer">'
-        + '<div class="dm-row-icon slate"><i class="fas fa-compass"></i></div>'
-        + '<div class="dm-row-info"><div class="dm-row-title">重放新手引导</div><div class="dm-row-desc">重新播放功能介绍教程</div></div>'
-        + '<button class="dm-nav-btn" id="replay-tutorial-btn"><i class="fas fa-play"></i></button>'
-        + '</div>'
-        + '<div class="dm-row-item" id="open-credits-row" style="cursor:pointer">'
-        + '<div class="dm-row-icon violet"><i class="fas fa-scroll"></i></div>'
-        + '<div class="dm-row-info"><div class="dm-row-title">声明与致谢</div><div class="dm-row-desc">开源声明、致谢名单</div></div>'
-        + '<button class="dm-nav-btn" id="open-credits-btn"><i class="fas fa-chevron-right"></i></button>'
         + '</div>'
         + '</div>'
 
@@ -424,15 +415,12 @@
         if (!mc) return;
         mc.style.opacity = '0';
         ensureHTML(mc);
-        requestAnimationFrame(function () {
-            mc.style.transform = 'none';
-        });
         setTimeout(function () {
             updateStats();
             syncToggles();
+            mc.style.transition = 'opacity 0.2s ease';
             mc.style.opacity = '1';
-            mc.style.transition = 'opacity 0.15s ease';
-        }, 0);
+        }, 150);
     }
 
     var _styleObserver = null;
