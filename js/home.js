@@ -257,7 +257,7 @@
     const content = m.querySelector('.modal-content');
     if (content) {
       content.style.animation = 'none';
-      content.style.opacity = '1';
+      if (modalId !== 'data-modal') content.style.opacity = '1';
       content.style.transform = 'translateY(0) scale(1)';
     }
     return true;
@@ -915,7 +915,7 @@
     const content = modal.querySelector('.modal-content');
     if (content) {
       content.style.animation = 'none';
-      content.style.opacity = '1';
+      if (modalId !== 'data-modal') content.style.opacity = '1';
       content.style.transform = 'translateY(0) scale(1)';
     }
 
@@ -976,15 +976,7 @@
         };
       }
 
-      // 无闪烁修改存储用量标签
-      const storageObserver = new MutationObserver(() => {
-        const totalLabel = document.getElementById('dm-storage-total');
-        if (totalLabel && totalLabel.innerText.includes('/')) {
-          totalLabel.innerText = totalLabel.innerText.split('/')[0].trim();
-          storageObserver.disconnect();
-        }
-      });
-      storageObserver.observe(modal, { childList: true, subtree: true });
+
 
       // 延迟隐藏箭头和删除条目（不会闪烁）
       setTimeout(() => {
