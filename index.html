@@ -365,7 +365,13 @@
                     <button class="send-btn input-btn" id="send-btn" title="发送消息"><i
                             class="fas fa-paper-plane"></i></button>
 
-                    <div class="sticker-picker-popover" id="user-sticker-picker">
+                    
+                </div>
+                <input type="file" id="image-input" class="file-input" accept="image/*">
+                <input type="file" id="my-sticker-quick-upload" class="file-input" accept="image/*" multiple>
+            </div>
+
+            <div class="sticker-picker-popover" id="user-sticker-picker">
                         <div class="combo-tabs-header">
                             <button class="combo-tab-btn active" data-tab="my-sticker"><i class="fas fa-user"
                                     style="font-size:10px;"></i> 我</button>
@@ -389,11 +395,6 @@
                         <div class="combo-content-area" id="combo-content-area">
                         </div>
                     </div>
-                </div>
-                <input type="file" id="image-input" class="file-input" accept="image/*">
-                <input type="file" id="my-sticker-quick-upload" class="file-input" accept="image/*" multiple>
-            </div>
-
             <div id="collapsed-extras-panel" style="display:none;">
                 <div class="collapsed-extras-inner"
                     style="padding:12px; background:var(--secondary-bg); border-top:1px solid var(--border-color);">
