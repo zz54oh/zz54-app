@@ -277,20 +277,13 @@
     setContext('home');
     showBackBtn(backToHome);
     setTimeout(() => {
-      const openM = id => {
-        const m = document.getElementById(id);
-        if (!m) return;
-        showModal(m);
-        const c = m.querySelector('.modal-content');
-        if (c) { c.style.animation='none'; c.style.opacity='1'; c.style.transform='none'; }
-        m.style.zIndex = '10001';
-      };
       const handlers = {
-        tarot:    () => openM('fortune-lenormand-modal'),
-        envelope: () => openM('envelope-modal'),
-        library:  () => openM('custom-replies-modal'),
-        group:    () => openM('group-chat-modal'),
-        call:     () => { if (window.callFeature?.startCall) window.callFeature.startCall(false); },
+        tarot: () => document.getElementById('fortune-lenormand-function')?.click(),
+        envelope: () => document.getElementById('envelope-function')?.click(),
+        library: () => document.getElementById('custom-replies-function')?.click(),
+        group: () => document.getElementById('group-chat-btn')?.click(),
+        call: () => { if (window.callFeature?.startCall) window.callFeature.startCall(false); else document.querySelector('#collapsed-call-btn')?.click(); },
+        music: () => document.getElementById('music-player-toggle')?.click()
       };
       if (handlers[featureName]) handlers[featureName]();
     }, 0);
