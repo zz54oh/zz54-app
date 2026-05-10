@@ -813,7 +813,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            max-width: 200px;
+            max-width: 150px;
             margin: 0 auto;
             padding: 4px 10px 4px;
             width: 100%;
@@ -1287,7 +1287,7 @@
             left: 0;
             right: 0;
             z-index: 50;
-            padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+            padding-bottom: max(env(safe-area-inset-bottom, 0px), 30px);
             padding-left: env(safe-area-inset-left, 0px);
             padding-right: env(safe-area-inset-right, 0px);
         }
