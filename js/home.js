@@ -28,7 +28,7 @@
     { id: 'mood', icon: 'fa-cloud-sun', label: '心情', bg: 'icon-bg-3' },
     { id: 'group', icon: 'fa-user-group', label: '群聊', bg: 'icon-bg-6' },
     { id: 'call', icon: 'fa-video', label: '通话', bg: 'icon-bg-11' },
-    { id: 'music', icon: 'fa-music', label: '音乐', bg: 'icon-bg-8' }
+    
   ];
 
   const MOOD_EMOJIS = ['😊', '😄', '🥰', '😌', '😴', '😢', '😭', '😠', '😰', '🤔', '😎', '🥳', '🤗', '😔', '😍', '🥺', '😤', '🌧️', '☀️', '⭐', '🌙', '🍃'];
