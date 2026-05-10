@@ -811,9 +811,9 @@
 
         .header-inner {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            max-width: 560px;
+            max-width: 360px;
             margin: 0 auto;
             padding: 4px 10px 4px;
             width: 100%;
