@@ -134,6 +134,7 @@ body.feature-mode {
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   min-height: 180px;
+  margin-top: max(env(safe-area-inset-top, 0px), 20px);
 }
 
 [data-theme="dark"] .home-hero {
@@ -497,6 +498,7 @@ body.feature-mode {
   display: flex;
   justify-content: center;
   gap: 30px;
+  margin-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
   /* 调整两个按钮之间的间距 */
 }
 
