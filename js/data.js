@@ -442,7 +442,9 @@
         var modal = document.getElementById('data-modal');
         if (!modal) return;
 
+        // 页面加载时就预先写入内容，避免第一次打开时从空到有的闪烁
         var mc = modal.querySelector('.modal-content');
+        if (mc) ensureHTML(mc);
         if (mc) mc.dataset.dm6Built = 'v9';
 
         if (_styleObserver) { _styleObserver.disconnect(); _styleObserver = null; }
