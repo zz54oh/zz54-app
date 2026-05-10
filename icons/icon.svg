@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="200 40 280 280" width="512" height="512">
 <defs>
-<linearGradient id="bg" x1="0" y1="0" x2="0.85" y2="1">
-<stop offset="0%" stop-color="#fde9f1"/>
-<stop offset="50%" stop-color="#f4e3ee"/>
-<stop offset="100%" stop-color="#e6dbf2"/>
-</linearGradient>
-<radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
-<stop offset="0%" stop-color="#f0a4c4" stop-opacity="0.6"/>
-<stop offset="55%" stop-color="#f0a4c4" stop-opacity="0.22"/>
-<stop offset="100%" stop-color="#f0a4c4" stop-opacity="0"/>
-</radialGradient>
-<linearGradient id="heart" x1="0.25" y1="0" x2="0.7" y2="1">
+<linearGradient id="hrt5" x1="0.2" y1="0" x2="0.8" y2="1">
 <stop offset="0%" stop-color="#f5acca"/>
-<stop offset="100%" stop-color="#c97cae"/>
+<stop offset="100%" stop-color="#b06bae"/>
 </linearGradient>
 </defs>
-<rect x="200" y="40" width="280" height="280" rx="62" fill="url(#bg)"/>
-<circle cx="340" cy="178" r="160" fill="url(#halo)"/>
-<path d="M340,262 C340,262 240,212 240,140 C240,98 276,68 340,110 C404,68 440,98 440,140 C440,212 340,262 340,262 Z" fill="url(#heart)"/>
-<ellipse cx="295" cy="130" rx="22" ry="13" fill="#ffffff" opacity="0.7" transform="rotate(-25 295 130)"/>
-<ellipse cx="380" cy="118" rx="9" ry="6" fill="#ffffff" opacity="0.8"/>
-<path d="M260,88 L262,95 L269,97 L262,99 L260,106 L258,99 L251,97 L258,95 Z" fill="#ffffff" opacity="0.9"/>
-<path d="M430,108 L432,114 L438,116 L432,118 L430,124 L428,118 L422,116 L428,114 Z" fill="#ffffff" opacity="0.85"/>
-<path d="M250,205 L251,209 L255,210 L251,211 L250,215 L249,211 L245,210 L249,209 Z" fill="#ffffff" opacity="0.7"/>
-<path d="M428,222 L430,227 L435,229 L430,231 L428,236 L426,231 L421,229 L426,227 Z" fill="#ffffff" opacity="0.8"/>
+<rect x="200" y="40" width="280" height="280" rx="62" fill="#ffffff"/>
+<circle cx="340" cy="180" r="118" fill="none" stroke="#e0c8f0" stroke-width="1.5" opacity="0.5"/>
+<ellipse cx="340" cy="180" rx="118" ry="50" fill="none" stroke="#d4b0e8" stroke-width="1.5" opacity="0.5" transform="rotate(20 340 180)"/>
+<ellipse cx="340" cy="180" rx="118" ry="50" fill="none" stroke="#d4b0e8" stroke-width="1.5" opacity="0.5" transform="rotate(-20 340 180)"/>
+<path d="M272,68 L274,76 L282,78 L274,80 L272,88 L270,80 L262,78 L270,76 Z" fill="#d4a0d4" opacity="0.85"/>
+<path d="M408,58 L410,65 L417,67 L410,69 L408,76 L406,69 L399,67 L406,65 Z" fill="#c090c8" opacity="0.8"/>
+<path d="M455,100 L457,107 L464,109 L457,111 L455,118 L453,111 L446,109 L453,107 Z" fill="#d4a0d4" opacity="0.75"/>
+<path d="M228,105 L230,111 L236,113 L230,115 L228,121 L226,115 L220,113 L226,111 Z" fill="#c090c8" opacity="0.75"/>
+<path d="M228,245 L230,251 L236,253 L230,255 L228,261 L226,255 L220,253 L226,251 Z" fill="#d4a0d4" opacity="0.7"/>
+<path d="M452,242 L454,248 L460,250 L454,252 L452,258 L450,252 L444,250 L450,248 Z" fill="#c090c8" opacity="0.7"/>
+<path d="M310,58 L311.5,63 L317,64.5 L311.5,66 L310,71 L308.5,66 L303,64.5 L308.5,63 Z" fill="#e0b0e8" opacity="0.8"/>
+<path d="M375,55 L376.5,60 L382,61.5 L376.5,63 L375,68 L373.5,63 L368,61.5 L373.5,60 Z" fill="#d4a0d4" opacity="0.75"/>
+<path d="M468,145 L469.5,150 L475,151.5 L469.5,153 L468,158 L466.5,153 L461,151.5 L466.5,150 Z" fill="#c8a0d8" opacity="0.75"/>
+<path d="M212,145 L213.5,150 L219,151.5 L213.5,153 L212,158 L210.5,153 L205,151.5 L210.5,150 Z" fill="#d4a0d4" opacity="0.7"/>
+<path d="M255,285 L256.5,290 L262,291.5 L256.5,293 L255,298 L253.5,293 L248,291.5 L253.5,290 Z" fill="#c8a0d8" opacity="0.65"/>
+<path d="M425,285 L426.5,290 L432,291.5 L426.5,293 L425,298 L423.5,293 L418,291.5 L423.5,290 Z" fill="#d4a0d4" opacity="0.65"/>
+<circle cx="345" cy="56" r="3" fill="#d4a0d4" opacity="0.75"/>
+<circle cx="290" cy="285" r="2.5" fill="#c8a0d8" opacity="0.7"/>
+<circle cx="392" cy="283" r="2" fill="#d4a0d4" opacity="0.65"/>
+<circle cx="468" cy="200" r="2.5" fill="#c090c8" opacity="0.7"/>
+<circle cx="212" cy="200" r="2" fill="#d4a0d4" opacity="0.65"/>
+<path d="M340,278 C340,278 214,216 214,130 C214,82 254,50 340,96 C426,50 466,82 466,130 C466,216 340,278 340,278 Z" fill="url(#hrt5)"/>
+<ellipse cx="290" cy="120" rx="25" ry="13" fill="#ffffff" opacity="0.5" transform="rotate(-25 290 120)"/>
+<ellipse cx="376" cy="108" rx="10" ry="6" fill="#ffffff" opacity="0.6"/>
 </svg>
