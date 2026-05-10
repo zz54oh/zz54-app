@@ -846,12 +846,22 @@
         openModalWithSettingsBack('stats-modal');
         break;
       case 'data':
+        // 先清理 DOM（modal 还没显示，不会闪）
+        const _dataModal = document.getElementById('data-modal');
+        if (_dataModal) {
+          const leftArea = _dataModal.querySelector('.d-topbar-left');
+          if (leftArea) leftArea.style.display = 'none';
+          _dataModal.querySelectorAll('.d-row-card, .db-body > div').forEach(row => {
+            if (row.innerText.includes('重放新手引导') || row.innerText.includes('声明与致谢')) {
+              row.remove();
+            }
+          });
+        }
+        // 清理完再打开
         openModalWithSettingsBack('data-modal');
         setTimeout(() => {
           const modal = document.getElementById('data-modal');
           if (!modal) return;
-
-          // 重新绑定关闭按钮
           const closeBtn = document.getElementById('close-data');
           if (closeBtn) {
             const newBtn = closeBtn.cloneNode(true);
@@ -862,35 +872,7 @@
               backToSettings();
             };
           }
-
-          // 隐藏左上角箭头（假设箭头在 .d-topbar-left 内）
-          const leftArea = modal.querySelector('.d-topbar-left');
-          if (leftArea) leftArea.style.display = 'none';
-
-          // 删除“重放新手引导”和“声明与致谢”
-          const allRows = modal.querySelectorAll('.d-row-card, .db-body > div');
-          allRows.forEach(row => {
-            const text = row.innerText;
-            if (text.includes('重放新手引导') || text.includes('声明与致谢')) {
-              row.remove();
-            }
-          });
-
-          // 简化存储用量
-          const storageCard = modal.querySelector('.d-storage-card');
-          if (storageCard) {
-            const originalText = storageCard.innerText;
-            const match = originalText.match(/\d+(?:\.\d+)?\s*[KMGT]?B/);
-            if (match) {
-              storageCard.innerHTML = `<div style="padding: 10px;">📦 已用存储：${match[0]}</div>`;
-            }
-          }
-        }, 150);
-        break;
-
-      default:
-        console.warn('未处理的设置动作:', action);
-        backToSettings();
+        }, 50);
         break;
     }
   }

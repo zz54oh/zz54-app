@@ -1,43 +1,43 @@
 (function () {
     'use strict';
 
-    const KEY_ENABLED  = 'callFeatureEnabled';
-    const KEY_POS      = 'callWindowPos';
-    const KEY_SIZE     = 'callWindowSize';
+    const KEY_ENABLED = 'callFeatureEnabled';
+    const KEY_POS = 'callWindowPos';
+    const KEY_SIZE = 'callWindowSize';
     const KEY_PILL_POS = 'callPillPos';
-    const BG_LF_KEY    = 'callBgImageData';
+    const BG_LF_KEY = 'callBgImageData';
 
     const S = {
-        enabled:         localStorage.getItem(KEY_ENABLED) !== 'false',
-        active:          false,
-        startTime:       null,
-        elapsed:         0,
-        timerRAF:        null,
-        minimized:       false,
-        immersive:       false,
-        bgImage:         null,
-        pos:             JSON.parse(localStorage.getItem(KEY_POS)  || 'null'),
-        pillPos:         JSON.parse(localStorage.getItem(KEY_PILL_POS) || 'null'),
-        size:            JSON.parse(localStorage.getItem(KEY_SIZE) || '{"w":280,"h":440}'),
-        dragOff:         null,
-        pillDragOff:     null,
-        pillDragged:     false,
-        resizeInit:      null,
-        incomingTimer:   null,
+        enabled: localStorage.getItem(KEY_ENABLED) !== 'false',
+        active: false,
+        startTime: null,
+        elapsed: 0,
+        timerRAF: null,
+        minimized: false,
+        immersive: false,
+        bgImage: null,
+        pos: JSON.parse(localStorage.getItem(KEY_POS) || 'null'),
+        pillPos: JSON.parse(localStorage.getItem(KEY_PILL_POS) || 'null'),
+        size: JSON.parse(localStorage.getItem(KEY_SIZE) || '{"w":280,"h":440}'),
+        dragOff: null,
+        pillDragOff: null,
+        pillDragged: false,
+        resizeInit: null,
+        incomingTimer: null,
         connectingTimer: null,
         randomCallTimer: null,
-        isPartnerCall:   false,
+        isPartnerCall: false,
     };
 
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
     function loadBg() {
         if (!window.localforage) return;
-        localforage.getItem(BG_LF_KEY).then(v => { if (v) { S.bgImage = v; applyBg(); } }).catch(() => {});
+        localforage.getItem(BG_LF_KEY).then(v => { if (v) { S.bgImage = v; applyBg(); } }).catch(() => { });
     }
     function saveBg(d) {
         if (!d || !window.localforage) return;
-        localforage.setItem(BG_LF_KEY, d).catch(() => {});
+        localforage.setItem(BG_LF_KEY, d).catch(() => { });
     }
 
     const SVG_HU = `<svg viewBox="0 0 24 24" fill="none" style="display:block;width:100%;height:100%;">
@@ -486,7 +486,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         btn.id = 'call-toolbar-btn';
         btn.title = '视频通话';
         btn.className = 'input-btn collapse-hideable';
-        btn.style.display = S.enabled ? '' : 'none';
+        btn.style.display = 'none';
         btn.innerHTML = '<i class="fas fa-video"></i>';
         btn.addEventListener('click', () => {
             if (!S.enabled) return;
@@ -499,8 +499,8 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
     function fmt(ms) {
         const s = Math.floor(ms / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60);
         return h > 0
-            ? `${h}:${String(m % 60).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`
-            : `${String(m).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
+            ? `${h}:${String(m % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+            : `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
     }
     const getAvSrc = () => {
         const img = document.querySelector('#partner-avatar img,[id*="partner-avatar"] img,.partner-avatar img');
@@ -540,20 +540,20 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         win.style.width = S.size.w + 'px';
         win.style.height = S.size.h + 'px';
         if (S.pos) {
-            win.style.left   = clamp(S.pos.x, 0, window.innerWidth  - S.size.w) + 'px';
-            win.style.top    = clamp(S.pos.y, 0, window.innerHeight - S.size.h) + 'px';
-            win.style.right  = 'auto'; win.style.bottom = 'auto';
+            win.style.left = clamp(S.pos.x, 0, window.innerWidth - S.size.w) + 'px';
+            win.style.top = clamp(S.pos.y, 0, window.innerHeight - S.size.h) + 'px';
+            win.style.right = 'auto'; win.style.bottom = 'auto';
         } else {
-            win.style.right  = '20px'; win.style.top = '72px';
-            win.style.left   = 'auto'; win.style.bottom = 'auto';
+            win.style.right = '20px'; win.style.top = '72px';
+            win.style.left = 'auto'; win.style.bottom = 'auto';
         }
     }
     function positionPill() {
         const pill = document.getElementById('call-mini-pill');
         if (!pill || !S.pillPos) return;
-        pill.style.left   = clamp(S.pillPos.x, 0, window.innerWidth  - (pill.offsetWidth  || 180)) + 'px';
-        pill.style.top    = clamp(S.pillPos.y, 0, window.innerHeight - (pill.offsetHeight || 50))  + 'px';
-        pill.style.right  = 'auto'; pill.style.bottom = 'auto';
+        pill.style.left = clamp(S.pillPos.x, 0, window.innerWidth - (pill.offsetWidth || 180)) + 'px';
+        pill.style.top = clamp(S.pillPos.y, 0, window.innerHeight - (pill.offsetHeight || 50)) + 'px';
+        pill.style.right = 'auto'; pill.style.bottom = 'auto';
     }
 
     function sendCallEvent(icon, label, detail) {
@@ -582,17 +582,17 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         S.minimized = false; S.isPartnerCall = !!isPartner; S.immersive = false;
         document.getElementById('call-window')?.classList.remove('immersive');
 
-        ['call-inc-avatar','call-conn-avatar','call-win-avatar','call-mini-av'].forEach(fillAv);
-        ['call-conn-name','call-win-name','call-mini-name'].forEach(fillNm);
+        ['call-inc-avatar', 'call-conn-avatar', 'call-win-avatar', 'call-mini-av'].forEach(fillAv);
+        ['call-conn-name', 'call-win-name', 'call-mini-name'].forEach(fillNm);
         applyBg(); positionWindow();
 
-        const win  = document.getElementById('call-window');
+        const win = document.getElementById('call-window');
         const body = document.getElementById('call-window-body');
         const conn = document.getElementById('call-connecting-state');
         const timerEl = document.getElementById('call-timer-display');
-        if (win)    win.classList.add('visible');
-        if (conn)   conn.classList.add('visible');
-        if (body)   body.style.display = 'none';
+        if (win) win.classList.add('visible');
+        if (conn) conn.classList.add('visible');
+        if (body) body.style.display = 'none';
         if (timerEl) timerEl.textContent = '连接中';
 
         clearTimeout(S.connectingTimer);
@@ -638,7 +638,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         cancelAnimationFrame(S.timerRAF);
         clearTimeout(S.connectingTimer); clearTimeout(S.incomingTimer);
 
-        ['call-window','call-mini-pill','call-incoming-overlay'].forEach(id => {
+        ['call-window', 'call-mini-pill', 'call-incoming-overlay'].forEach(id => {
             const e = document.getElementById(id);
             if (e) { e.classList.remove('visible'); if (id === 'call-window') e.classList.remove('immersive'); }
         });
@@ -650,7 +650,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         const iBtn = document.getElementById('call-immersive-btn');
         if (iBtn) { iBtn.classList.remove('active'); iBtn.querySelector('i').className = 'fas fa-eye-slash'; }
 
-        localStorage.setItem(KEY_POS,  JSON.stringify(S.pos));
+        localStorage.setItem(KEY_POS, JSON.stringify(S.pos));
         localStorage.setItem(KEY_SIZE, JSON.stringify(S.size));
         sendCallMsg(dur);
         if (typeof showNotification === 'function' && dur > 1500)
@@ -732,7 +732,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         const b = document.getElementById('call-size-preset-toggle');
         if (!p || !b) return;
         const r = b.getBoundingClientRect();
-        p.style.top  = (r.bottom + 8) + 'px';
+        p.style.top = (r.bottom + 8) + 'px';
         p.style.left = Math.max(8, r.left - 40) + 'px';
         p.classList.add('open');
     }
@@ -748,19 +748,19 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
             const r = win.getBoundingClientRect();
             S.dragOff = { x: e.clientX - r.left, y: e.clientY - r.top };
             on = true;
-            try { hdr.setPointerCapture(e.pointerId); } catch(_) {}
+            try { hdr.setPointerCapture(e.pointerId); } catch (_) { }
         });
         hdr.addEventListener('pointermove', e => {
             if (!on || !S.dragOff) return; e.preventDefault();
-            win.style.left   = clamp(e.clientX - S.dragOff.x, 0, window.innerWidth  - win.offsetWidth)  + 'px';
-            win.style.top    = clamp(e.clientY - S.dragOff.y, 0, window.innerHeight - win.offsetHeight) + 'px';
-            win.style.right  = 'auto'; win.style.bottom = 'auto';
+            win.style.left = clamp(e.clientX - S.dragOff.x, 0, window.innerWidth - win.offsetWidth) + 'px';
+            win.style.top = clamp(e.clientY - S.dragOff.y, 0, window.innerHeight - win.offsetHeight) + 'px';
+            win.style.right = 'auto'; win.style.bottom = 'auto';
         });
         const stop = e => {
             if (!on) return; on = false; S.dragOff = null;
             const r = win.getBoundingClientRect(); S.pos = { x: r.left, y: r.top };
             localStorage.setItem(KEY_POS, JSON.stringify(S.pos));
-            try { hdr.releasePointerCapture(e.pointerId); } catch(_) {}
+            try { hdr.releasePointerCapture(e.pointerId); } catch (_) { }
         };
         hdr.addEventListener('pointerup', stop);
         hdr.addEventListener('pointercancel', stop);
@@ -776,14 +776,14 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
             const r = pill.getBoundingClientRect();
             S.pillDragOff = { x: e.clientX - r.left, y: e.clientY - r.top };
             S.pillDragged = false; on = true;
-            try { pill.setPointerCapture(e.pointerId); } catch(_) {}
+            try { pill.setPointerCapture(e.pointerId); } catch (_) { }
         });
         pill.addEventListener('pointermove', e => {
             if (!on || !S.pillDragOff) return; e.preventDefault();
             S.pillDragged = true;
-            pill.style.left   = clamp(e.clientX - S.pillDragOff.x, 0, window.innerWidth  - pill.offsetWidth)  + 'px';
-            pill.style.top    = clamp(e.clientY - S.pillDragOff.y, 0, window.innerHeight - pill.offsetHeight) + 'px';
-            pill.style.right  = 'auto'; pill.style.bottom = 'auto';
+            pill.style.left = clamp(e.clientX - S.pillDragOff.x, 0, window.innerWidth - pill.offsetWidth) + 'px';
+            pill.style.top = clamp(e.clientY - S.pillDragOff.y, 0, window.innerHeight - pill.offsetHeight) + 'px';
+            pill.style.right = 'auto'; pill.style.bottom = 'auto';
         });
         const stop = e => {
             if (!on) return; on = false;
@@ -793,7 +793,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
                 localStorage.setItem(KEY_PILL_POS, JSON.stringify(S.pillPos));
             }
             S.pillDragOff = null;
-            try { pill.releasePointerCapture(e.pointerId); } catch(_) {}
+            try { pill.releasePointerCapture(e.pointerId); } catch (_) { }
         };
         pill.addEventListener('pointerup', stop);
         pill.addEventListener('pointercancel', stop);
@@ -809,7 +809,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
             const r = win.getBoundingClientRect();
             S.resizeInit = { ex: e.clientX, ey: e.clientY, w: r.width, h: r.height };
             on = true;
-            try { h.setPointerCapture(e.pointerId); } catch(_) {}
+            try { h.setPointerCapture(e.pointerId); } catch (_) { }
         });
         h.addEventListener('pointermove', e => {
             if (!on || !S.resizeInit) return; e.preventDefault();
@@ -820,7 +820,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         const stop = e => {
             if (!on) return; on = false; S.resizeInit = null;
             localStorage.setItem(KEY_SIZE, JSON.stringify(S.size));
-            try { h.releasePointerCapture(e.pointerId); } catch(_) {}
+            try { h.releasePointerCapture(e.pointerId); } catch (_) { }
         };
         h.addEventListener('pointerup', stop);
         h.addEventListener('pointercancel', stop);
@@ -873,7 +873,7 @@ html:not([data-theme="dark"])[data-color-theme="black-white"] .message-sent{
         document.getElementById('call-bg-file-input')?.addEventListener('change', e => {
             const f = e.target.files?.[0]; if (!f) return;
             const r = new FileReader();
-            r.onload = ev => { S.bgImage = ev.target.result; saveBg(S.bgImage); applyBg(); showNotification?.('通话背景已更新 ✓','success',2000); };
+            r.onload = ev => { S.bgImage = ev.target.result; saveBg(S.bgImage); applyBg(); showNotification?.('通话背景已更新 ✓', 'success', 2000); };
             r.readAsDataURL(f); e.target.value = '';
         });
 
