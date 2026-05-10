@@ -7329,7 +7329,7 @@
                 width: min(320px, calc(100vw - 40px));
                 height: min(350px, calc(100svh - 200px));
                 right: 0;
-                
+
                 max-height: calc(100svh - 180px);
             }
 
@@ -7348,7 +7348,7 @@
             .sticker-picker-popover {
                 max-height: calc(100svh - 160px);
                 height: min(350px, calc(100svh - 160px));
-                
+
             }
 
             .combo-content-area {
@@ -11854,7 +11854,7 @@
         }
 
         .dm-body {
-            flex: 1 1 0 !important;
+            flex: 9 0 !important;
             min-height: 0 !important;
             overflow-y: auto !important;
             overflow-x: hidden;

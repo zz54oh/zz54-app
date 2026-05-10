@@ -3213,3 +3213,24 @@ window.exitCollapseMode = function () {
         setTimeout(tryApply, 400);
     }
 })();
+
+// 三点菜单开关
+(function () {
+    function initMenu() {
+        var menuBtn = document.getElementById('header-menu-btn');
+        var menuDrop = document.getElementById('header-menu-dropdown');
+        if (!menuBtn || !menuDrop) { setTimeout(initMenu, 500); return; }
+        menuBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            menuDrop.style.display = menuDrop.style.display === 'none' ? 'block' : 'none';
+        });
+        document.addEventListener('click', function () {
+            menuDrop.style.display = 'none';
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initMenu);
+    } else {
+        initMenu();
+    }
+})();

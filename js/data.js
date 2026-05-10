@@ -62,7 +62,7 @@
         + '</div>'
         + '</div>'
         + '</div>'
-
+        + '<div style="padding-top:16px;">'
         + '<div class="dm-section-label danger-label"><i class="fas fa-triangle-exclamation"></i> 危险操作</div>'
         + '<div class="dm-danger-cards dm-danger-cards-row">'
         + '<button class="dm-danger-card dm-danger-card-orange dm-danger-card-half" id="clear-chat-only">'
