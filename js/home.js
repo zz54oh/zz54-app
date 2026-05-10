@@ -22,13 +22,9 @@
 
   const FEATURES = [
     { id: 'chat', icon: 'fa-comment-dots', label: '聊天', bg: 'icon-bg-7' },
+    { id: 'group', icon: 'fa-user-group', label: '群聊', bg: 'icon-bg-6' },
     { id: 'tarot', icon: 'fa-star-and-crescent', label: '塔罗占卜', bg: 'icon-bg-12' },
     { id: 'envelope', icon: 'fa-envelope', label: '信箱', bg: 'icon-bg-4' },
-    { id: 'library', icon: 'fa-book-open', label: '字卡库', bg: 'icon-bg-1' },
-    { id: 'mood', icon: 'fa-cloud-sun', label: '心情', bg: 'icon-bg-3' },
-    { id: 'group', icon: 'fa-user-group', label: '群聊', bg: 'icon-bg-6' },
-    { id: 'call', icon: 'fa-video', label: '通话', bg: 'icon-bg-11' },
-    
   ];
 
   const MOOD_EMOJIS = ['😊', '😄', '🥰', '😌', '😴', '😢', '😭', '😠', '😰', '🤔', '😎', '🥳', '🤗', '😔', '😍', '🥺', '😤', '🌧️', '☀️', '⭐', '🌙', '🍃'];
@@ -280,6 +276,10 @@
     isOnHome = false;
     setContext('home');
     showBackBtn(backToHome);
+    // 先隐藏聊天界面，防止闪烁
+    document.querySelector('.header')?.style.setProperty('display','none','important');
+    document.querySelector('.main-chat-area')?.style.setProperty('display','none','important');
+    document.querySelector('.input-area-wrapper')?.style.setProperty('display','none','important');
     setTimeout(() => {
       const handlers = {
         tarot: () => document.getElementById('fortune-lenormand-function')?.click(),
@@ -290,7 +290,7 @@
         music: () => document.getElementById('music-player-toggle')?.click()
       };
       if (handlers[featureName]) handlers[featureName]();
-    }, 100);
+    }, 0);
   }
 
   // ---------- 主页数据同步 ----------
