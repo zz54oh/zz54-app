@@ -516,7 +516,7 @@ function updateStorageUsageBar() {
                 }
                 var pct = Math.min(ls / (5 * 1024 * 1024) * 100, 100).toFixed(1);
                 if (bar) bar.style.width = pct + '%';
-                if (text) text.textContent = (ls / 1024).toFixed(1) + ' KB (localStorage)';
+                if (text) text.textContent = (ls / 1024).toFixed(1) + ' KB';
             });
         } else {
             if (text) text.textContent = '暂无数据';
