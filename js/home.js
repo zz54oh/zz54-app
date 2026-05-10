@@ -276,17 +276,64 @@
     isOnHome = false;
     setContext('home');
     showBackBtn(backToHome);
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       const handlers = {
-        tarot: () => document.getElementById('fortune-lenormand-function')?.click(),
-        envelope: () => document.getElementById('envelope-function')?.click(),
-        library: () => document.getElementById('custom-replies-function')?.click(),
-        group: () => document.getElementById('group-chat-btn')?.click(),
+        tarot: () => {
+          const m = document.getElementById('fortune-lenormand-modal');
+          if (m) {
+            m.style.animation = 'none';
+            m.style.display = 'flex';
+            m.classList.remove('hidden');
+            m.querySelectorAll('*').forEach(el => { el.style.animation = 'none'; el.style.transition = 'none'; });
+            const c = m.querySelector('.modal-content');
+            if (c) { c.style.animation = 'none'; c.style.opacity = '1'; c.style.transform = 'none'; }
+          }
+          document.getElementById('close-fortune')?.style.setProperty('display', 'none', 'important');
+          document.getElementById('fortune-lenormand-function')?.click();
+        },
+        envelope: () => {
+          const m = document.getElementById('envelope-modal');
+          if (m) {
+            m.classList.remove('hidden');
+            m.style.animation = 'none';
+            m.style.display = 'flex';  // 先设 flex，不等 showModal
+            const c2 = m.querySelector('.modal-content');
+            if (c2) { c2.style.transform = 'scale(1)'; c2.style.animation = 'none'; c2.style.transition = 'none'; c2.style.opacity = '1'; }
+            m.querySelectorAll('*').forEach(el => { el.style.animation = 'none'; el.style.transition = 'none'; });
+            const c = m.querySelector('.modal-content');
+            if (c) { c.style.animation = 'none'; c.style.opacity = '1'; c.style.transform = 'none'; }
+          }
+          const closeBtn = document.getElementById('cancel-envelope');
+          if (closeBtn && !closeBtn._homePatched) {
+            closeBtn._homePatched = true;
+            closeBtn.onclick = (e) => {
+              e.stopPropagation();
+              document.getElementById('envelope-modal').style.display = 'none';
+              backToHome();
+            };
+          }
+          document.getElementById('envelope-function')?.click();
+        },
+        library: () => {
+          const m = document.getElementById('custom-replies-modal');
+          if (m) { const c = m.querySelector('.modal-content'); if (c) { c.style.animation = 'none'; c.style.opacity = '1'; c.style.transform = 'none'; } }
+          document.getElementById('custom-replies-function')?.click();
+        },
+        group: () => {
+          const m = document.getElementById('group-chat-modal');
+          if (m) {
+            m.classList.remove('hidden');
+            m.style.animation = 'none';
+            const c = m.querySelector('.modal-content');
+            if (c) { c.style.animation = 'none'; c.style.opacity = '1'; c.style.transform = 'none'; }
+          }
+          document.getElementById('group-chat-btn')?.click();
+        },
         call: () => { if (window.callFeature?.startCall) window.callFeature.startCall(false); else document.querySelector('#collapsed-call-btn')?.click(); },
         music: () => document.getElementById('music-player-toggle')?.click()
       };
       if (handlers[featureName]) handlers[featureName]();
-    }, 0);
+    });
   }
 
   // ---------- 主页数据同步 ----------
@@ -892,6 +939,36 @@
   }
 
   // ---------- 辅助函数：打开任意模态框，并确保关闭后回到设置页 ----------
+  function openModalForHome(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.style.transition = 'none';
+    modal.style.animation = 'none';
+    modal.classList.remove('hidden');
+    modal.style.zIndex = '10001';
+    const content = modal.querySelector('.modal-content');
+    if (content) {
+      content.style.animation = 'none';
+      content.style.opacity = '1';
+      content.style.transform = 'translateY(0) scale(1)';
+    }
+    const allBtns = modal.querySelectorAll('.modal-btn, .env-close-btn, .close-btn, [onclick*="hideModal"]');
+    allBtns.forEach(btn => {
+      if (btn._patchedForHome) return;
+      btn._patchedForHome = true;
+      const oldClick = btn.onclick;
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        modal.style.display = 'none';
+        backToHome();
+        if (oldClick && typeof oldClick === 'function') {
+          try { oldClick.call(btn, e); } catch (err) { console.warn(err); }
+        }
+      };
+    });
+  }
+
   function openModalWithSettingsBack(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) {
@@ -1105,6 +1182,29 @@
     progressBar.style.width = '100%';
     setTimeout(() => { progressBar.style.opacity = '0'; setTimeout(() => progressBar.remove(), 400); }, 200);
     document.addEventListener('visibilitychange', () => document.body.classList.toggle('pause-animations', document.hidden));
+    // 全局劫持 showModal，禁用所有模态框入场动画
+    (function hijackShowModal() {
+      const originalShowModal = window.showModal;
+      if (typeof originalShowModal !== 'function') return;
+      window.showModal = function (modal) {
+        if (modal) {
+          modal.style.transition = 'none';
+          modal.style.animation = 'none';
+          const content = modal.querySelector('.modal-content');
+          if (content) {
+            content.style.animation = 'none';
+            content.style.transition = 'none';
+            content.style.transform = 'scale(1)';
+            content.style.opacity = '1';
+          }
+          modal.querySelectorAll('*').forEach(el => {
+            el.style.animation = 'none';
+            el.style.transition = 'none';
+          });
+        }
+        return originalShowModal.call(this, modal);
+      };
+    })();
   }
 
   function setupSyncObservers() {
