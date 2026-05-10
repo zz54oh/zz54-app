@@ -1947,6 +1947,9 @@
             max-width: 400px;
             max-height: 80vh;
             overflow-y: auto;
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
             border: 1px solid var(--surface-border);
             box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24), 0 2px 10px rgba(0, 0, 0, 0.10);
             animation: modalContentSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
