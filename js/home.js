@@ -276,10 +276,6 @@
     isOnHome = false;
     setContext('home');
     showBackBtn(backToHome);
-    // 先隐藏聊天界面，防止闪烁
-    document.querySelector('.header')?.style.setProperty('display','none','important');
-    document.querySelector('.main-chat-area')?.style.setProperty('display','none','important');
-    document.querySelector('.input-area-wrapper')?.style.setProperty('display','none','important');
     setTimeout(() => {
       const handlers = {
         tarot: () => document.getElementById('fortune-lenormand-function')?.click(),
