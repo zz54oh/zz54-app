@@ -211,8 +211,6 @@
     const home = document.getElementById('home-screen');
     if (home) {
       home.classList.remove('hidden');
-      home.classList.add('home-screen-enter');
-      setTimeout(() => home.classList.remove('home-screen-enter'), 240);
     }
     refreshHomeData();
     isOnHome = true;
