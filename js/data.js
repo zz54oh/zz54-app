@@ -60,6 +60,25 @@
         + '<div class="dm-row-info"><div class="dm-row-title">后台消息推送</div><div class="dm-row-desc" id="notif-status-text">收到新消息时弹出提醒</div></div>'
         + '<label class="dm-toggle-pill"><input type="checkbox" id="notif-permission-toggle" onchange="handleNotifToggle(this)"><span class="dm-toggle-slider"></span></label>'
         + '</div>'
+        + '<div class="dm-row-item" id="replay-tutorial-btn-row" style="cursor:pointer">'
+        + '<div class="dm-row-icon slate"><i class="fas fa-compass"></i></div>'
+        + '<div class="dm-row-info"><div class="dm-row-title">重放新手引导</div><div class="dm-row-desc">重新播放功能介绍教程</div></div>'
+        + '<button class="dm-nav-btn" id="replay-tutorial-btn"><i class="fas fa-play"></i></button>'
+        + '</div>'
+        + '<div class="dm-row-item" id="open-credits-row" style="cursor:pointer">'
+        + '<div class="dm-row-icon violet"><i class="fas fa-scroll"></i></div>'
+        + '<div class="dm-row-info"><div class="dm-row-title">声明与致谢</div><div class="dm-row-desc">开源声明、致谢名单</div></div>'
+        + '<button class="dm-nav-btn" id="open-credits-btn"><i class="fas fa-chevron-right"></i></button>'
+        + '</div>'
+        + '</div>'
+
+        + '<div class="dm-section-label danger-label"><i class="fas fa-triangle-exclamation"></i> 危险操作</div>'
+        + '<div class="dm-danger-cards dm-danger-cards-row">'
+        + '<button class="dm-danger-card dm-danger-card-orange dm-danger-card-half" id="clear-chat-only">'
+        + '<div class="dm-danger-card-icon"><i class="fas fa-eraser"></i></div>'
+        + '<div class="dm-danger-card-body">'
+        + '<div class="dm-danger-card-title">清除会话</div>'
+        + '<div class="dm-danger-card-desc">删除本会话消息</div>'
         + '</div>'
         + '</button>'
         + '<button class="dm-danger-card dm-danger-card-red dm-danger-card-half" id="clear-storage">'
@@ -175,7 +194,7 @@
                     ? 'linear-gradient(90deg,#FF9F0A,#E07000)'
                     : 'linear-gradient(90deg,var(--accent-color),rgba(var(--accent-color-rgb),0.6))';
         }
-        if (g('dm-storage-total')) g('dm-storage-total').textContent = fmt(total) + ' / ~5 MB';
+        if (g('dm-storage-total')) g('dm-storage-total').textContent = fmt(total);
         if (g('dm-stat-msgs')) g('dm-stat-msgs').textContent = fmt(msgs);
         if (g('dm-stat-settings')) g('dm-stat-settings').textContent = fmt(cfg);
         if (g('dm-stat-media')) g('dm-stat-media').textContent = fmt(media);
@@ -403,15 +422,17 @@
     function onModalOpen(modal) {
         var mc = modal.querySelector('.modal-content');
         if (!mc) return;
+        mc.style.opacity = '0';
         ensureHTML(mc);
         requestAnimationFrame(function () {
-            mc.style.opacity = '1';
             mc.style.transform = 'none';
         });
         setTimeout(function () {
             updateStats();
             syncToggles();
-        }, 60);
+            mc.style.opacity = '1';
+            mc.style.transition = 'opacity 0.15s ease';
+        }, 0);
     }
 
     var _styleObserver = null;
@@ -484,7 +505,7 @@ function updateStorageUsageBar() {
                         else
                             bar.style.background = 'linear-gradient(90deg,var(--accent-color),rgba(var(--accent-color-rgb),0.6))';
                     }
-                    if (text) text.textContent = fmt(total) + ' / ~5 MB (' + pct + '%)';
+                    if (text) text.textContent = fmt(total);
                 });
             }).catch(function () {
                 var ls = 0;
