@@ -1,4 +1,4 @@
-/**
+﻿/**
  * home.js — 最终修复版（解决设置子功能空白页）
  */
 (function () {
@@ -94,9 +94,12 @@
   }
 
   function applyHeroOpacity(val) {
+    const hero = document.querySelector('.home-hero');
+    if (!hero) return;
+    const alpha = (val / 100) * 0.28;
+    hero.style.background = `hsla(var(--theme-h), var(--theme-s), 99%, ${alpha})`;
     const heroBg = document.querySelector('.home-hero-bg');
-    if (!heroBg) return;
-    heroBg.style.opacity = val / 100;
+    if (heroBg) heroBg.style.opacity = val / 100;
     try { if (window.localforage) localforage.setItem('home_hero_opacity', val); } catch (e) { }
   }
 
@@ -1079,8 +1082,15 @@
       '.modal-btn:contains("关闭")',
       '.modal-btn:contains("取消")'
     ];
+    // 这些modal内部按钮逻辑复杂，不整体劫持，只劫持close-开头的关闭按钮
+    const noHijack = ["fortune-lenormand-modal"];
+    const btnSelector = noHijack.includes(modalId)
+      ? "[id]"
+      : ".modal-btn, .env-close-btn, .close-btn, [onclick*=hideModal]";
     // 更可靠的方法：遍历所有可能关闭模态框的按钮
-    const allBtns = modal.querySelectorAll('.modal-btn, .env-close-btn, .close-btn, [onclick*="hideModal"]');
+    const allBtns = noHijack.includes(modalId)
+      ? modal.querySelectorAll('[id^="close-"]')
+      : modal.querySelectorAll(".modal-btn, .env-close-btn, .close-btn");
     allBtns.forEach(btn => {
       // 避免重复绑定，标记已处理
       if (btn._settingsPatched) return;

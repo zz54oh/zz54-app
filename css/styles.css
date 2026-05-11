@@ -13285,3 +13285,7 @@
             animation-delay: 0s !important;
             transition-duration: 0s !important;
         }
+
+        #appearance-modal .modal-content {
+            touch-action: pan-y;
+        }

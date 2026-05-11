@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    home.css — 毛玻璃主页（v3 重做）
    设计参考 iOS 桌面：紧凑图标网格 + 大顶卡 + iOS 风 dock
    ============================================================ */
@@ -220,6 +220,7 @@ body.feature-mode {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  padding-top: 12px
 }
 
 .dual-profile {
@@ -277,14 +278,7 @@ body.feature-mode {
 }
 
 .profile-online-dot {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 12px;
-  height: 12px;
-  background: #4ad883;
-  border-radius: 50%;
-  border: 2.5px solid white;
+  display: none;
 }
 
 .profile-name {
@@ -292,7 +286,7 @@ body.feature-mode {
   font-weight: 600;
   color: var(--home-text);
   letter-spacing: 0.6px;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -301,7 +295,7 @@ body.feature-mode {
 
 .profile-status {
   font-size: 10.5px;
-  color: var(--home-text-sub);
+  color: var(--text-secondary);
   letter-spacing: 0.4px;
 }
 
@@ -313,6 +307,7 @@ body.feature-mode {
 }
 
 .profile-divider i {
+  display: none;
   font-size: 16px;
   color: hsla(var(--theme-h), 60%, 60%, 0.85);
   animation: heartbeat 1.6s ease infinite;

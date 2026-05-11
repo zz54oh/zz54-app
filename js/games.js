@@ -1,51 +1,51 @@
 function renderStatsContent() {
-            const statsContent = DOMElements.statsModal.content;
+    const statsContent = DOMElements.statsModal.content;
 
-            const partnerMessages = messages.filter(msg =>
-                msg.sender !== 'user' && msg.sender !== null &&
-                msg.text &&
-                msg.type !== 'system'
-            );
-            
-            const myMessages = messages.filter(msg =>
-                msg.sender === 'user' &&
-                msg.text &&
-                msg.type !== 'system'
-            );
+    const partnerMessages = messages.filter(msg =>
+        msg.sender !== 'user' && msg.sender !== null &&
+        msg.text &&
+        msg.type !== 'system'
+    );
 
-            if (partnerMessages.length === 0 && myMessages.length === 0) {
-                statsContent.innerHTML = `
+    const myMessages = messages.filter(msg =>
+        msg.sender === 'user' &&
+        msg.text &&
+        msg.type !== 'system'
+    );
+
+    if (partnerMessages.length === 0 && myMessages.length === 0) {
+        statsContent.innerHTML = `
                     <div class="stats-empty-state">
                         <div class="stats-empty-icon"><i class="fas fa-chart-pie"></i></div>
                         <h3>暂无数据</h3>
                         <p>多聊几句再来看看吧...</p>
                     </div>`;
-                return;
+        return;
+    }
+
+    const getTopReplies = (msgs) => {
+        const countMap = {};
+        msgs.forEach(msg => {
+            const text = msg.text.trim();
+            if (text) {
+                countMap[text] = (countMap[text] || 0) + 1;
             }
+        });
+        return Object.entries(countMap)
+            .map(([text, count]) => ({ text, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+    };
 
-            const getTopReplies = (msgs) => {
-                const countMap = {};
-                msgs.forEach(msg => {
-                    const text = msg.text.trim();
-                    if (text) {
-                        countMap[text] = (countMap[text] || 0) + 1;
-                    }
-                });
-                return Object.entries(countMap)
-                    .map(([text, count]) => ({ text, count }))
-                    .sort((a, b) => b.count - a.count)
-                    .slice(0, 5); 
-            };
+    const partnerTop = getTopReplies(partnerMessages);
+    const myTop = getTopReplies(myMessages);
 
-            const partnerTop = getTopReplies(partnerMessages);
-            const myTop = getTopReplies(myMessages);
-
-            const generateRankHTML = (list) => {
-                if (list.length === 0) return '<div style="text-align:center;color:var(--text-secondary);font-size:12px;padding:10px;">暂无数据</div>';
-                const maxVal = list[0].count;
-                return list.map((item, index) => {
-                    const percent = (item.count / maxVal) * 100;
-                    return `
+    const generateRankHTML = (list) => {
+        if (list.length === 0) return '<div style="text-align:center;color:var(--text-secondary);font-size:12px;padding:10px;">暂无数据</div>';
+        const maxVal = list[0].count;
+        return list.map((item, index) => {
+            const percent = (item.count / maxVal) * 100;
+            return `
                     <div class="rank-item">
                         <div class="rank-progress-bg" style="width: ${percent}%; opacity: 0.1; background-color: var(--text-primary);"></div>
                         <div class="rank-info">
@@ -54,20 +54,20 @@ function renderStatsContent() {
                             <div class="rank-count">${item.count}次</div>
                         </div>
                     </div>`;
-                }).join('');
-            };
+        }).join('');
+    };
 
-            const allMsgs = messages.filter(m => m.timestamp);
-            const firstMsg = allMsgs.length > 0 ? allMsgs[0] : { timestamp: new Date() };
-            const lastMsg = allMsgs.length > 0 ? allMsgs[allMsgs.length - 1] : { timestamp: new Date() };
+    const allMsgs = messages.filter(m => m.timestamp);
+    const firstMsg = allMsgs.length > 0 ? allMsgs[0] : { timestamp: new Date() };
+    const lastMsg = allMsgs.length > 0 ? allMsgs[allMsgs.length - 1] : { timestamp: new Date() };
 
-            const formatDate = (dateObj) => {
-                return new Date(dateObj).toLocaleDateString('zh-CN', {
-                    month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-                });
-            };
+    const formatDate = (dateObj) => {
+        return new Date(dateObj).toLocaleDateString('zh-CN', {
+            month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+        });
+    };
 
-            statsContent.innerHTML = `
+    statsContent.innerHTML = `
                 <div class="stats-dashboard">
                     <div class="stats-overview-grid">
                         <div class="overview-item overview-large">
@@ -121,38 +121,38 @@ function renderStatsContent() {
                 </div>
             `;
 
-            statsContent._partnerHTML = generateRankHTML(partnerTop);
-            statsContent._myHTML = generateRankHTML(myTop);
-        }
+    statsContent._partnerHTML = generateRankHTML(partnerTop);
+    statsContent._myHTML = generateRankHTML(myTop);
+}
 
-        window.switchStatsView = function(who) {
-            const statsContent = DOMElements.statsModal.content;
-            const partnerBtn = document.getElementById('stats-toggle-partner');
-            const meBtn = document.getElementById('stats-toggle-me');
-            const title = document.getElementById('stats-rank-title');
-            const list = document.getElementById('stats-rank-list');
-            if (!partnerBtn || !meBtn || !list) return;
+window.switchStatsView = function (who) {
+    const statsContent = DOMElements.statsModal.content;
+    const partnerBtn = document.getElementById('stats-toggle-partner');
+    const meBtn = document.getElementById('stats-toggle-me');
+    const title = document.getElementById('stats-rank-title');
+    const list = document.getElementById('stats-rank-list');
+    if (!partnerBtn || !meBtn || !list) return;
 
-            if (who === 'partner') {
-                partnerBtn.classList.add('active');
-                meBtn.classList.remove('active');
-                title.innerHTML = '<i class="fas fa-user-circle"></i> 对方高频词 TOP 5';
-                list.innerHTML = statsContent._partnerHTML || '<div style="text-align:center;color:var(--text-secondary);font-size:12px;padding:10px;">暂无数据</div>';
-            } else {
-                meBtn.classList.add('active');
-                partnerBtn.classList.remove('active');
-                title.innerHTML = '<i class="fas fa-user"></i> 我方高频词 TOP 5';
-                list.innerHTML = statsContent._myHTML || '<div style="text-align:center;color:var(--text-secondary);font-size:12px;padding:10px;">暂无数据</div>';
-            }
-        };
-        function renderSessionList() {
-            const listContainer = DOMElements.sessionModal.list;
-            if (sessionList.length === 0) {
-                listContainer.innerHTML = '<div class="stats-empty" style="padding: 20px 0;"><p>还没有会话</p></div>';
-                return;
-            }
-            listContainer.innerHTML = sessionList.map(session => `
-            <div class="session-item ${session.id === SESSION_ID ? 'active': ''}" data-id="${session.id}">
+    if (who === 'partner') {
+        partnerBtn.classList.add('active');
+        meBtn.classList.remove('active');
+        title.innerHTML = '<i class="fas fa-user-circle"></i> 对方高频词 TOP 5';
+        list.innerHTML = statsContent._partnerHTML || '<div style="text-align:center;color:var(--text-secondary);font-size:12px;padding:10px;">暂无数据</div>';
+    } else {
+        meBtn.classList.add('active');
+        partnerBtn.classList.remove('active');
+        title.innerHTML = '<i class="fas fa-user"></i> 我方高频词 TOP 5';
+        list.innerHTML = statsContent._myHTML || '<div style="text-align:center;color:var(--text-secondary);font-size:12px;padding:10px;">暂无数据</div>';
+    }
+};
+function renderSessionList() {
+    const listContainer = DOMElements.sessionModal.list;
+    if (sessionList.length === 0) {
+        listContainer.innerHTML = '<div class="stats-empty" style="padding: 20px 0;"><p>还没有会话</p></div>';
+        return;
+    }
+    listContainer.innerHTML = sessionList.map(session => `
+            <div class="session-item ${session.id === SESSION_ID ? 'active' : ''}" data-id="${session.id}">
             <div class="session-info">
             <div class="session-name">${session.name}</div>
             <div class="session-meta">创建于 ${new Date(session.createdAt).toLocaleDateString()}</div>
@@ -163,12 +163,12 @@ function renderStatsContent() {
             </div>
             </div>
             `).join('');
-        }
+}
 
 
 async function generateFortune() {
     const today = new Date();
-    const todayKey = today.toDateString(); 
+    const todayKey = today.toDateString();
     const start = new Date(today.getFullYear(), 0, 1);
     const diff = today - start + (start.getTimezoneOffset() - today.getTimezoneOffset()) * 60000;
     const weekNum = Math.floor(diff / (1000 * 60 * 60 * 24) / 7);
@@ -184,18 +184,18 @@ async function generateFortune() {
         }
     } catch (e) { console.warn("读取运势失败", e); }
 
-const majorCards = CONSTANTS.TAROT_CARDS;
+    const majorCards = CONSTANTS.TAROT_CARDS;
     if (!fortuneData) {
         const randomIndex = Math.floor(Math.random() * majorCards.length);
         const isUpright = Math.random() > 0.5;
-        
+
         const fixedStars = isUpright ? (Math.floor(Math.random() * 2) + 4) : (Math.floor(Math.random() * 2) + 3);
 
         fortuneData = {
             week: weekKey,
             cardIndex: randomIndex,
             isUpright: isUpright,
-            stars: fixedStars 
+            stars: fixedStars
         };
         await localforage.setItem(storageKey, fortuneData);
     }
@@ -222,7 +222,7 @@ function renderFortunePanel(weeklyData, majorCards, todayKey) {
     showModal(document.getElementById('fortune-lenormand-modal'));
 }
 
-window.showFortuneSub = function(tab) {
+window.showFortuneSub = function (tab) {
     const weeklyEl = document.getElementById('fortune-sub-weekly');
     const dailyEl = document.getElementById('fortune-sub-daily');
     const weeklyBtn = document.getElementById('fsub-weekly');
@@ -254,7 +254,7 @@ function renderWeeklyFortune(data, majorCards) {
     const isUpright = data.isUpright;
     const starCount = data.stars || 3;
 
-    let starsHtml = Array(5).fill(0).map((_, i) => 
+    let starsHtml = Array(5).fill(0).map((_, i) =>
         `<i class="fas fa-star" style="color: ${i < starCount ? 'var(--accent-color)' : 'var(--border-color)'}; font-size: 12px; margin: 0 2px;"></i>`
     ).join('');
 
@@ -298,7 +298,7 @@ async function renderDailyFortune(todayKey) {
         if (saved && saved.day === todayKey) {
             dailyData = saved;
         }
-    } catch(e) {}
+    } catch (e) { }
 
     if (!dailyData) {
         const deck = [...ALL_78_TAROT_CARDS];
@@ -317,7 +317,7 @@ async function renderDailyFortune(todayKey) {
             isUpright: Math.random() > 0.5
         }));
         dailyData = { day: todayKey, cards: drawn };
-        try { await localforage.setItem(storageKey, dailyData); } catch(e) {}
+        try { await localforage.setItem(storageKey, dailyData); } catch (e) { }
     }
 
     const positionLabels = ['过去 · 根源', '现在 · 核心', '未来 · 启示'];
@@ -325,7 +325,7 @@ async function renderDailyFortune(todayKey) {
 
     el.innerHTML = `
         <div style="text-align:center; margin-bottom:14px; color:var(--text-secondary); font-size:12px; letter-spacing:1px;">
-            <i class="fas fa-moon" style="color:var(--accent-color);"></i> ${new Date().toLocaleDateString('zh-CN', {month:'long',day:'numeric'})} · 三牌展开
+            <i class="fas fa-moon" style="color:var(--accent-color);"></i> ${new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' })} · 三牌展开
         </div>
         <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:16px;">
             ${dailyData.cards.map((card, i) => `
@@ -350,7 +350,7 @@ async function renderDailyFortune(todayKey) {
         </div>
       <div style="margin-bottom:10px;">
             <div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;">✍️ 今日解读</div>
-            <textarea id="daily-fortune-notes" placeholder="写下你对今日牌阵的感悟..." style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--primary-bg);color:var(--text-primary);font-size:12px;font-family:var(--font-family);resize:vertical;min-height:72px;outline:none;transition:border 0.18s;line-height:1.6;" onfocus="this.style.borderColor='var(--accent-color)'" onblur="this.style.borderColor='var(--border-color)'">${(function(){try{return localStorage.getItem('dailyFortuneNotes_'+todayKey)||''}catch(e){return ''}}())}</textarea>
+            <textarea id="daily-fortune-notes" placeholder="写下你对今日牌阵的感悟..." style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--primary-bg);color:var(--text-primary);font-size:12px;font-family:var(--font-family);resize:vertical;min-height:72px;outline:none;transition:border 0.18s;line-height:1.6;" onfocus="this.style.borderColor='var(--accent-color)'" onblur="this.style.borderColor='var(--border-color)'">${(function () { try { return localStorage.getItem('dailyFortuneNotes_' + todayKey) || '' } catch (e) { return '' } }())}</textarea>
             <div style="display:flex;justify-content:flex-end;margin-top:4px;">
                 <button onclick="(function(){var t=document.getElementById('daily-fortune-notes');try{localStorage.setItem('dailyFortuneNotes_'+'${todayKey}',t.value);}catch(e){}this.textContent='已保存 ✓';var self=this;setTimeout(function(){self.textContent='保存';},1500);}).call(this)" style="font-size:11px;padding:4px 12px;border:1.5px solid var(--accent-color);border-radius:8px;background:transparent;color:var(--accent-color);cursor:pointer;font-family:var(--font-family);">保存</button>
             </div>
@@ -487,7 +487,7 @@ function startLenormandDraw() {
         const m0 = drawn[0].meaning.split('，')[0];
         const m2 = drawn.length >= 3 ? drawn[2].meaning.split('，')[0] : '';
         const n0 = drawn[0].name, n1 = drawn[1].name, n2 = drawn.length >= 3 ? drawn[2].name : '';
-        
+
         const templates3 = [
             `「${n0}」的能量如同${m0}的底色，与「${n1}」相互呼应；「${n2}」则带来${m2}的质感。三张牌的能量流动，共同编织出一段关于${keywords}的故事。`,
             `星盘之上，「${n0}」、「${n1}」、「${n2}」三张牌依次展开——各自携带的能量在此汇聚，悄悄低语。${keywords}，是此刻需要关注的核心能量。`,
@@ -501,10 +501,10 @@ function startLenormandDraw() {
             `${energies}——两种能量在你的问题上留下印记。${m0}与对方的能量相互作用，当前局面因此充满了${keywords}的质感。静下心来，答案已在其中。`,
             `牌与牌之间总有呼应。「${n0}」和「${n1}」的组合，像是宇宙特意为你排列的密码，${keywords}便是解读这段缘分的钥匙。`
         ];
-        
+
         const templates = drawn.length === 3 ? templates3 : templates2;
         const chosenText = templates[Math.floor(Math.random() * templates.length)];
-        
+
         synthesisHTML = `
         <div class="lenormand-synthesis">
             <div class="lenormand-synthesis-title">✦ 综合解读</div>
@@ -610,7 +610,7 @@ const ALL_78_TAROT_CARDS = [
     { name: "星币骑士", num: "Knight", type: "pentacles", eng: "Knight of Pentacles", keyword: "务实", upright: "勤勉可靠、务实稳重、责任心强、按部就班、耐心坚持、工作努力、守护", reversed: "停滞不前、无聊乏味、过于保守、缺乏冒险、效率低下、固执不变", img: "https://i.postimg.cc/G2pSvWFD/f9dedf51440bafc9ddb64b8ecf45362a.jpg" },
     { name: "星币女王", num: "Queen", type: "pentacles", eng: "Queen of Pentacles", keyword: "滋养", upright: "务实养育、富足慷慨、关爱家庭、接地气的生活、物质与情感平衡、舒适", reversed: "工作与生活失衡、嫉妒他人、过度物质、忽视情感、操劳过度、焦虑", img: "https://i.postimg.cc/xCdFLwvN/9aa38a0ab78af98aeb73d93a00b74573.jpg" },
     { name: "星币国王", num: "King", type: "pentacles", eng: "King of Pentacles", keyword: "繁荣", upright: "物质成功、财务安全、商业头脑、可靠稳重、富足丰盛、投资有道、成就", reversed: "固执己见、物质主义、冒险财务、贪婪腐败、失去判断、投资失败", img: "https://i.postimg.cc/MG5FM6Q0/c8093dafa7eb0921bb16f32c77df51f6.jpg" }
-];const TAROT_TYPE_NAMES = { major: '大阿卡纳', wands: '权杖', cups: '圣杯', swords: '宝剑', pentacles: '星币' };
+]; const TAROT_TYPE_NAMES = { major: '大阿卡纳', wands: '权杖', cups: '圣杯', swords: '宝剑', pentacles: '星币' };
 
 let currentTarotSpread = 'single';
 
@@ -650,14 +650,14 @@ function startTarotDraw() {
     const questionTrimmed = question.trim();
     const drawnCards = [];
 
-function cardHTML(card, position, labelOverride) {
+    function cardHTML(card, position, labelOverride) {
         const isReversed = Math.random() > 0.5;
         const meaning = isReversed ? card.reversed : card.upright;
         const posLabel = labelOverride || position;
-        
+
         drawnCards.push({ name: card.name, keyword: card.keyword, position: posLabel, isReversed, meaning });
 
-        const frontContent = card.img 
+        const frontContent = card.img
             ? `<img src="${card.img}" style="width: 100%; height: 100%; object-fit: cover; ${isReversed ? 'transform: rotate(180deg);' : ''}">`
             : `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; background:var(--primary-bg); color:var(--text-secondary);">
                  <i class="fas ${card.icon}" style="font-size:40px; margin-bottom:10px; ${isReversed ? 'transform: rotate(180deg);' : ''}"></i>
@@ -665,7 +665,7 @@ function cardHTML(card, position, labelOverride) {
                  <div style="font-size:10px; margin-top:5px;"></div>
                </div>`;
 
-return `
+        return `
         <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
             <div class="tarot-container-3d tarot-responsive" style="margin-bottom: 10px; cursor: pointer;" onclick="this.classList.toggle('flipped');">
                 <div class="tarot-card-inner">
@@ -712,12 +712,12 @@ return `
     saveDiviHistory({ type: spreadLabel, question: questionTrimmed, cards: drawnCards });
 }
 
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     const btn = e.target.closest('.tarot-spread-btn');
     if (!btn) return;
     setTarotSpread(btn.dataset.spread);
 });
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     if (e.target.id === 'close-tarot-divination') {
         const modal = document.getElementById('fortune-lenormand-modal');
         if (modal) hideModal(modal);
@@ -728,13 +728,13 @@ const DIVI_HISTORY_KEY = 'diviHistory_v1';
 const DIVI_HISTORY_MAX = 50;
 
 function getDiviHistory() {
-    try { return JSON.parse(localStorage.getItem(DIVI_HISTORY_KEY) || '[]'); } catch(e) { return []; }
+    try { return JSON.parse(localStorage.getItem(DIVI_HISTORY_KEY) || '[]'); } catch (e) { return []; }
 }
 
 function saveDiviHistory(entry) {
     const history = getDiviHistory();
     entry.id = Date.now();
-    entry.time = new Date().toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+    entry.time = new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
     history.unshift(entry);
     if (history.length > DIVI_HISTORY_MAX) history.splice(DIVI_HISTORY_MAX);
     localStorage.setItem(DIVI_HISTORY_KEY, JSON.stringify(history));
@@ -788,12 +788,12 @@ function toggleDiviDetail(btn) {
 }
 
 const _origSwitchFLTab = switchFLTab;
-window.switchFLTab = function(tab) {
+window.switchFLTab = function (tab) {
     _origSwitchFLTab(tab);
     if (tab === 'divihistory') renderDiviHistory();
 };
 
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     if (e.target.id === 'close-divihistory') {
         const modal = document.getElementById('fortune-lenormand-modal');
         if (modal) hideModal(modal);
@@ -828,7 +828,7 @@ function renderFavorites() {
         }) : '';
         const content = msg.text
             ? msg.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            : (msg.image ? `<img src="${msg.image}" style="max-width:100%;max-height:180px;border-radius:8px;display:block;margin-top:4px;cursor:pointer;" onclick="if(typeof viewImage==='function')viewImage('${msg.image.replace(/'/g,'\\\'')}')" loading="lazy">` : '');
+            : (msg.image ? `<img src="${msg.image}" style="max-width:100%;max-height:180px;border-radius:8px;display:block;margin-top:4px;cursor:pointer;" onclick="if(typeof viewImage==='function')viewImage('${msg.image.replace(/'/g, '\\\'')}')" loading="lazy">` : '');
         const avatarEl = isUser
             ? (typeof DOMElements !== 'undefined' ? DOMElements.me.avatar : null)
             : (typeof DOMElements !== 'undefined' ? DOMElements.partner.avatar : null);
@@ -876,7 +876,7 @@ function renderFavorites() {
 }
 window.renderFavorites = renderFavorites;
 
-window._runMsgSearch = function() {
+window._runMsgSearch = function () {
     const input = document.getElementById('msg-search-input');
     const dateFrom = document.getElementById('msg-search-date-from');
     const dateTo = document.getElementById('msg-search-date-to');
@@ -899,8 +899,8 @@ window._runMsgSearch = function() {
         if (from && ts && ts < from) return false;
         if (to && ts && ts > to) return false;
         if (q && m.text && m.text.toLowerCase().includes(q)) return true;
-        if (q && !m.text && m.image) return false; 
-        return !q; 
+        if (q && !m.text && m.image) return false;
+        return !q;
     });
 
     if (results.length === 0) {
@@ -955,8 +955,8 @@ let wheelOptions = ["是", "否", "再想一想", "听你的"];
 let wheelResultText = "";
 
 function initDecisionModule() {
-    const entryBtn = document.getElementById('decision-function'); 
-    if(entryBtn) {
+    const entryBtn = document.getElementById('decision-function');
+    if (entryBtn) {
         const newBtn = entryBtn.cloneNode(true);
         entryBtn.parentNode.replaceChild(newBtn, entryBtn);
         newBtn.addEventListener('click', () => {
@@ -989,14 +989,20 @@ function initDecisionModule() {
         });
         openWheelBtn.dataset.initialized = 'true';
     }
-    
+
     if (closeMenuBtn && !closeMenuBtn.dataset.initialized) {
-        closeMenuBtn.addEventListener('click', () => hideModal(document.getElementById('decision-menu-modal')));
+        closeMenuBtn.addEventListener('click', () => {
+            hideModal(document.getElementById('decision-menu-modal'));
+            if (typeof window.backToSettings === 'function') window.backToSettings();
+        });
         closeMenuBtn.dataset.initialized = 'true';
     }
 
     if (closeWheelBtn && !closeWheelBtn.dataset.initialized) {
-        closeWheelBtn.addEventListener('click', () => hideModal(document.getElementById('wheel-modal')));
+        closeWheelBtn.addEventListener('click', () => {
+            hideModal(document.getElementById('wheel-modal'));
+            if (typeof window.backToSettings === 'function') window.backToSettings();
+        });
         closeWheelBtn.dataset.initialized = 'true';
     }
 
@@ -1013,10 +1019,10 @@ function initDecisionModule() {
         spinBtn.addEventListener('click', doPick);
         spinBtn.dataset.initialized = 'true';
     }
-    
+
     if (sendResultBtn && !sendResultBtn.dataset.initialized) {
         sendResultBtn.addEventListener('click', () => {
-            if(wheelResultText) {
+            if (wheelResultText) {
                 sendMessage(`✨ 随机抽签结果：${wheelResultText}`, 'normal');
                 hideModal(document.getElementById('wheel-modal'));
                 wheelResultText = "";
@@ -1046,7 +1052,7 @@ function renderPickerOptions() {
     const list = document.getElementById('wheel-options-list');
     if (!list) return;
     list.innerHTML = '';
-    const colors = ['#FFD93D','#FF6B6B','#6BCB77','#4D96FF','#E0C3FC','#FF9A8B','#A8D8EA','#C44569'];
+    const colors = ['#FFD93D', '#FF6B6B', '#6BCB77', '#4D96FF', '#E0C3FC', '#FF9A8B', '#A8D8EA', '#C44569'];
     wheelOptions.forEach((opt, index) => {
         const item = document.createElement('div');
         item.className = 'picker-option-item';
@@ -1060,7 +1066,7 @@ function renderPickerOptions() {
             renderPickerCards();
         });
         item.querySelector('.picker-option-remove').addEventListener('click', () => {
-            if(wheelOptions.length <= 2) {
+            if (wheelOptions.length <= 2) {
                 showNotification('至少保留两个选项', 'warning');
                 return;
             }
@@ -1075,7 +1081,7 @@ function renderPickerOptions() {
 function renderPickerCards(selectedIndex = -1) {
     const row = document.getElementById('picker-cards-row');
     if (!row) return;
-    const colors = ['#FFD93D','#FF6B6B','#6BCB77','#4D96FF','#E0C3FC','#FF9A8B','#A8D8EA','#C44569'];
+    const colors = ['#FFD93D', '#FF6B6B', '#6BCB77', '#4D96FF', '#E0C3FC', '#FF9A8B', '#A8D8EA', '#C44569'];
     row.innerHTML = '';
     wheelOptions.forEach((opt, i) => {
         const card = document.createElement('div');
@@ -1085,13 +1091,13 @@ function renderPickerCards(selectedIndex = -1) {
             else card.classList.add('unselected');
         }
         if (selectedIndex >= 0 && i === selectedIndex) {
-            card.style.background = `linear-gradient(135deg, ${colors[i % colors.length]}, ${colors[(i+2) % colors.length]})`;
+            card.style.background = `linear-gradient(135deg, ${colors[i % colors.length]}, ${colors[(i + 2) % colors.length]})`;
         } else {
             card.style.borderTop = `3px solid ${colors[i % colors.length]}`;
         }
         card.style.animationDelay = (i * 0.06) + 's';
-        const label = opt || `选项${i+1}`;
-        card.textContent = label.length > 6 ? label.slice(0,5) + '…' : label;
+        const label = opt || `选项${i + 1}`;
+        card.textContent = label.length > 6 ? label.slice(0, 5) + '…' : label;
         row.appendChild(card);
     });
 }
@@ -1104,7 +1110,7 @@ function doPick() {
     const spinBtn = document.getElementById('spin-wheel-btn');
     const resultDisplay = document.getElementById('wheel-result');
     const sendBtn = document.getElementById('send-wheel-result');
-    
+
     spinBtn.disabled = true;
     sendBtn.style.display = 'none';
     resultDisplay.classList.remove('show');
@@ -1113,20 +1119,20 @@ function doPick() {
     let flashCount = 0;
     const totalFlashes = 16 + Math.floor(Math.random() * 8);
     const finalIndex = Math.floor(Math.random() * wheelOptions.length);
-    
+
     function flash() {
         const row = document.getElementById('picker-cards-row');
         if (!row) return;
         const cards = row.querySelectorAll('.picker-card');
         cards.forEach(c => c.style.transform = '');
-        
+
         let showIdx;
         if (flashCount < totalFlashes - 3) {
             showIdx = Math.floor(Math.random() * wheelOptions.length);
         } else {
             showIdx = finalIndex;
         }
-        
+
         cards.forEach((c, i) => {
             if (i === showIdx) {
                 c.style.transform = 'translateY(-4px) scale(1.06)';
@@ -1140,7 +1146,7 @@ function doPick() {
                 c.style.color = '';
             }
         });
-        
+
         flashCount++;
         const delay = flashCount < 8 ? 80 : flashCount < 14 ? 130 : 250;
         if (flashCount < totalFlashes) {
@@ -1157,7 +1163,7 @@ function doPick() {
             }, 300);
         }
     }
-    
+
     flash();
 }
 
@@ -1213,15 +1219,15 @@ function initComboMenu() {
     const comboBtn = document.getElementById('combo-btn');
     const picker = document.getElementById('user-sticker-picker');
     const contentArea = document.getElementById('combo-content-area');
-    
+
     if (!comboBtn || !picker) return;
-    
+
     if (comboBtn.dataset.initialized) return;
-    
+
     comboBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const isActive = picker.classList.contains('active');
-        
+
         if (isActive) {
             picker.classList.remove('active');
         } else {
@@ -1229,7 +1235,7 @@ function initComboMenu() {
             picker.classList.add('active');
         }
     });
-    
+
     comboBtn.dataset.initialized = 'true';
 
     document.addEventListener('click', (e) => {
@@ -1385,12 +1391,12 @@ function initComboMenu() {
                 e.stopPropagation();
                 addMessage({
                     id: Date.now(),
-                    text: _formatPokeText(`${settings.myName} ${text}`), 
+                    text: _formatPokeText(`${settings.myName} ${text}`),
                     timestamp: new Date(),
-                    type: 'system' 
+                    type: 'system'
                 });
                 picker.classList.remove('active');
-                
+
                 setTimeout(simulateReply, 1500);
             };
             wrapper.appendChild(item);
@@ -1400,20 +1406,20 @@ function initComboMenu() {
     }
 }
 
-(function() {
+(function () {
     var STOP_WORDS = new Set([
-        '的','了','是','我','你','他','她','它','们','这','那','有','在','就','也','都',
-        '和','与','或','但','不','没','很','太','更','最','已','被','让','把','对','从',
-        '到','于','以','为','之','其','而','则','所','等','啊','哦','嗯','哈','呢','吧',
-        '吗','嘛','呀','哇','哎','唉','嗯嗯','哈哈','嘻嘻','呵呵','哦哦','啊啊','哈哈哈',
-        '一','二','三','四','五','六','七','八','九','十','个','次','条','件','种',
-        '好','行','可以','可','又','再','还','来','去','说','想','知道','觉得','感觉',
-        '什么','怎么','为什么','哪','谁','哪里','怎样','如何','这么','那么',
-        '然后','因为','所以','如果','虽然','但是','而且','不过','只是','只有',
-        '没有','不是','还是','就是','真的','对啊','好的','好吧','那个','这个',
-        '今天','昨天','明天','现在','以前','以后','时候','时间','一下','一直','一个',
-        'ok','OK','Ok','yes','no','hh','hhhh','hhh','嗯','额',
-        '图片','表情','语音','【图片】','【表情】','【语音】','撤回了一条消息','已撤回'
+        '的', '了', '是', '我', '你', '他', '她', '它', '们', '这', '那', '有', '在', '就', '也', '都',
+        '和', '与', '或', '但', '不', '没', '很', '太', '更', '最', '已', '被', '让', '把', '对', '从',
+        '到', '于', '以', '为', '之', '其', '而', '则', '所', '等', '啊', '哦', '嗯', '哈', '呢', '吧',
+        '吗', '嘛', '呀', '哇', '哎', '唉', '嗯嗯', '哈哈', '嘻嘻', '呵呵', '哦哦', '啊啊', '哈哈哈',
+        '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '个', '次', '条', '件', '种',
+        '好', '行', '可以', '可', '又', '再', '还', '来', '去', '说', '想', '知道', '觉得', '感觉',
+        '什么', '怎么', '为什么', '哪', '谁', '哪里', '怎样', '如何', '这么', '那么',
+        '然后', '因为', '所以', '如果', '虽然', '但是', '而且', '不过', '只是', '只有',
+        '没有', '不是', '还是', '就是', '真的', '对啊', '好的', '好吧', '那个', '这个',
+        '今天', '昨天', '明天', '现在', '以前', '以后', '时候', '时间', '一下', '一直', '一个',
+        'ok', 'OK', 'Ok', 'yes', 'no', 'hh', 'hhhh', 'hhh', '嗯', '额',
+        '图片', '表情', '语音', '【图片】', '【表情】', '【语音】', '撤回了一条消息', '已撤回'
     ]);
 
     function tokenize(text) {
@@ -1433,7 +1439,7 @@ function initComboMenu() {
             var w4 = cn.slice(i, i + 4);
             if (!STOP_WORDS.has(w4)) {
                 words[w4] = (words[w4] || 0) + 2.4;
-                covered[i] = covered[i+1] = covered[i+2] = covered[i+3] = true;
+                covered[i] = covered[i + 1] = covered[i + 2] = covered[i + 3] = true;
                 i += 3; // 跳过已覆盖字符
             }
         }
@@ -1454,7 +1460,7 @@ function initComboMenu() {
             }
         }
         // 英文单词（长度≥3）
-        (text.match(/[a-z]{3,}/g) || []).forEach(function(w) {
+        (text.match(/[a-z]{3,}/g) || []).forEach(function (w) {
             if (!STOP_WORDS.has(w)) words[w] = (words[w] || 0) + 1;
         });
         return words;
@@ -1462,17 +1468,17 @@ function initComboMenu() {
 
     function mergeFreq(a, b) {
         var o = Object.assign({}, a);
-        Object.keys(b).forEach(function(k) { o[k] = (o[k] || 0) + b[k]; });
+        Object.keys(b).forEach(function (k) { o[k] = (o[k] || 0) + b[k]; });
         return o;
     }
 
     function topWords(freq, n) {
         var min = Object.keys(freq).length > 60 ? 2 : 1;
         return Object.entries(freq)
-            .filter(function(e) { return e[1] >= min && e[0].length >= 2; })
-            .sort(function(a, b) { return b[1] - a[1]; })
+            .filter(function (e) { return e[1] >= min && e[0].length >= 2; })
+            .sort(function (a, b) { return b[1] - a[1]; })
             .slice(0, n)
-            .map(function(e) { return { word: e[0], count: e[1] }; });
+            .map(function (e) { return { word: e[0], count: e[1] }; });
     }
 
     function resolveFont() {
@@ -1485,23 +1491,23 @@ function initComboMenu() {
     }
 
     function hex3(hex) {
-        hex = hex.replace('#','');
-        if (hex.length === 3) hex = hex.split('').map(function(c){return c+c;}).join('');
+        hex = hex.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
         var n = parseInt(hex, 16);
-        return [(n>>16)&255, (n>>8)&255, n&255];
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
     }
     function drawWordCloud(canvas, words) {
-        var ctx   = canvas.getContext('2d');
-        var dpr   = window.devicePixelRatio || 1;
+        var ctx = canvas.getContext('2d');
+        var dpr = window.devicePixelRatio || 1;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         var W = canvas.width / dpr;
         var H = canvas.height / dpr;
 
-        var cs     = getComputedStyle(document.documentElement);
+        var cs = getComputedStyle(document.documentElement);
         var accent = cs.getPropertyValue('--accent-color').trim() || '#c5a47e';
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        var rgb    = hex3(accent);
-        var font   = resolveFont();
+        var rgb = hex3(accent);
+        var font = resolveFont();
 
         ctx.fillStyle = isDark ? '#141414' : '#ffffff';
         ctx.fillRect(0, 0, W, H);
@@ -1522,9 +1528,9 @@ function initComboMenu() {
 
         function wordAlpha(idx, total) {
             if (idx === 0) return 1.0;
-            if (idx < 3)   return 0.82;
-            if (idx < 8)   return 0.64;
-            if (idx < 20)  return 0.46;
+            if (idx < 3) return 0.82;
+            if (idx < 8) return 0.64;
+            if (idx < 20) return 0.46;
             return Math.max(0.20, 0.46 - (idx - 20) / total * 0.25);
         }
 
@@ -1548,11 +1554,11 @@ function initComboMenu() {
         ctx.textBaseline = 'middle';
         ctx.shadowBlur = 0;
 
-        words.forEach(function(item, idx) {
-            var fs  = fontSize(item.count);
-            var fw  = idx < 2 ? '800' : idx < 8 ? '600' : '400';
+        words.forEach(function (item, idx) {
+            var fs = fontSize(item.count);
+            var fw = idx < 2 ? '800' : idx < 8 ? '600' : '400';
             var rot = tilt(item.word, idx);
-            var a   = wordAlpha(idx, words.length);
+            var a = wordAlpha(idx, words.length);
 
             ctx.font = fw + ' ' + fs + 'px ' + font;
             var tw = ctx.measureText(item.word).width;
@@ -1567,16 +1573,16 @@ function initComboMenu() {
 
             for (var t = 0; t < 320; t += 0.09) {
                 var ang = t * 2.2;
-                var r   = 1.8 * ang;
-                var bx  = cx + r * Math.cos(ang) * 1.2 - bw / 2;
-                var by  = cy + r * Math.sin(ang) * 0.88 - bh / 2;
+                var r = 1.8 * ang;
+                var bx = cx + r * Math.cos(ang) * 1.2 - bw / 2;
+                var by = cy + r * Math.sin(ang) * 0.88 - bh / 2;
 
                 if (bx >= pad && by >= pad && bx + bw <= W - pad && by + bh <= H - pad) {
                     if (!overlaps(bx, by, bw, bh, pad)) {
                         ctx.save();
                         ctx.globalAlpha = a;
                         ctx.fillStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
-                        ctx.translate(bx + bw/2, by + bh/2);
+                        ctx.translate(bx + bw / 2, by + bh / 2);
                         ctx.rotate(rot);
                         ctx.fillText(item.word, 0, 0);
                         ctx.restore();
@@ -1610,7 +1616,7 @@ function initComboMenu() {
         });
     }
 
-    window.renderWordCloud = function() {
+    window.renderWordCloud = function () {
         var container = document.getElementById('wordcloud-container');
         if (!container) return;
 
@@ -1620,14 +1626,14 @@ function initComboMenu() {
         }
 
         var pName = (typeof settings !== 'undefined' && settings.partnerName) ? settings.partnerName : '对方';
-        var mName = (typeof settings !== 'undefined' && settings.myName)      ? settings.myName      : '我';
+        var mName = (typeof settings !== 'undefined' && settings.myName) ? settings.myName : '我';
 
-        var partnerMsgs = messages.filter(function(m) { return m.sender !== 'user' && m.text && m.type !== 'system' && m.type !== 'call-event'; });
-        var myMsgs      = messages.filter(function(m) { return m.sender === 'user' && m.text && m.type !== 'system' && m.type !== 'call-event'; });
+        var partnerMsgs = messages.filter(function (m) { return m.sender !== 'user' && m.text && m.type !== 'system' && m.type !== 'call-event'; });
+        var myMsgs = messages.filter(function (m) { return m.sender === 'user' && m.text && m.type !== 'system' && m.type !== 'call-event'; });
 
         var pFreq = {}, mFreq = {};
-        partnerMsgs.forEach(function(m) { pFreq = mergeFreq(pFreq, tokenize(m.text)); });
-        myMsgs.forEach(function(m)      { mFreq = mergeFreq(mFreq, tokenize(m.text)); });
+        partnerMsgs.forEach(function (m) { pFreq = mergeFreq(pFreq, tokenize(m.text)); });
+        myMsgs.forEach(function (m) { mFreq = mergeFreq(mFreq, tokenize(m.text)); });
         var aFreq = mergeFreq(pFreq, mFreq);
 
         var pTop = topWords(pFreq, 60);
@@ -1638,7 +1644,7 @@ function initComboMenu() {
 
         function data(v) {
             if (v === 'partner') return { words: pTop, total: partnerMsgs.length };
-            if (v === 'me')      return { words: mTop, total: myMsgs.length };
+            if (v === 'me') return { words: mTop, total: myMsgs.length };
             return { words: aTop, total: partnerMsgs.length + myMsgs.length };
         }
 
@@ -1646,20 +1652,20 @@ function initComboMenu() {
             var el = container.querySelector('.wc-rank-list');
             if (!el) return;
             if (!words.length) { el.innerHTML = '<div class="wc-rank-empty">暂无数据</div>'; return; }
-            var cs     = getComputedStyle(document.documentElement);
+            var cs = getComputedStyle(document.documentElement);
             var accent = cs.getPropertyValue('--accent-color').trim() || '#c5a47e';
-            var rgb    = hex3(accent);
-            var max    = words[0].count;
-            el.innerHTML = words.slice(0, 10).map(function(item, i) {
+            var rgb = hex3(accent);
+            var max = words[0].count;
+            el.innerHTML = words.slice(0, 10).map(function (item, i) {
                 var pct = Math.round(item.count / max * 100);
                 var numStyle = i < 3
-                    ? 'color:rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+');font-weight:700;'
+                    ? 'color:rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ');font-weight:700;'
                     : 'color:var(--text-secondary);font-weight:500;';
                 return '<div class="wc-rank-item">'
-                    + '<span class="wc-rank-num" style="'+numStyle+'">' + (i < 9 ? '0'+(i+1) : i+1) + '</span>'
+                    + '<span class="wc-rank-num" style="' + numStyle + '">' + (i < 9 ? '0' + (i + 1) : i + 1) + '</span>'
                     + '<span class="wc-rank-word">' + item.word + '</span>'
                     + '<div class="wc-rank-bar-wrap">'
-                    +   '<div class="wc-rank-bar" style="width:'+pct+'%;background:rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+(0.2+pct/100*0.6)+');"></div>'
+                    + '<div class="wc-rank-bar" style="width:' + pct + '%;background:rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (0.2 + pct / 100 * 0.6) + ');"></div>'
                     + '</div>'
                     + '<span class="wc-rank-count">' + Math.round(item.count) + '</span>'
                     + '</div>';
@@ -1676,7 +1682,7 @@ function initComboMenu() {
 
         function renderView(v) {
             container._currentView = v;
-            container.querySelectorAll('.wc-view-btn').forEach(function(b) {
+            container.querySelectorAll('.wc-view-btn').forEach(function (b) {
                 b.classList.toggle('active', b.dataset.view === v);
             });
             var canvas = container.querySelector('#wc-canvas');
@@ -1689,35 +1695,35 @@ function initComboMenu() {
 
         if (!container.querySelector('#wc-canvas')) {
             var dpr = window.devicePixelRatio || 1;
-            var cw  = Math.min(container.offsetWidth || (container.parentElement && container.parentElement.offsetWidth) || 340, 500);
-            var ch  = Math.round(cw * 0.72);
+            var cw = Math.min(container.offsetWidth || (container.parentElement && container.parentElement.offsetWidth) || 340, 500);
+            var ch = Math.round(cw * 0.72);
 
             container.innerHTML =
                 '<div class="wc-header">'
-                +   '<div class="wc-tabs"><div class="wc-tabs-track">'
-                +     '<button class="wc-view-btn'+(cur==='all'?' active':'')+'" data-view="all">全部</button>'
-                +     '<button class="wc-view-btn'+(cur==='partner'?' active':'')+'" data-view="partner">'+pName+'</button>'
-                +     '<button class="wc-view-btn'+(cur==='me'?' active':'')+'" data-view="me">'+mName+'</button>'
-                +   '</div></div>'
-                +   '<button class="wc-regen-btn" title="换一种布局"><i class="fas fa-redo"></i></button>'
+                + '<div class="wc-tabs"><div class="wc-tabs-track">'
+                + '<button class="wc-view-btn' + (cur === 'all' ? ' active' : '') + '" data-view="all">全部</button>'
+                + '<button class="wc-view-btn' + (cur === 'partner' ? ' active' : '') + '" data-view="partner">' + pName + '</button>'
+                + '<button class="wc-view-btn' + (cur === 'me' ? ' active' : '') + '" data-view="me">' + mName + '</button>'
+                + '</div></div>'
+                + '<button class="wc-regen-btn" title="换一种布局"><i class="fas fa-redo"></i></button>'
                 + '</div>'
                 + '<div class="wc-summary"></div>'
                 + '<div class="wc-canvas-wrap">'
-                +   '<canvas id="wc-canvas" width="'+(cw*dpr)+'" height="'+(ch*dpr)+'" style="width:'+cw+'px;height:'+ch+'px;display:block;"></canvas>'
+                + '<canvas id="wc-canvas" width="' + (cw * dpr) + '" height="' + (ch * dpr) + '" style="width:' + cw + 'px;height:' + ch + 'px;display:block;"></canvas>'
                 + '</div>'
                 + '<div class="wc-rank-section">'
-                +   '<div class="wc-rank-title"><i class="fas fa-bars"></i> 高频词 Top 10</div>'
-                +   '<div class="wc-rank-list"></div>'
+                + '<div class="wc-rank-title"><i class="fas fa-bars"></i> 高频词 Top 10</div>'
+                + '<div class="wc-rank-list"></div>'
                 + '</div>';
 
-            container.querySelector('.wc-tabs-track').addEventListener('click', function(e) {
+            container.querySelector('.wc-tabs-track').addEventListener('click', function (e) {
                 var b = e.target.closest('.wc-view-btn');
                 if (b) renderView(b.dataset.view);
             });
-            container.querySelector('.wc-regen-btn').addEventListener('click', function() {
+            container.querySelector('.wc-regen-btn').addEventListener('click', function () {
                 var canvas = container.querySelector('#wc-canvas');
                 var d = data(container._currentView);
-                var shuffled = d.words.slice().sort(function(a, b) {
+                var shuffled = d.words.slice().sort(function (a, b) {
                     return a.count !== b.count ? b.count - a.count : Math.random() - 0.5;
                 });
                 drawWordCloud(canvas, shuffled);
