@@ -1,4 +1,4 @@
-function setupEventListeners() {
+﻿function setupEventListeners() {
     try {
         initCoreListeners();
         initModalListeners();
@@ -231,6 +231,21 @@ function initModalListeners() {
 
 
 function initHeaderAndSettingsListeners() {
+
+    const csSaveBtn = document.getElementById('cs-save-names-btn');
+    if (csSaveBtn) {
+        csSaveBtn._settingsPatched = true;
+        csSaveBtn.addEventListener('click', () => {
+            const p = document.getElementById('cs-partner-name-input')?.value.trim();
+            const m = document.getElementById('cs-my-name-input')?.value.trim();
+            if (p) settings.partnerName = p;
+            if (m) settings.myName = m;
+            throttledSaveData();
+            updateUI();
+            if (window.homeScreen && window.homeScreen.refreshHomeData) window.homeScreen.refreshHomeData();
+            showNotification('昵称已更新 ✦', 'success');
+        });
+    }
 
     const openNameModal = (isPartner) => {
         const modal = DOMElements.editModal;
@@ -492,7 +507,27 @@ function initHeaderAndSettingsListeners() {
         const rrTextBtn = document.getElementById('rr-style-text');
         if (rrIconBtn) { rrIconBtn.className = rrStyle === 'icon' ? 'modal-btn modal-btn-primary' : 'modal-btn modal-btn-secondary'; rrIconBtn.style.cssText = 'padding:5px 12px;font-size:12px;'; }
         if (rrTextBtn) { rrTextBtn.className = rrStyle === 'text' ? 'modal-btn modal-btn-primary' : 'modal-btn modal-btn-secondary'; rrTextBtn.style.cssText = 'padding:5px 12px;font-size:12px;'; }
+        // 打开时填入当前昵称
+        const csPartnerInput = document.getElementById('cs-partner-name-input');
+        const csMyInput = document.getElementById('cs-my-name-input');
+        if (csPartnerInput) csPartnerInput.value = settings.partnerName || '梦角';
+        if (csMyInput) csMyInput.value = settings.myName || '我';
 
+        // 保存按钮（只绑一次）
+        const csSaveBtn = document.getElementById('cs-save-names-btn');
+        if (csSaveBtn && !csSaveBtn._bound) {
+            csSaveBtn._bound = true;
+            csSaveBtn._settingsPatched = true;
+            csSaveBtn.addEventListener('click', () => {
+                const p = document.getElementById('cs-partner-name-input')?.value.trim();
+                const m = document.getElementById('cs-my-name-input')?.value.trim();
+                if (p) settings.partnerName = p;
+                if (m) settings.myName = m;
+                if (typeof throttledSaveData === 'function') throttledSaveData();
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof showNotification === 'function') showNotification('昵称已更新 ✦', 'success');
+            });
+        }
         showModal(DOMElements.chatModal.modal);
         setupAvatarFrameSettings();
     });
@@ -1164,16 +1199,28 @@ function initHeaderAndSettingsListeners() {
     bindAudioUpload('upload-sound-partner-poke-btn', 'upload-sound-partner-poke-file', 'sound-partner-poke-custom-url', 'partnerPokeCustomSoundUrl', 'sound-partner-poke-preset');
 
     const btnMySend = document.getElementById('test-sound-my-send-btn');
-    if (btnMySend) btnMySend.addEventListener('click', (e) => { e.stopPropagation(); playSound('my_send'); });
+    if (btnMySend) {
+        btnMySend._settingsPatched = true;  // ← 加
+        btnMySend.addEventListener('click', () => playSound('my_send'));
+    }
 
     const btnPartnerMsg = document.getElementById('test-sound-partner-message-btn');
-    if (btnMySend) btnMySend.addEventListener('click', (e) => { e.stopPropagation(); playSound('my_send'); });
+    if (btnPartnerMsg) {
+        btnPartnerMsg._settingsPatched = true;  // ← 加
+        btnPartnerMsg.addEventListener('click', () => playSound('partner_message'));
+    }
 
     const btnMyPoke = document.getElementById('test-sound-my-poke-btn');
-    if (btnMySend) btnMySend.addEventListener('click', (e) => { e.stopPropagation(); playSound('my_send'); });
+    if (btnMyPoke) {
+        btnMyPoke._settingsPatched = true;  // ← 加
+        btnMyPoke.addEventListener('click', () => playSound('my_poke'));
+    }
 
     const btnPartnerPoke = document.getElementById('test-sound-partner-poke-btn');
-    if (btnMySend) btnMySend.addEventListener('click', (e) => { e.stopPropagation(); playSound('my_send'); });
+    if (btnPartnerPoke) {
+        btnPartnerPoke._settingsPatched = true;  // ← 加
+        btnPartnerPoke.addEventListener('click', () => playSound('partner_poke'));
+    }
 
     document.querySelectorAll('.time-fmt-opt').forEach(opt => {
         opt.classList.toggle('active', opt.dataset.fmt === (settings.timeFormat || 'HH:mm'));

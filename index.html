@@ -1747,19 +1747,18 @@
 
                     <div class="cs-panel" id="cs-panel-names">
                         <p class="cs-group-label">聊天昵称</p>
-                        <div class="cs-name-row">
-                            <button class="cs-name-btn"
-                                onclick="(function(){var m=document.getElementById('edit-modal'),ti=m.querySelector('#edit-modal-title'),ni=m.querySelector('#name-input'),sb=m.querySelector('#save-name');ti.textContent='修改梦角的昵称';ni.value=(typeof settings!=='undefined'?settings.partnerName:'梦角');sb.disabled=!ni.value.trim();sb.onclick=function(){var n=ni.value.trim();if(n){settings.partnerName=n;var pEls=document.querySelectorAll('.username[data-role=partner],.partner-name,.contact-name');pEls.forEach(function(el){el.textContent=n;});if(typeof throttledSaveData==='function')throttledSaveData();if(typeof updateUI==='function')updateUI();if(typeof showNotification==='function')showNotification('梦角昵称已更新为「'+n+'」✦','success');}if(typeof hideModal==='function')hideModal(m);};if(typeof showModal==='function')showModal(m,ni);})()">
-                                <i class="fas fa-user"></i>
-                                <span>修改梦角名称</span>
-                            </button>
-                            <button class="cs-name-btn"
-                                onclick="(function(){var m=document.getElementById('edit-modal'),ti=m.querySelector('#edit-modal-title'),ni=m.querySelector('#name-input'),sb=m.querySelector('#save-name');ti.textContent='修改我的昵称';ni.value=(typeof settings!=='undefined'?settings.myName:'我');sb.disabled=!ni.value.trim();sb.onclick=function(){var n=ni.value.trim();if(n){settings.myName=n;if(typeof throttledSaveData==='function')throttledSaveData();if(typeof updateUI==='function')updateUI();if(typeof showNotification==='function')showNotification('我的昵称已更新为「'+n+'」✦','success');}if(typeof hideModal==='function')hideModal(m);};if(typeof showModal==='function')showModal(m,ni);})()">
-                                <i class="fas fa-user-circle"></i>
-                                <span>修改我方名称</span>
-                            </button>
+                        <div style="display:flex;flex-direction:column;gap:10px;padding:0 2px;">
+                            <div>
+                                <label style="font-size:11px;color:var(--text-secondary);margin-bottom:5px;display:block;">梦角名称</label>
+                                <input type="text" id="cs-partner-name-input" style="width:100%;padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:var(--primary-bg);color:var(--text-primary);font-size:13px;outline:none;box-sizing:border-box;font-family:var(--font-family);">
+                            </div>
+                            <div>
+                                <label style="font-size:11px;color:var(--text-secondary);margin-bottom:5px;display:block;">我的名称</label>
+                                <input type="text" id="cs-my-name-input" style="width:100%;padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:var(--primary-bg);color:var(--text-primary);font-size:13px;outline:none;box-sizing:border-box;font-family:var(--font-family);">
+                            </div>
+                            <button id="cs-save-names-btn" style="width:100%;padding:11px;border:none;border-radius:10px;background:var(--accent-color);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-family);">保存昵称</button>
                         </div>
-                        <p class="cs-hint">专为顶部昵称不可见的机型设置</p>
+                        <p class="cs-hint">修改后自动同步到聊天界面</p>
                     </div>
 
                 </div>
