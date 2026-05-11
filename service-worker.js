@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zz54oh-v1';
+﻿const CACHE_NAME = 'zz54oh-v2';
 
 const STATIC_ASSETS = [
   './',

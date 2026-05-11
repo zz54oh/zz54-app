@@ -203,6 +203,7 @@ function initModalListeners() {
     DOMElements.cancelCoinResult.addEventListener('click', () => {
         DOMElements.coinTossOverlay.classList.remove('visible', 'finished');
         lastCoinResult = null;
+        if (typeof window.backToSettings === 'function') window.backToSettings();
     });
 
 
@@ -212,6 +213,7 @@ function initModalListeners() {
             DOMElements.coinTossOverlay.classList.remove('visible', 'finished');
             lastCoinResult = null;
         }
+        if (typeof window.backToSettings === 'function') window.backToSettings();
     });
 
 
@@ -1162,16 +1164,16 @@ function initHeaderAndSettingsListeners() {
     bindAudioUpload('upload-sound-partner-poke-btn', 'upload-sound-partner-poke-file', 'sound-partner-poke-custom-url', 'partnerPokeCustomSoundUrl', 'sound-partner-poke-preset');
 
     const btnMySend = document.getElementById('test-sound-my-send-btn');
-    if (btnMySend) btnMySend.addEventListener('click', () => playSound('my_send'));
+    if (btnMySend) btnMySend.addEventListener('click', (e) => { e.stopPropagation(); playSound('my_send'); });
 
     const btnPartnerMsg = document.getElementById('test-sound-partner-message-btn');
-    if (btnPartnerMsg) btnPartnerMsg.addEventListener('click', () => playSound('partner_message'));
+    if (btnMySend) btnMySend.addEventListener('click', (e) => { e.stopPropagation(); playSound('my_send'); });
 
     const btnMyPoke = document.getElementById('test-sound-my-poke-btn');
-    if (btnMyPoke) btnMyPoke.addEventListener('click', () => playSound('my_poke'));
+    if (btnMySend) btnMySend.addEventListener('click', (e) => { e.stopPropagation(); playSound('my_send'); });
 
     const btnPartnerPoke = document.getElementById('test-sound-partner-poke-btn');
-    if (btnPartnerPoke) btnPartnerPoke.addEventListener('click', () => playSound('partner_poke'));
+    if (btnMySend) btnMySend.addEventListener('click', (e) => { e.stopPropagation(); playSound('my_send'); });
 
     document.querySelectorAll('.time-fmt-opt').forEach(opt => {
         opt.classList.toggle('active', opt.dataset.fmt === (settings.timeFormat || 'HH:mm'));

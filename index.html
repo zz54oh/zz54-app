@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN" data-theme="light" data-color-theme="black-white">
 
 <head>
@@ -416,7 +416,7 @@
                             onmouseover="this.style.opacity='0.85';this.style.transform='scale(1.05)'"
                             onmouseout="this.style.opacity='1';this.style.transform='scale(1)'"><i
                                 class="fas fa-plus"></i> 添加</button>
-                        <button onclick="window.openMyStickerSettings()" title="管理表情库"
+                        <button onclick="window.openMyStickerSettings()" title="管理表情库" style="display:none"
                             style="background:none;border:none;cursor:pointer;padding:4px 8px;color:var(--text-secondary);font-size:12px;display:flex;align-items:center;gap:3px;border-radius:6px;transition:all 0.2s;"
                             onmouseover="this.style.background='rgba(var(--accent-color-rgb),0.12)';this.style.color='var(--accent-color)'"
                             onmouseout="this.style.background='none';this.style.color='var(--text-secondary)'"><i
@@ -2342,572 +2342,572 @@
                                     <button onclick="clearDgHeaderBg()"
                                         style="padding:9px 14px;border:1px solid var(--border-color);border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-family:var(--font-family);">清除</button>
                                 </div>
-                            </div>
-
-                            <div
-                                style="background:rgba(var(--accent-color-rgb),0.05);border-radius:14px;padding:14px 16px;border:1px solid rgba(var(--accent-color-rgb),0.12);">
-                                <div
-                                    style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-color);font-weight:700;margin-bottom:10px;">
-                                    <i class="fas fa-image" style="margin-right:6px;"></i>中部装饰图
-                                </div>
-                                <div style="display:flex;gap:8px;align-items:center;">
-                                    <button onclick="document.getElementById('dg-deco-img-input').click()"
-                                        style="flex:1;padding:9px;border:1.5px dashed rgba(var(--accent-color-rgb),0.4);border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-family:var(--font-family);">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2"
-                                            style="vertical-align:-2px;margin-right:4px">
-                                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                                            <circle cx="8.5" cy="8.5" r="1.5" />
-                                            <polyline points="21 15 16 10 5 21" />
-                                        </svg>
-                                        上传装饰图
-                                    </button>
-                                    <button onclick="clearDgDecoImg()"
-                                        style="padding:9px 14px;border:1px solid var(--border-color);border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-family:var(--font-family);">清除</button>
-                                </div>
-                                <input type="file" id="dg-deco-img-input" accept="image/*" style="display:none">
-                                <div id="dg-deco-preview"
-                                    style="margin-top:8px;display:none;border-radius:10px;overflow:hidden;">
-                                    <img id="dg-deco-preview-img" src=""
-                                        style="width:100%;max-height:100px;object-fit:cover;display:block;">
-                                </div>
-                            </div>
-
-                            <div
-                                style="background:rgba(var(--accent-color-rgb),0.05);border-radius:14px;padding:14px 16px;border:1px solid rgba(var(--accent-color-rgb),0.12);">
-                                <div
-                                    style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-color);font-weight:700;margin-bottom:10px;">
-                                    <i class="fas fa-edit" style="margin-right:6px;"></i>公告文案
-                                </div>
-                                <div style="display:flex;flex-direction:column;gap:10px;">
-                                    <div>
-                                        <label
-                                            style="font-size:11px;color:var(--text-secondary);display:block;margin-bottom:5px;">公告标题
-                                            <span style="opacity:0.6;">（每行一条，随机显示）</span></label>
-                                        <textarea id="dg-edit-title" rows="4"
-                                            placeholder="每行一条，如：&#10;早上好&#10;七夕快乐&#10;思念你"
-                                            style="width:100%;padding:9px 12px;border:1px solid var(--border-color);border-radius:10px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);resize:none;line-height:1.6;"></textarea>
-                                    </div>
-                                    <div>
-                                        <label
-                                            style="font-size:11px;color:var(--text-secondary);display:block;margin-bottom:5px;">每日寄语
-                                            <span style="opacity:0.6;">（每行一条，随机显示）</span></label>
-                                        <textarea id="dg-edit-note" rows="5"
-                                            placeholder="每行一条，如：&#10;今天也要元气满满，我在这里陪着你 ✦&#10;想你了，你有没有在想我呢"
-                                            style="width:100%;padding:9px 12px;border:1px solid var(--border-color);border-radius:10px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);resize:none;line-height:1.6;"></textarea>
-                                    </div>
-                                    <button onclick="saveDailyGreetingCustom()"
-                                        style="width:100%;padding:11px;background:var(--accent-color);color:white;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-family);">
-                                        <i class="fas fa-save" style="margin-right:6px;"></i>保存公告内容
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div
-                                style="background:rgba(var(--accent-color-rgb),0.05);border-radius:14px;padding:14px 16px;border:1px solid rgba(var(--accent-color-rgb),0.12);">
-                                <div
-                                    style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-color);font-weight:700;margin-bottom:10px;">
-                                    <i class="fas fa-random" style="margin-right:6px;"></i>状态随机库
-                                </div>
-                                <div
-                                    style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5;">
-                                    每次打开公告时，状态、英文标签、图标将从下方随机抽取一条。</div>
-                                <div id="ann-status-pool-list"
-                                    style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;max-height:200px;overflow-y:auto;">
-                                </div>
-                                <div style="display:flex;flex-direction:column;gap:7px;">
-                                    <input type="text" id="ann-status-pool-input" placeholder="状态文案，如：在想你"
-                                        style="width:100%;padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);">
-                                    <input type="text" id="ann-status-label-input" placeholder="英文标签，如：MISSING YOU"
-                                        style="width:100%;padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);">
-                                    <div style="display:flex;gap:7px;align-items:center;">
-                                        <div style="position:relative;flex:1;">
-                                            <input type="text" id="ann-status-icon-input" placeholder="图标 emoji 或留空"
-                                                style="width:100%;padding:9px 36px 9px 12px;border:1px solid var(--border-color);border-radius:9px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);box-sizing:border-box;">
-                                            <button onclick="document.getElementById('ann-icon-img-input').click()"
-                                                title="上传图片图标"
-                                                style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;background:rgba(var(--accent-color-rgb),0.15);border:none;border-radius:6px;cursor:pointer;font-size:10px;color:var(--accent-color);display:flex;align-items:center;justify-content:center;padding:0;"><i
-                                                    class="fas fa-image"></i></button>
-                                            <input type="file" id="ann-icon-img-input" accept="image/*"
-                                                style="display:none" onchange="handleAnnStatusIconUpload(this)">
-                                        </div>
-                                        <button onclick="addAnnStatusPoolItem()"
-                                            style="padding:9px 18px;background:var(--accent-color);color:white;border:none;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;flex-shrink:0;font-family:var(--font-family);letter-spacing:0.5px;">添加</button>
+                                <div id="dg-header-bg-preview"
+                                    style="margin-top:8px;display:none;border-radius:10px;overflow:hidden;position:relative;">
+                                    <img id="dg-header-bg-preview-img" src=""
+                                        style="width:100%;max-height:80px;object-fit:cover;display:block;">
+                                    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;">
+                                        <span style="color:#fff;font-size:11px;">顶部背景预览</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="modal-buttons">
-                        <button class="modal-btn modal-btn-primary" id="add-custom-reply" style="flex: 1;">
-                            <i class="fas fa-plus"></i> 新增
-                        </button>
-                        <button class="modal-btn modal-btn-secondary" id="close-custom-replies">关闭</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <input type="file" id="import-replies-input" accept=".json" style="display: none;">
-        <input type="file" id="background-input" class="file-input" accept="image/*">
-        <input type="file" id="import-input" class="file-input" accept=".json">
-        <input type="file" id="sticker-file-input" class="file-input" accept="image/*" multiple>
-
-        <div class="coin-toss-overlay" id="coin-toss-overlay">
-            <div class="coin-container">
-                <div class="coin" id="animated-coin">
-                    <div class="coin-face coin-front">
-                        <div class="coin-text-main">是</div>
-                        <div class="coin-text-sub">YES</div>
-                    </div>
-                    <div class="coin-face coin-back">
-                        <div class="coin-text-main">否</div>
-                        <div class="coin-text-sub">NO</div>
-                    </div>
-                </div>
-            </div>
-            <div class="coin-result-container">
-                <div class="coin-result-text" id="coin-result-text"></div>
-            </div>
-            <div class="coin-confirm-buttons" id="coin-action-area">
-                <button class="coin-btn-action" id="cancel-coin-result">取消</button>
-                <button class="coin-btn-action" id="retry-coin-toss"><i class="fas fa-redo-alt"></i> 再来一次</button>
-                <button class="coin-btn-action coin-btn-primary" id="send-coin-result">发送结果</button>
-            </div>
-        </div>
-
-        <div class="modal" id="disclaimer-modal">
-            <div class="modal-content">
-                <div class="modal-title">
-                    <i class="fas fa-scroll"></i><span>关于 & 声明</span>
-                </div>
-                <div id="disclaimer-content"
-                    style="font-size: 14px; line-height: 1.8; color: var(--text-secondary); max-height: 50vh; overflow-y: auto; padding-right: 10px;">
-                    <div
-                        style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color);">
-                        <h3 style="color: var(--accent-color); margin-bottom: 10px;">特别鸣谢</h3>
                         <div
-                            style="text-align: center; margin: 15px 0; padding: 10px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--accent-color);">
-                            <p style="margin: 5px 0; color: var(--text-primary);">
-                                参考了 <strong>B站 @molina-3- 的传讯网站</strong>
-                            </p>
-                            <p style="margin: 5px 0; font-weight: bold; color: #e53935;">
-                                如果需要更好的沟通体验 请支持哦！
-                            </p>
-                        </div>
-                        <p>感谢 <strong>@苏铂潼</strong></p>
-                        <p style="font-size: 12px; opacity: 0.8;">小红书号：9568228497</p>
-                        <p style="font-size: 12px; margin-top: 5px; font-style: italic;">(聊天统计部分代码参考)</p>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <p style="font-weight: bold; color: var(--text-primary); text-align: center;">
-                            原创：小红书 @milk (1149615009)
-                        </p>
-                        <p
-                            style="color: #e53935; font-weight: bold; text-align: center; margin-top: 10px; border: 1px solid #e53935; padding: 5px; border-radius: 5px;">
-                            此代码绝对禁止商用和盈利行为，一旦发现追究到底
-                        </p>
-                        <p style="text-align: center; margin-bottom: 15px;">支持二改二传，感谢使用！</p>
-                        <li
-                            style="text-align: center; font-size: 1.1em; color: #8A2BE2; list-style: none; margin: 5px 0;">
-                            <b>反对性别暴力</b>
-                        </li>
-                        <li
-                            style="text-align: center; font-size: 1.1em; color: #8A2BE2; list-style: none; margin: 5px 0;">
-                            <b>尊重不该是奢求,安全必须是底线</b>
-                        </li>
-                    </div>
-                </div>
-                <div class="modal-buttons" style="margin-top: 20px;">
-                    <button class="modal-btn modal-btn-primary" id="accept-disclaimer"
-                        onclick="(function(){var m=document.getElementById('disclaimer-modal');if(m&&typeof hideModal==='function')hideModal(m);})()"
-                        style="width: 100%;">关闭</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="anniversary-modal">
-            <div class="modal-content">
-                <div class="ann-header-card" id="ann-header-card" style="display: none;">
-                    <div class="ann-header-card-bg" id="ann-header-card-bg"></div>
-                    <div class="ann-header-card-overlay" id="ann-header-card-overlay"></div>
-                    <input type="file" id="ann-header-bg-input" accept="image/*" style="display:none;">
-                    <div class="ann-header-card-inner">
-                        <span class="ann-header-icon" id="ann-header-icon">❤︎</span>
-                        <span class="ann-header-label" id="ann-header-label">ANNIVERSARY</span>
-                        <div class="ann-header-title" id="ann-header-title">纪念日</div>
-                        <div class="ann-header-days" id="ann-header-days">0<span class="ann-header-days-unit">天</span>
-                        </div>
-                        <div class="ann-header-date" id="ann-header-date">--/--</div>
-                        <div class="ann-header-milestones" id="ann-header-milestones"></div>
-                    </div>
-                </div>
-                <div class="ann-data-tabs" id="ann-data-tabs"
-                    style="display:flex;gap:8px;align-items:center;padding:10px 14px 6px;border-bottom:1px solid var(--border-color);background:linear-gradient(180deg, rgba(var(--accent-color-rgb),0.05), transparent);">
-                    <button id="ann-tab-card" onclick="window.switchAnnDataTab && window.switchAnnDataTab('card')"
-                        class="ann-tab-btn"
-                        style="flex:1;padding:8px 10px;border-radius:12px;border:1px solid var(--border-color);background:var(--secondary-bg);color:var(--text-secondary);cursor:pointer;font-size:12px;font-family:var(--font-family);">卡片</button>
-                    <button id="ann-tab-data" onclick="window.switchAnnDataTab && window.switchAnnDataTab('data')"
-                        class="ann-tab-btn"
-                        style="flex:1;padding:8px 10px;border-radius:12px;border:none;background:rgba(var(--accent-color-rgb),0.16);color:var(--accent-color);cursor:pointer;font-size:12px;font-family:var(--font-family);">数据</button>
-                </div>
-                <div id="ann-data-panel" style="display:none;padding:10px 14px 0;overflow:hidden;">
-                    <div id="ann-data-milestones" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
-                </div>
-                <div id="ann-card-toolbar"
-                    style="display:none; padding:6px 14px 2px; align-items:center; justify-content:flex-end; gap:8px;">
-                    <button class="ann-header-upload-btn"
-                        onclick="document.getElementById('ann-header-bg-input').click()" title="更换背景图"
-                        style="position:static; background:rgba(var(--accent-color-rgb),0.1); border-color:rgba(var(--accent-color-rgb),0.3); color:var(--accent-color);">
-                        <i class="fas fa-image"></i> 更换封面
-                    </button>
-                    <button class="ann-header-upload-btn" onclick="clearAnnCardBg()" title="清除背景图"
-                        style="position:static; background:rgba(var(--accent-color-rgb),0.05); border-color:rgba(var(--accent-color-rgb),0.2); color:var(--text-secondary);">
-                        <i class="fas fa-times"></i> 清除
-                    </button>
-                </div>
-
-                <div class="ann-list-container" id="ann-list-container">
-                </div>
-
-                <div class="ann-footer">
-                    <button class="modal-btn modal-btn-secondary" id="close-anniversary-modal">关闭</button>
-                    <button class="modal-btn modal-btn-primary" id="open-ann-add-btn" style="flex: 1;">
-                        <i class="fas fa-plus"></i> 新增纪念日
-                    </button>
-                </div>
-
-                <div class="ann-editor-slide" id="ann-editor-slide">
-                    <div class="ann-editor-header">
-                        <button class="ann-back-btn" id="close-ann-editor"><i class="fas fa-arrow-left"></i></button>
-                        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" style="vertical-align:-2px;margin-right:4px">
-                                <path d="M12 5v14M5 12h14" />
-                            </svg> 添加纪念日</span>
-                    </div>
-
-                    <div class="ann-editor-content">
-                        <div class="ann-form-group">
-                            <label class="ann-label"><i class="fas fa-tag"></i>标题名称</label>
-                            <input type="text" class="modal-input" id="ann-input-name" placeholder="例如：恋爱纪念日、梦角生日">
-                        </div>
-
-                        <div class="ann-form-group">
-                            <label class="ann-label"><i class="fas fa-calendar-alt"></i>选择日期</label>
-                            <input type="date" class="modal-input" id="ann-input-date">
-                        </div>
-
-                        <div class="ann-form-group">
-                            <label class="ann-label"><i class="fas fa-th-large"></i>类型</label>
-                            <div class="ann-type-selector">
-                                <div class="ann-type-btn active" data-type="anniversary"
-                                    onclick="switchAnnType('anniversary')">
-                                    <i class="fas fa-heart"></i>
-                                    <span>纪念日</span>
-                                    <span class="ann-type-hint">过去 → 今天</span>
-                                </div>
-                                <div class="ann-type-btn" data-type="countdown" onclick="switchAnnType('countdown')">
-                                    <i class="fas fa-hourglass-half"></i>
-                                    <span>倒数日</span>
-                                    <span class="ann-type-hint">今天 → 未来</span>
-                                </div>
-                            </div>
+                            style="background:rgba(var(--accent-color-rgb),0.05);border-radius:14px;padding:14px 16px;border:1px solid rgba(var(--accent-color-rgb),0.12);">
                             <div
-                                style="font-size: 12px; color: var(--text-secondary); margin-top: 10px; opacity: 0.7; padding: 0 2px;">
-                                <span id="ann-type-desc">计算从过去某一天到现在已经过了多少天</span>
+                                style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-color);font-weight:700;margin-bottom:10px;">
+                                <i class="fas fa-image" style="margin-right:6px;"></i>中部装饰图
+                            </div>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <button onclick="document.getElementById('dg-deco-img-input').click()"
+                                    style="flex:1;padding:9px;border:1.5px dashed rgba(var(--accent-color-rgb),0.4);border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-family:var(--font-family);">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" style="vertical-align:-2px;margin-right:4px">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                                        <circle cx="8.5" cy="8.5" r="1.5" />
+                                        <polyline points="21 15 16 10 5 21" />
+                                    </svg>
+                                    上传装饰图
+                                </button>
+                                <button onclick="clearDgDecoImg()"
+                                    style="padding:9px 14px;border:1px solid var(--border-color);border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-family:var(--font-family);">清除</button>
+                            </div>
+                            <input type="file" id="dg-deco-img-input" accept="image/*" style="display:none">
+                            <div id="dg-deco-preview"
+                                style="margin-top:8px;display:none;border-radius:10px;overflow:hidden;">
+                                <img id="dg-deco-preview-img" src=""
+                                    style="width:100%;max-height:100px;object-fit:cover;display:block;">
                             </div>
                         </div>
 
-                        <button class="modal-btn modal-btn-primary" id="save-ann-btn"
-                            style="width: 100%; margin-top: 10px;">
-                            <i class="fas fa-check"></i> 保存
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <div
+                            style="background:rgba(var(--accent-color-rgb),0.05);border-radius:14px;padding:14px 16px;border:1px solid rgba(var(--accent-color-rgb),0.12);">
+                            <div
+                                style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-color);font-weight:700;margin-bottom:10px;">
+                                <i class="fas fa-edit" style="margin-right:6px;"></i>公告文案
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                <div>
+                                    <label
+                                        style="font-size:11px;color:var(--text-secondary);display:block;margin-bottom:5px;">公告标题
+                                        <span style="opacity:0.6;">（每行一条，随机显示）</span></label>
+                                    <textarea id="dg-edit-title" rows="4" placeholder="每行一条，如：&#10;早上好&#10;七夕快乐&#10;思念你"
+                                        style="width:100%;padding:9px 12px;border:1px solid var(--border-color);border-radius:10px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);resize:none;line-height:1.6;"></textarea>
+                                </div>
+                                <div>
+                                    <label
+                                        style="font-size:11px;color:var(--text-secondary);display:block;margin-bottom:5px;">每日寄语
+                                        <span style="opacity:0.6;">（每行一条，随机显示）</span></label>
+                                    <textarea id="dg-edit-note" rows="5"
+                                        placeholder="每行一条，如：&#10;今天也要元气满满，我在这里陪着你 ✦&#10;想你了，你有没有在想我呢"
+                                        style="width:100%;padding:9px 12px;border:1px solid var(--border-color);border-radius:10px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);resize:none;line-height:1.6;"></textarea>
+                                </div>
+                                <button onclick="saveDailyGreetingCustom()"
+                                    style="width:100%;padding:11px;background:var(--accent-color);color:white;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-family);">
+                                    <i class="fas fa-save" style="margin-right:6px;"></i>保存公告内容
+                                </button>
+                            </div>
+                        </div>
 
-        <div class="anniversary-animation" id="anniversary-animation">
-            <div class="anniversary-animation-content">
-                <div class="anniversary-animation-title" id="anniversary-animation-title">
-                    纪念日快乐！
-                </div>
-                <div class="anniversary-animation-days" id="anniversary-animation-days">
-                    0
-                </div>
-                <div class="anniversary-animation-message" id="anniversary-animation-message">
-                    我们已经相伴了这么多天
-                </div>
-                <div class="modal-buttons" style="margin-top: 20px;">
-                    <button class="modal-btn modal-btn-primary" id="close-anniversary-animation">关闭</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="decision-menu-modal">
-            <div class="modal-content">
-                <div class="modal-title">
-                    <i class="fas fa-balance-scale"></i><span>抉择助手</span>
-                </div>
-                <div class="decision-menu-grid">
-                    <div class="decision-option-card" id="open-coin-toss">
-                        <i class="fas fa-coins"></i>
-                        <h3>抛硬币</h3>
-                        <p>是 / 否 二元选择</p>
-                    </div>
-                    <div class="decision-option-card" id="open-wheel">
-                        <i class="fas fa-magic"></i>
-                        <h3>随机抽签</h3>
-                        <p>自定义选项随机抽取</p>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button class="modal-btn modal-btn-secondary" id="close-decision-menu">关闭</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="wheel-modal">
-            <div class="modal-content">
-                <div class="modal-title">
-                    <i class="fas fa-magic"></i><span>随机抽签</span>
-                </div>
-
-                <div class="picker-wrapper">
-                    <div class="picker-box-stage">
-                        <div class="picker-cards-row" id="picker-cards-row"></div>
-                        <div class="picker-result-text" id="wheel-result"></div>
-                    </div>
-                    <div class="picker-controls">
-                        <div class="picker-options-label">选项列表（至少 2 项）</div>
-                        <div class="picker-options-list" id="wheel-options-list"></div>
-                        <button class="modal-btn modal-btn-secondary picker-add-btn" id="add-wheel-option">
-                            <i class="fas fa-plus"></i> 添加选项
-                        </button>
+                        <div
+                            style="background:rgba(var(--accent-color-rgb),0.05);border-radius:14px;padding:14px 16px;border:1px solid rgba(var(--accent-color-rgb),0.12);">
+                            <div
+                                style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-color);font-weight:700;margin-bottom:10px;">
+                                <i class="fas fa-random" style="margin-right:6px;"></i>状态随机库
+                            </div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5;">
+                                每次打开公告时，状态、英文标签、图标将从下方随机抽取一条。</div>
+                            <div id="ann-status-pool-list"
+                                style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;max-height:200px;overflow-y:auto;">
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:7px;">
+                                <input type="text" id="ann-status-pool-input" placeholder="状态文案，如：在想你"
+                                    style="width:100%;padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);">
+                                <input type="text" id="ann-status-label-input" placeholder="英文标签，如：MISSING YOU"
+                                    style="width:100%;padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);">
+                                <div style="display:flex;gap:7px;align-items:center;">
+                                    <div style="position:relative;flex:1;">
+                                        <input type="text" id="ann-status-icon-input" placeholder="图标 emoji 或留空"
+                                            style="width:100%;padding:9px 36px 9px 12px;border:1px solid var(--border-color);border-radius:9px;font-size:13px;background:var(--primary-bg);color:var(--text-primary);outline:none;font-family:var(--font-family);box-sizing:border-box;">
+                                        <button onclick="document.getElementById('ann-icon-img-input').click()"
+                                            title="上传图片图标"
+                                            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;background:rgba(var(--accent-color-rgb),0.15);border:none;border-radius:6px;cursor:pointer;font-size:10px;color:var(--accent-color);display:flex;align-items:center;justify-content:center;padding:0;"><i
+                                                class="fas fa-image"></i></button>
+                                        <input type="file" id="ann-icon-img-input" accept="image/*" style="display:none"
+                                            onchange="handleAnnStatusIconUpload(this)">
+                                    </div>
+                                    <button onclick="addAnnStatusPoolItem()"
+                                        style="padding:9px 18px;background:var(--accent-color);color:white;border:none;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;flex-shrink:0;font-family:var(--font-family);letter-spacing:0.5px;">添加</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="modal-buttons">
-                    <button class="modal-btn modal-btn-secondary" id="close-wheel">关闭</button>
-                    <button class="modal-btn modal-btn-primary" id="spin-wheel-btn"><svg width="13" height="13"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            style="vertical-align:-2px;margin-right:4px">
-                            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 12a10 10 0 0 1 18.8-3.6M22 12a10 10 0 0 1-18.8 3.6" />
-                        </svg> 开始抽签</button>
-                    <button class="modal-btn modal-btn-primary" id="send-wheel-result"
-                        style="display:none;">发送结果</button>
+                    <button class="modal-btn modal-btn-primary" id="add-custom-reply" style="flex: 1;">
+                        <i class="fas fa-plus"></i> 新增
+                    </button>
+                    <button class="modal-btn modal-btn-secondary" id="close-custom-replies">关闭</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="player-container" id="player">
-            <div class="mini-view" id="mini-view" title="点击展开">
-                <div class="vinyl-record" id="vinyl-record-visual">
-                    <svg viewBox="0 0 24 24">
-                        <path
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 13l-4-4h8l-4 4z" />
-                    </svg>
+    <input type="file" id="import-replies-input" accept=".json" style="display: none;">
+    <input type="file" id="background-input" class="file-input" accept="image/*">
+    <input type="file" id="import-input" class="file-input" accept=".json">
+    <input type="file" id="sticker-file-input" class="file-input" accept="image/*" multiple>
+
+    <div class="coin-toss-overlay" id="coin-toss-overlay">
+        <div class="coin-container">
+            <div class="coin" id="animated-coin">
+                <div class="coin-face coin-front">
+                    <div class="coin-text-main">是</div>
+                    <div class="coin-text-sub">YES</div>
+                </div>
+                <div class="coin-face coin-back">
+                    <div class="coin-text-main">否</div>
+                    <div class="coin-text-sub">NO</div>
                 </div>
             </div>
-            <div class="full-view">
-                <div class="minimize-btn" id="minimize-btn" title="收起">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
-                    </svg>
+        </div>
+        <div class="coin-result-container">
+            <div class="coin-result-text" id="coin-result-text"></div>
+        </div>
+        <div class="coin-confirm-buttons" id="coin-action-area">
+            <button class="coin-btn-action" id="cancel-coin-result">取消</button>
+            <button class="coin-btn-action" id="retry-coin-toss"><i class="fas fa-redo-alt"></i> 再来一次</button>
+            <button class="coin-btn-action coin-btn-primary" id="send-coin-result">发送结果</button>
+        </div>
+    </div>
+
+    <div class="modal" id="disclaimer-modal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <i class="fas fa-scroll"></i><span>关于 & 声明</span>
+            </div>
+            <div id="disclaimer-content"
+                style="font-size: 14px; line-height: 1.8; color: var(--text-secondary); max-height: 50vh; overflow-y: auto; padding-right: 10px;">
+                <div
+                    style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-color);">
+                    <h3 style="color: var(--accent-color); margin-bottom: 10px;">特别鸣谢</h3>
+                    <div
+                        style="text-align: center; margin: 15px 0; padding: 10px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+                        <p style="margin: 5px 0; color: var(--text-primary);">
+                            参考了 <strong>B站 @molina-3- 的传讯网站</strong>
+                        </p>
+                        <p style="margin: 5px 0; font-weight: bold; color: #e53935;">
+                            如果需要更好的沟通体验 请支持哦！
+                        </p>
+                    </div>
+                    <p>感谢 <strong>@苏铂潼</strong></p>
+                    <p style="font-size: 12px; opacity: 0.8;">小红书号：9568228497</p>
+                    <p style="font-size: 12px; margin-top: 5px; font-style: italic;">(聊天统计部分代码参考)</p>
                 </div>
-                <button id="upload-cover-btn"
-                    style="position: absolute; top: 12px; left: 15px; background: none; border: 1px dashed var(--border-color); color: var(--text-secondary); cursor: pointer; opacity: 0.7; z-index: 10; width: 24px; height: 24px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:12px;"
-                    title="更换专辑封面">
-                    <i class="fas fa-camera"></i>
+                <div style="margin-top: 15px;">
+                    <p style="font-weight: bold; color: var(--text-primary); text-align: center;">
+                        原创：小红书 @milk (1149615009)
+                    </p>
+                    <p
+                        style="color: #e53935; font-weight: bold; text-align: center; margin-top: 10px; border: 1px solid #e53935; padding: 5px; border-radius: 5px;">
+                        此代码绝对禁止商用和盈利行为，一旦发现追究到底
+                    </p>
+                    <p style="text-align: center; margin-bottom: 15px;">支持二改二传，感谢使用！</p>
+                    <li style="text-align: center; font-size: 1.1em; color: #8A2BE2; list-style: none; margin: 5px 0;">
+                        <b>反对性别暴力</b>
+                    </li>
+                    <li style="text-align: center; font-size: 1.1em; color: #8A2BE2; list-style: none; margin: 5px 0;">
+                        <b>尊重不该是奢求,安全必须是底线</b>
+                    </li>
+                </div>
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="modal-btn modal-btn-primary" id="accept-disclaimer"
+                    onclick="(function(){var m=document.getElementById('disclaimer-modal');if(m&&typeof hideModal==='function')hideModal(m);})()"
+                    style="width: 100%;">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="anniversary-modal">
+        <div class="modal-content">
+            <div class="ann-header-card" id="ann-header-card" style="display: none;">
+                <div class="ann-header-card-bg" id="ann-header-card-bg"></div>
+                <div class="ann-header-card-overlay" id="ann-header-card-overlay"></div>
+                <input type="file" id="ann-header-bg-input" accept="image/*" style="display:none;">
+                <div class="ann-header-card-inner">
+                    <span class="ann-header-icon" id="ann-header-icon">❤︎</span>
+                    <span class="ann-header-label" id="ann-header-label">ANNIVERSARY</span>
+                    <div class="ann-header-title" id="ann-header-title">纪念日</div>
+                    <div class="ann-header-days" id="ann-header-days">0<span class="ann-header-days-unit">天</span>
+                    </div>
+                    <div class="ann-header-date" id="ann-header-date">--/--</div>
+                    <div class="ann-header-milestones" id="ann-header-milestones"></div>
+                </div>
+            </div>
+            <div class="ann-data-tabs" id="ann-data-tabs"
+                style="display:flex;gap:8px;align-items:center;padding:10px 14px 6px;border-bottom:1px solid var(--border-color);background:linear-gradient(180deg, rgba(var(--accent-color-rgb),0.05), transparent);">
+                <button id="ann-tab-card" onclick="window.switchAnnDataTab && window.switchAnnDataTab('card')"
+                    class="ann-tab-btn"
+                    style="flex:1;padding:8px 10px;border-radius:12px;border:1px solid var(--border-color);background:var(--secondary-bg);color:var(--text-secondary);cursor:pointer;font-size:12px;font-family:var(--font-family);">卡片</button>
+                <button id="ann-tab-data" onclick="window.switchAnnDataTab && window.switchAnnDataTab('data')"
+                    class="ann-tab-btn"
+                    style="flex:1;padding:8px 10px;border-radius:12px;border:none;background:rgba(var(--accent-color-rgb),0.16);color:var(--accent-color);cursor:pointer;font-size:12px;font-family:var(--font-family);">数据</button>
+            </div>
+            <div id="ann-data-panel" style="display:none;padding:10px 14px 0;overflow:hidden;">
+                <div id="ann-data-milestones" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+            <div id="ann-card-toolbar"
+                style="display:none; padding:6px 14px 2px; align-items:center; justify-content:flex-end; gap:8px;">
+                <button class="ann-header-upload-btn" onclick="document.getElementById('ann-header-bg-input').click()"
+                    title="更换背景图"
+                    style="position:static; background:rgba(var(--accent-color-rgb),0.1); border-color:rgba(var(--accent-color-rgb),0.3); color:var(--accent-color);">
+                    <i class="fas fa-image"></i> 更换封面
                 </button>
-                <input type="file" id="cover-input" accept="image/*" style="display: none;">
-                <div class="track-info">
-                    <div class="track-name" id="music-title">Loading...</div>
-                    <div class="track-sub" id="music-subtitle">...</div>
+                <button class="ann-header-upload-btn" onclick="clearAnnCardBg()" title="清除背景图"
+                    style="position:static; background:rgba(var(--accent-color-rgb),0.05); border-color:rgba(var(--accent-color-rgb),0.2); color:var(--text-secondary);">
+                    <i class="fas fa-times"></i> 清除
+                </button>
+            </div>
+
+            <div class="ann-list-container" id="ann-list-container">
+            </div>
+
+            <div class="ann-footer">
+                <button class="modal-btn modal-btn-secondary" id="close-anniversary-modal">关闭</button>
+                <button class="modal-btn modal-btn-primary" id="open-ann-add-btn" style="flex: 1;">
+                    <i class="fas fa-plus"></i> 新增纪念日
+                </button>
+            </div>
+
+            <div class="ann-editor-slide" id="ann-editor-slide">
+                <div class="ann-editor-header">
+                    <button class="ann-back-btn" id="close-ann-editor"><i class="fas fa-arrow-left"></i></button>
+                    <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" style="vertical-align:-2px;margin-right:4px">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg> 添加纪念日</span>
                 </div>
-                <div class="progress-wrapper" id="progress-area">
-                    <div class="progress-bar" id="progress-bar"></div>
-                </div>
-                <div class="controls">
-                    <button class="btn" id="mode-btn" title="切换模式">
-                        <svg id="icon-loop" viewBox="0 0 24 24">
-                            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
-                        </svg>
-                        <svg id="icon-single" style="display:none" viewBox="0 0 24 24">
-                            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" /><text x="12"
-                                y="14" text-anchor="middle" font-size="7" fill="currentColor"
-                                font-weight="bold">1</text>
-                        </svg>
-                        <svg id="icon-shuffle" style="display:none" viewBox="0 0 24 24">
-                            <path
-                                d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" />
-                        </svg>
+
+                <div class="ann-editor-content">
+                    <div class="ann-form-group">
+                        <label class="ann-label"><i class="fas fa-tag"></i>标题名称</label>
+                        <input type="text" class="modal-input" id="ann-input-name" placeholder="例如：恋爱纪念日、梦角生日">
+                    </div>
+
+                    <div class="ann-form-group">
+                        <label class="ann-label"><i class="fas fa-calendar-alt"></i>选择日期</label>
+                        <input type="date" class="modal-input" id="ann-input-date">
+                    </div>
+
+                    <div class="ann-form-group">
+                        <label class="ann-label"><i class="fas fa-th-large"></i>类型</label>
+                        <div class="ann-type-selector">
+                            <div class="ann-type-btn active" data-type="anniversary"
+                                onclick="switchAnnType('anniversary')">
+                                <i class="fas fa-heart"></i>
+                                <span>纪念日</span>
+                                <span class="ann-type-hint">过去 → 今天</span>
+                            </div>
+                            <div class="ann-type-btn" data-type="countdown" onclick="switchAnnType('countdown')">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span>倒数日</span>
+                                <span class="ann-type-hint">今天 → 未来</span>
+                            </div>
+                        </div>
+                        <div
+                            style="font-size: 12px; color: var(--text-secondary); margin-top: 10px; opacity: 0.7; padding: 0 2px;">
+                            <span id="ann-type-desc">计算从过去某一天到现在已经过了多少天</span>
+                        </div>
+                    </div>
+
+                    <button class="modal-btn modal-btn-primary" id="save-ann-btn"
+                        style="width: 100%; margin-top: 10px;">
+                        <i class="fas fa-check"></i> 保存
                     </button>
-                    <button class="btn" id="prev-btn"><svg viewBox="0 0 24 24">
-                            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
-                        </svg></button>
-                    <button class="btn btn-main" id="play-btn">
-                        <svg id="icon-play" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                        </svg>
-                        <svg id="icon-pause" style="display:none" viewBox="0 0 24 24">
-                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                        </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="anniversary-animation" id="anniversary-animation">
+        <div class="anniversary-animation-content">
+            <div class="anniversary-animation-title" id="anniversary-animation-title">
+                纪念日快乐！
+            </div>
+            <div class="anniversary-animation-days" id="anniversary-animation-days">
+                0
+            </div>
+            <div class="anniversary-animation-message" id="anniversary-animation-message">
+                我们已经相伴了这么多天
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="modal-btn modal-btn-primary" id="close-anniversary-animation">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="decision-menu-modal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <i class="fas fa-balance-scale"></i><span>抉择助手</span>
+            </div>
+            <div class="decision-menu-grid">
+                <div class="decision-option-card" id="open-coin-toss">
+                    <i class="fas fa-coins"></i>
+                    <h3>抛硬币</h3>
+                    <p>是 / 否 二元选择</p>
+                </div>
+                <div class="decision-option-card" id="open-wheel">
+                    <i class="fas fa-magic"></i>
+                    <h3>随机抽签</h3>
+                    <p>自定义选项随机抽取</p>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="close-decision-menu">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="wheel-modal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <i class="fas fa-magic"></i><span>随机抽签</span>
+            </div>
+
+            <div class="picker-wrapper">
+                <div class="picker-box-stage">
+                    <div class="picker-cards-row" id="picker-cards-row"></div>
+                    <div class="picker-result-text" id="wheel-result"></div>
+                </div>
+                <div class="picker-controls">
+                    <div class="picker-options-label">选项列表（至少 2 项）</div>
+                    <div class="picker-options-list" id="wheel-options-list"></div>
+                    <button class="modal-btn modal-btn-secondary picker-add-btn" id="add-wheel-option">
+                        <i class="fas fa-plus"></i> 添加选项
                     </button>
-                    <button class="btn" id="next-btn"><svg viewBox="0 0 24 24">
-                            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
-                        </svg></button>
-                    <button class="btn" id="list-btn"><svg viewBox="0 0 24 24">
-                            <path
-                                d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
-                        </svg></button>
                 </div>
             </div>
-        </div>
-        <div class="playlist-popup" id="playlist"></div>
-        <audio id="audio"></audio>
 
-        <div class="modal" id="add-song-modal">
-            <div class="modal-content">
-                <div class="modal-title">
-                    <i class="fas fa-music"></i><span>添加自定义歌曲</span>
-                </div>
-                <input type="text" class="modal-input" id="new-song-title" placeholder="歌曲名称 (例如: 这里的风景)">
-                <input type="text" class="modal-input" id="new-song-sub" placeholder="歌手/备注 (例如: 你的名字)">
-                <input type="text" class="modal-input" id="new-song-url" placeholder="音频链接 (mp3/m4a 链接)">
-                <div class="modal-buttons">
-                    <button class="modal-btn modal-btn-secondary" id="cancel-add-song">取消</button>
-                    <button class="modal-btn modal-btn-primary" id="confirm-add-song">添加播放</button>
-                </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="close-wheel">关闭</button>
+                <button class="modal-btn modal-btn-primary" id="spin-wheel-btn"><svg width="13" height="13"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="vertical-align:-2px;margin-right:4px">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 12a10 10 0 0 1 18.8-3.6M22 12a10 10 0 0 1-18.8 3.6" />
+                    </svg> 开始抽签</button>
+                <button class="modal-btn modal-btn-primary" id="send-wheel-result" style="display:none;">发送结果</button>
             </div>
         </div>
+    </div>
+
+    <div class="player-container" id="player">
+        <div class="mini-view" id="mini-view" title="点击展开">
+            <div class="vinyl-record" id="vinyl-record-visual">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 13l-4-4h8l-4 4z" />
+                </svg>
+            </div>
+        </div>
+        <div class="full-view">
+            <div class="minimize-btn" id="minimize-btn" title="收起">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
+                </svg>
+            </div>
+            <button id="upload-cover-btn"
+                style="position: absolute; top: 12px; left: 15px; background: none; border: 1px dashed var(--border-color); color: var(--text-secondary); cursor: pointer; opacity: 0.7; z-index: 10; width: 24px; height: 24px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:12px;"
+                title="更换专辑封面">
+                <i class="fas fa-camera"></i>
+            </button>
+            <input type="file" id="cover-input" accept="image/*" style="display: none;">
+            <div class="track-info">
+                <div class="track-name" id="music-title">Loading...</div>
+                <div class="track-sub" id="music-subtitle">...</div>
+            </div>
+            <div class="progress-wrapper" id="progress-area">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="mode-btn" title="切换模式">
+                    <svg id="icon-loop" viewBox="0 0 24 24">
+                        <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
+                    </svg>
+                    <svg id="icon-single" style="display:none" viewBox="0 0 24 24">
+                        <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" /><text x="12" y="14"
+                            text-anchor="middle" font-size="7" fill="currentColor" font-weight="bold">1</text>
+                    </svg>
+                    <svg id="icon-shuffle" style="display:none" viewBox="0 0 24 24">
+                        <path
+                            d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" />
+                    </svg>
+                </button>
+                <button class="btn" id="prev-btn"><svg viewBox="0 0 24 24">
+                        <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                    </svg></button>
+                <button class="btn btn-main" id="play-btn">
+                    <svg id="icon-play" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <svg id="icon-pause" style="display:none" viewBox="0 0 24 24">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                    </svg>
+                </button>
+                <button class="btn" id="next-btn"><svg viewBox="0 0 24 24">
+                        <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                    </svg></button>
+                <button class="btn" id="list-btn"><svg viewBox="0 0 24 24">
+                        <path
+                            d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
+                    </svg></button>
+            </div>
+        </div>
+    </div>
+    <div class="playlist-popup" id="playlist"></div>
+    <audio id="audio"></audio>
+
+    <div class="modal" id="add-song-modal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <i class="fas fa-music"></i><span>添加自定义歌曲</span>
+            </div>
+            <input type="text" class="modal-input" id="new-song-title" placeholder="歌曲名称 (例如: 这里的风景)">
+            <input type="text" class="modal-input" id="new-song-sub" placeholder="歌手/备注 (例如: 你的名字)">
+            <input type="text" class="modal-input" id="new-song-url" placeholder="音频链接 (mp3/m4a 链接)">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="cancel-add-song">取消</button>
+                <button class="modal-btn modal-btn-primary" id="confirm-add-song">添加播放</button>
+            </div>
+        </div>
+    </div>
 
 
-        <div id="daily-greeting-modal" class="hidden">
-            <div class="daily-greeting-card" id="daily-greeting-card">
-                <div class="dg-card-bg-layer" id="dg-card-bg-layer"></div>
-                <div class="dg-card-tint-overlay" id="dg-card-tint-overlay"></div>
-                <div class="dg-header-band" id="dg-header-band">
-                    <div class="dg-header-band-bg" id="dg-header-band-bg"></div>
-                    <div class="dg-header-band-overlay" id="dg-header-band-overlay"></div>
-                    <div class="dg-header-band-shimmer"></div>
-                    <div class="dg-header-band-wave"></div>
-                    <input type="file" id="dg-header-img-input" accept="image/*" style="display:none">
-                    <div class="dg-header-top">
-                        <div class="dg-emoji-circle" id="dg-emoji">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)"
+    <div id="daily-greeting-modal" class="hidden">
+        <div class="daily-greeting-card" id="daily-greeting-card">
+            <div class="dg-card-bg-layer" id="dg-card-bg-layer"></div>
+            <div class="dg-card-tint-overlay" id="dg-card-tint-overlay"></div>
+            <div class="dg-header-band" id="dg-header-band">
+                <div class="dg-header-band-bg" id="dg-header-band-bg"></div>
+                <div class="dg-header-band-overlay" id="dg-header-band-overlay"></div>
+                <div class="dg-header-band-shimmer"></div>
+                <div class="dg-header-band-wave"></div>
+                <input type="file" id="dg-header-img-input" accept="image/*" style="display:none">
+                <div class="dg-header-top">
+                    <div class="dg-emoji-circle" id="dg-emoji">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)"
+                            stroke-width="1.5">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                            <line x1="9" y1="9" x2="9.01" y2="9" />
+                            <line x1="15" y1="9" x2="15.01" y2="9" />
+                        </svg>
+                    </div>
+                    <div class="dg-header-text">
+                        <div class="dg-festival-label" id="dg-festival">GOOD MORNING</div>
+                        <div class="dg-main-title" id="dg-title">早上好</div>
+                    </div>
+                </div>
+                <div class="dg-date-stamp" id="dg-date-stamp">— 今日公告已送达 —</div>
+            </div>
+            <div class="dg-body">
+                <div class="dg-section-label" id="dg-section-label-partner">梦角今日状态</div>
+                <div class="dg-mood-panel" id="dg-mood-panel">
+                    <div class="dg-mood-icon-big" id="dg-partner-mood-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)"
+                            stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                            <line x1="9" y1="9" x2="9.01" y2="9" />
+                            <line x1="15" y1="9" x2="15.01" y2="9" />
+                        </svg>
+                    </div>
+                    <div class="dg-mood-info">
+                        <div class="dg-mood-name" id="dg-partner-mood">还没有记录今日心情</div>
+                        <div class="dg-mood-sub" id="dg-partner-mood-note"></div>
+                    </div>
+                </div>
+                <div class="dg-info-grid">
+                    <div class="dg-info-cell">
+                        <div class="dg-info-cell-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)"
                                 stroke-width="1.5">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
-                                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-                                <line x1="9" y1="9" x2="9.01" y2="9" />
-                                <line x1="15" y1="9" x2="15.01" y2="9" />
+                                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z" />
                             </svg>
                         </div>
-                        <div class="dg-header-text">
-                            <div class="dg-festival-label" id="dg-festival">GOOD MORNING</div>
-                            <div class="dg-main-title" id="dg-title">早上好</div>
-                        </div>
+                        <div class="dg-info-cell-label" id="dg-weather-label">梦角的天气</div>
+                        <div class="dg-info-cell-val" id="dg-weather" onclick="startEditDgWeather(this)"
+                            style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;"
+                            title="点击编辑">晴朗</div>
                     </div>
-                    <div class="dg-date-stamp" id="dg-date-stamp">— 今日公告已送达 —</div>
-                </div>
-                <div class="dg-body">
-                    <div class="dg-section-label" id="dg-section-label-partner">梦角今日状态</div>
-                    <div class="dg-mood-panel" id="dg-mood-panel">
-                        <div class="dg-mood-icon-big" id="dg-partner-mood-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)"
+                    <div class="dg-info-cell">
+                        <div class="dg-info-cell-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)"
                                 stroke-width="1.5">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-                                <line x1="9" y1="9" x2="9.01" y2="9" />
-                                <line x1="15" y1="9" x2="15.01" y2="9" />
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                                <circle cx="12" cy="10" r="3" />
                             </svg>
                         </div>
-                        <div class="dg-mood-info">
-                            <div class="dg-mood-name" id="dg-partner-mood">还没有记录今日心情</div>
-                            <div class="dg-mood-sub" id="dg-partner-mood-note"></div>
-                        </div>
-                    </div>
-                    <div class="dg-info-grid">
-                        <div class="dg-info-cell">
-                            <div class="dg-info-cell-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)"
-                                    stroke-width="1.5">
-                                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z" />
-                                </svg>
-                            </div>
-                            <div class="dg-info-cell-label" id="dg-weather-label">梦角的天气</div>
-                            <div class="dg-info-cell-val" id="dg-weather" onclick="startEditDgWeather(this)"
-                                style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;"
-                                title="点击编辑">晴朗</div>
-                        </div>
-                        <div class="dg-info-cell">
-                            <div class="dg-info-cell-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)"
-                                    stroke-width="1.5">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                            </div>
-                            <div class="dg-info-cell-label" id="dg-status-label">梦角的状态</div>
-                            <div class="dg-info-cell-val" id="dg-status">一切都好</div>
-                        </div>
-                    </div>
-                    <div id="dg-deco-img-wrap"
-                        style="display:none; margin-bottom:12px; border-radius:12px; overflow:hidden;">
-                        <img id="dg-deco-img" src="" alt=""
-                            style="width:100%; max-height:160px; object-fit:cover; display:block; border-radius:12px;">
-                    </div>
-                    <div class="dg-note-box" id="dg-note">
-                        <div class="dg-note-inner">
-                            <div class="dg-note-weather-badge" id="dg-note-weather-badge" style="display:none;">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z" />
-                                </svg>
-                                <span id="dg-note-weather-text"></span>
-                            </div>
-                            <div id="dg-note-text">今天也要元气满满，我在这里陪着你 ✦</div>
-                        </div>
-                    </div>
-                    <div class="dg-footer">
-                        <button class="daily-greeting-close-btn" onclick="closeDailyGreeting()">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.5" style="vertical-align:-2px;margin-right:6px">
-                                <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                            知道了，开始今天
-                        </button>
+                        <div class="dg-info-cell-label" id="dg-status-label">梦角的状态</div>
+                        <div class="dg-info-cell-val" id="dg-status">一切都好</div>
                     </div>
                 </div>
-
+                <div id="dg-deco-img-wrap"
+                    style="display:none; margin-bottom:12px; border-radius:12px; overflow:hidden;">
+                    <img id="dg-deco-img" src="" alt=""
+                        style="width:100%; max-height:160px; object-fit:cover; display:block; border-radius:12px;">
+                </div>
+                <div class="dg-note-box" id="dg-note">
+                    <div class="dg-note-inner">
+                        <div class="dg-note-weather-badge" id="dg-note-weather-badge" style="display:none;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z" />
+                            </svg>
+                            <span id="dg-note-weather-text"></span>
+                        </div>
+                        <div id="dg-note-text">今天也要元气满满，我在这里陪着你 ✦</div>
+                    </div>
+                </div>
+                <div class="dg-footer">
+                    <button class="daily-greeting-close-btn" onclick="closeDailyGreeting()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" style="vertical-align:-2px;margin-right:6px">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        知道了，开始今天
+                    </button>
+                </div>
             </div>
+
         </div>
+    </div>
 
-        <div id="dg-editor-modal" style="display:none;"></div>
-        <!-- == 核心层 == -->
-        <script src="js/config.js"></script>
-        <script src="js/utils.js"></script>
-        <script src="js/backup-engine.js"></script>
-        <script src="js/state.js"></script>
-        <script src="js/core.js"></script>
+    <div id="dg-editor-modal" style="display:none;"></div>
+    <!-- == 核心层 == -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/backup-engine.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/core.js"></script>
 
-        <!-- == 功能模块 == -->
-        <script src="js/features/mood.js"></script>
-        <script src="js/features/envelope.js"></script>
-        <script src="js/features/reply-library.js"></script>
-        <script src="js/features/theme-editor.js"></script>
-        <script src="js/features/group-chat.js"></script>
-        <script src="js/features/call.js"></script>
+    <!-- == 功能模块 == -->
+    <script src="js/features/mood.js"></script>
+    <script src="js/features/envelope.js"></script>
+    <script src="js/features/reply-library.js"></script>
+    <script src="js/features/theme-editor.js"></script>
+    <script src="js/features/group-chat.js"></script>
+    <script src="js/features/call.js"></script>
 
-        <!-- == 合并模块 == -->
-        <script src="js/games.js"></script>
-        <script src="js/features.js"></script>
-        <script src="js/data.js"></script>
-        <script src="js/onboarding.js"></script>
-        <script src="js/listeners.js"></script>
-        <script src="js/app.js"></script>
-        <script src="js/home.js"></script>
+    <!-- == 合并模块 == -->
+    <script src="js/games.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/onboarding.js"></script>
+    <script src="js/listeners.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/home.js"></script>
 </body>
 
 </html>

@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     try {
-        try { setupEventListeners?.(); } catch(e) { console.error('setupEventListeners:', e); }
+        try { setupEventListeners?.(); } catch (e) { console.error('setupEventListeners:', e); }
 
         if (typeof localforage === 'undefined') {
             console.warn('LocalForage 未加载，将使用 localStorage 降级方案');
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await safeAwait(loadData());
 
         updateLoader('正在渲染我们的世界...', '70%');
-        
+
         await Promise.allSettled([
             safeAwait(initializeRandomUI?.()),
             safeAwait(initMusicPlayer?.())
@@ -61,22 +61,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         setInterval(checkStatusChange, 60000);
 
-        if (disclaimerModal) {
-            const tourSeen = await safeAwait(localforage?.getItem(APP_PREFIX + 'tour_seen'), false);
-            
-            if (!tourSeen) {
-                showModal(disclaimerModal);
-                
-                if (acceptDisclaimerBtn && !acceptDisclaimerBtn._bound) {
-                    acceptDisclaimerBtn._bound = true;
-                    acceptDisclaimerBtn.addEventListener('click', () => {
-                        hideModal(disclaimerModal);
-                        localforage?.setItem(APP_PREFIX + 'tour_seen', true).catch(() => {});
-                        startTour?.();
-                    }, { once: true });
-                }
-            }
-        }
 
         updateLoader('连接成功，欢迎回来。', '100%');
         setTimeout(hideWelcomeScreen, 3500);
@@ -85,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (document.visibilityState === 'hidden') {
                 try {
                     if (typeof saveTimeout !== 'undefined') clearTimeout(saveTimeout);
-                } catch (e) {}
+                } catch (e) { }
                 try { _backupCriticalData(); } catch (e) { console.warn('[visibilitychange] 紧急备份失败:', e); }
                 try {
                     const p = saveData();
@@ -120,11 +104,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         window.addEventListener('pagehide', () => {
-            try { _backupCriticalData(); } catch (e) {}
+            try { _backupCriticalData(); } catch (e) { }
         });
 
         window.addEventListener('beforeunload', () => {
-            try { _backupCriticalData(); } catch (e) {}
+            try { _backupCriticalData(); } catch (e) { }
         });
 
         setInterval(() => {
@@ -150,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (permission === 'granted') {
                         showNotification('已开启系统通知，收到消息时会提醒你', 'success', 3000);
                     }
-                } catch(e) {
+                } catch (e) {
                     console.warn('通知权限请求失败:', e);
                 }
             }
@@ -177,47 +161,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 const stickerInput = document.getElementById('sticker-file-input');
-            if (stickerInput) {
-                stickerInput.addEventListener('change', async (e) => {
-                    const files = Array.from(e.target.files);
-                    if (!files.length) return;
+if (stickerInput) {
+    stickerInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
 
-                    const oversized = files.filter(f => f.size > 2 * 1024 * 1024);
-                    if (oversized.length > 0) {
-                        showNotification(oversized.length + ' 张图片超过 2MB 限制，已跳过', 'warning');
-                    }
+        const oversized = files.filter(f => f.size > 2 * 1024 * 1024);
+        if (oversized.length > 0) {
+            showNotification(oversized.length + ' 张图片超过 2MB 限制，已跳过', 'warning');
+        }
 
-                    const validFiles = files.filter(f => f.size <= 2 * 1024 * 1024);
-                    if (!validFiles.length) return;
+        const validFiles = files.filter(f => f.size <= 2 * 1024 * 1024);
+        if (!validFiles.length) return;
 
-                    showNotification('正在批量处理 ' + validFiles.length + ' 张图片...', 'info');
+        showNotification('正在批量处理 ' + validFiles.length + ' 张图片...', 'info');
 
-                    let successCount = 0;
-                    let failCount = 0;
+        let successCount = 0;
+        let failCount = 0;
 
-                    for (const file of validFiles) {
-                        try {
-                            const base64 = await optimizeImage(file, 300, 0.8);
-                            stickerLibrary.push(base64);
-                            successCount++;
-                        } catch (err) {
-                            console.error(err);
-                            failCount++;
-                        }
-                    }
-
-                    throttledSaveData();
-                    renderReplyLibrary();
-
-                    if (failCount > 0) {
-                        showNotification('上传完成：' + successCount + ' 张成功，' + failCount + ' 张失败', 'warning');
-                    } else {
-                        showNotification('上传成功，共 ' + successCount + ' 张', 'success');
-                    }
-
-                    e.target.value = '';
-                });
+        for (const file of validFiles) {
+            try {
+                const base64 = await optimizeImage(file, 300, 0.8);
+                stickerLibrary.push(base64);
+                successCount++;
+            } catch (err) {
+                console.error(err);
+                failCount++;
             }
+        }
+
+        throttledSaveData();
+        renderReplyLibrary();
+
+        if (failCount > 0) {
+            showNotification('上传完成：' + successCount + ' 张成功，' + failCount + ' 张失败', 'warning');
+        } else {
+            showNotification('上传成功，共 ' + successCount + ' 张', 'success');
+        }
+
+        e.target.value = '';
+    });
+}
 const myStickerQuickUpload = document.getElementById('my-sticker-quick-upload');
 if (myStickerQuickUpload) {
     myStickerQuickUpload.addEventListener('change', async (e) => {
@@ -234,7 +218,7 @@ if (myStickerQuickUpload) {
                 const base64 = await optimizeImage(file, 300, 0.8);
                 myStickerLibrary.push(base64);
                 ok++;
-            } catch(err) { fail++; }
+            } catch (err) { fail++; }
         }
         throttledSaveData();
         if (typeof renderComboContent === 'function') renderComboContent('my-sticker');
@@ -243,20 +227,20 @@ if (myStickerQuickUpload) {
     });
 }
 
-window.addEventListener('load', function() {
-    setTimeout(function() {
+window.addEventListener('load', function () {
+    setTimeout(function () {
         try {
             if (localStorage.getItem('dailyGreetingShown') === new Date().toDateString()) return;
-            try { if (typeof checkPartnerDailyMood === 'function') checkPartnerDailyMood(); } catch(e2) { console.warn('checkPartnerDailyMood error:', e2); }
+            try { if (typeof checkPartnerDailyMood === 'function') checkPartnerDailyMood(); } catch (e2) { console.warn('checkPartnerDailyMood error:', e2); }
             if (typeof _buildDailyGreeting === 'function') _buildDailyGreeting();
             if (window.localforage && window.APP_PREFIX) {
-                localforage.getItem(window.APP_PREFIX + 'tour_seen').then(function(seen) {
+                localforage.getItem(window.APP_PREFIX + 'tour_seen').then(function (seen) {
                     if (seen) {
                         var modal = document.getElementById('daily-greeting-modal');
                         if (modal) modal.classList.remove('hidden');
                         localStorage.setItem('dailyGreetingShown', new Date().toDateString());
                     }
-                }).catch(function() {
+                }).catch(function () {
                     var modal = document.getElementById('daily-greeting-modal');
                     if (modal) modal.classList.remove('hidden');
                     localStorage.setItem('dailyGreetingShown', new Date().toDateString());
@@ -266,6 +250,6 @@ window.addEventListener('load', function() {
                 if (modal) modal.classList.remove('hidden');
                 localStorage.setItem('dailyGreetingShown', new Date().toDateString());
             }
-        } catch(e) { console.warn('Daily greeting timing error:', e); }
+        } catch (e) { console.warn('Daily greeting timing error:', e); }
     }, 4500);
 }, { once: true });

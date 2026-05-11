@@ -44,16 +44,35 @@
     try { if (window.localforage) localforage.setItem(HUE_KEY, h); localStorage.setItem(HUE_KEY, h); } catch (e) { }
   }
 
+  function applyHomeFont(url) {
+    if (!url || !url.trim()) {
+      document.getElementById('home-screen').style.fontFamily = '';
+      try { if (window.localforage) localforage.removeItem('home_custom_font'); } catch (e) { }
+      return;
+    }
+    const fontName = 'HomeCustomFont_' + Date.now();
+    const font = new FontFace(fontName, `url(${url})`);
+    font.load().then(f => {
+      document.fonts.add(f);
+      document.getElementById('home-screen').style.fontFamily = `"${fontName}", sans-serif`;
+      try { if (window.localforage) localforage.setItem('home_custom_font', url); } catch (e) { }
+    }).catch(() => {
+      if (typeof showNotification === 'function') showNotification('字体加载失败，请检查链接', 'error');
+    });
+  }
+
   function applyPageBg(dataUrl) {
     const bgEl = document.getElementById('home-bg-image');
     if (!bgEl) return;
     if (dataUrl) {
       bgEl.style.backgroundImage = `url(${dataUrl})`;
       bgEl.classList.add('loaded');
+      document.getElementById('home-screen')?.classList.add('has-page-bg');
       try { if (window.localforage) localforage.setItem(PAGE_BG_KEY, dataUrl); } catch (e) { }
     } else {
       bgEl.style.backgroundImage = '';
       bgEl.classList.remove('loaded');
+      document.getElementById('home-screen')?.classList.remove('has-page-bg');
       try { if (window.localforage) localforage.removeItem(PAGE_BG_KEY); } catch (e) { }
     }
   }
@@ -74,6 +93,13 @@
     }
   }
 
+  function applyHeroOpacity(val) {
+    const heroBg = document.querySelector('.home-hero-bg');
+    if (!heroBg) return;
+    heroBg.style.opacity = val / 100;
+    try { if (window.localforage) localforage.setItem('home_hero_opacity', val); } catch (e) { }
+  }
+
   async function loadStoredPrefs() {
     try {
       let h = null;
@@ -92,6 +118,10 @@
         const hbg = await localforage.getItem(HERO_BG_KEY);
         if (hbg) applyHeroBg(hbg);
         const icons = await localforage.getItem(ICON_KEY);
+        const heroOp = await localforage.getItem('home_hero_opacity');
+        const homeFont = await localforage.getItem('home_custom_font');
+        if (homeFont) applyHomeFont(homeFont);
+        if (heroOp !== null && heroOp !== undefined) applyHeroOpacity(heroOp);
         if (icons && typeof icons === 'object') {
           customIcons = icons;
           applyCustomIcons();
@@ -373,16 +403,19 @@
     const el = document.getElementById('home-love-days');
     if (!el) return;
     try {
-      const loveDate = window.settings?.loveStartDate;
-      if (loveDate) {
-        const start = new Date(loveDate);
-        const diff = Math.floor((Date.now() - start) / 86400000);
-        if (!isNaN(diff) && diff >= 0) { el.textContent = `在一起第 ${diff + 1} 天`; return; }
+      const anns = window._anniversaries;
+      if (anns && anns.length > 0) {
+        const love = anns.find(a => a.type === 'anniversary');
+        if (love && love.date) {
+          const diff = Math.floor((Date.now() - new Date(love.date)) / 86400000);
+          if (!isNaN(diff) && diff >= 0) {
+            el.innerHTML = `在一起第 <strong style="font-size:14px;">${diff + 1}</strong> 天`;
+            return;
+          }
+        }
       }
     } catch (e) { }
-    const annDays = document.getElementById('anniversary-days');
-    if (annDays && annDays.textContent && annDays.textContent !== '0') el.textContent = `在一起第 ${annDays.textContent} 天`;
-    else el.textContent = '记录我们的故事';
+    el.textContent = '记录我们的故事';
   }
 
   // ---------- 主题面板 ----------
@@ -394,12 +427,24 @@
     const panel = document.createElement('div');
     panel.id = 'home-theme-panel';
     panel.innerHTML = `
-      <div class="theme-panel-head"><span class="theme-panel-title"><i class="fas fa-palette"></i>主题外观</span><button class="theme-panel-close" id="theme-panel-close">&times;</button></div>
+      <div class="theme-panel-head"><span class="theme-panel-title"><i class="fas fa-palette"></i>主页外观</span><button class="theme-panel-close" id="theme-panel-close">&times;</button></div>
       <div class="theme-section-label">预设颜色</div><div class="theme-color-swatches">${swatchHTML}</div>
       <div class="theme-section-label">自定义色相</div><div class="theme-hue-row"><input type="range" id="theme-hue-slider" min="0" max="360" value="${currentH}"><div class="theme-hue-preview" id="theme-hue-preview" style="background:hsl(${currentH},55%,70%)"></div></div>
       <div class="theme-section-label">饱和度</div><div class="theme-hue-row"><input type="range" id="theme-sat-slider" min="0" max="100" value="${currentS}"><span id="theme-sat-value" style="font-size:12px">${currentS}%</span></div>
       <div class="theme-section-label">主页背景</div><div class="bg-upload-row"><input type="file" id="page-bg-input" accept="image/*" style="display:none"><button class="bg-upload-btn" id="page-bg-upload-btn"><i class="fas fa-cloud-arrow-up"></i> 上传主页背景</button><button class="bg-clear-btn" id="page-bg-clear-btn"><i class="fas fa-xmark"></i></button></div>
       <div class="theme-section-label">顶部卡片背景</div><div class="bg-upload-row"><input type="file" id="hero-bg-input" accept="image/*" style="display:none"><button class="bg-upload-btn" id="hero-bg-upload-btn"><i class="fas fa-cloud-arrow-up"></i> 上传卡片背景</button><button class="bg-clear-btn" id="hero-bg-clear-btn"><i class="fas fa-xmark"></i></button></div>
+      <div class="theme-section-label">顶部卡片透明度</div>
+      <div class="theme-hue-row">
+        <input type="range" id="hero-opacity-slider" min="0" max="100" value="100">
+        <span id="hero-opacity-value" style="font-size:12px">100%</span>
+      </div>
+      <div class="theme-section-label">主页字体</div>
+      <div class="theme-hue-row" style="gap:6px;">
+        <input type="text" id="home-font-url-input" placeholder="粘贴字体URL" 
+          style="flex:1;padding:6px 8px;border:1px solid var(--border-color);border-radius:8px;background:var(--primary-bg);color:var(--text-primary);font-size:12px;outline:none;">
+        <button id="home-font-apply-btn" style="padding:6px 10px;border-radius:8px;background:var(--accent-color);color:#fff;border:none;font-size:12px;cursor:pointer;">应用</button>
+        <button id="home-font-reset-btn" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);font-size:12px;cursor:pointer;">重置</button>
+      </div>
       <div class="theme-section-label">主页设置</div><div class="bg-upload-row"><button class="bg-upload-btn" id="open-icon-customize-btn"><i class="fas fa-icons"></i> 自定义功能图标</button></div>
     `;
     document.body.appendChild(panel);
@@ -424,6 +469,26 @@
     }
     bindBgUpload(panel, '#page-bg-input', '#page-bg-upload-btn', '#page-bg-clear-btn', applyPageBg);
     bindBgUpload(panel, '#hero-bg-input', '#hero-bg-upload-btn', '#hero-bg-clear-btn', applyHeroBg);
+    const heroOpSlider = panel.querySelector('#hero-opacity-slider');
+    const heroOpVal = panel.querySelector('#hero-opacity-value');
+    // 读取当前值
+    localforage.getItem('home_hero_opacity').then(v => {
+      if (v !== null && v !== undefined) {
+        heroOpSlider.value = v;
+        heroOpVal.textContent = v + '%';
+      }
+    }).catch(() => { });
+    heroOpSlider.addEventListener('input', () => {
+      const v = heroOpSlider.value;
+      heroOpVal.textContent = v + '%';
+      applyHeroOpacity(v);
+    });
+    const homeFontInput = panel.querySelector('#home-font-url-input');
+    const homeFontApply = panel.querySelector('#home-font-apply-btn');
+    const homeFontReset = panel.querySelector('#home-font-reset-btn');
+    localforage.getItem('home_custom_font').then(v => { if (v && homeFontInput) homeFontInput.value = v; }).catch(() => { });
+    homeFontApply.addEventListener('click', () => applyHomeFont(homeFontInput.value.trim()));
+    homeFontReset.addEventListener('click', () => { homeFontInput.value = ''; applyHomeFont(''); });
     panel.querySelector('#open-icon-customize-btn').addEventListener('click', () => { panel.remove(); openIconCustomize(); });
     setTimeout(() => { const handler = (ev) => { if (!panel.contains(ev.target) && ev.target.id !== 'dock-theme') { panel.remove(); document.removeEventListener('click', handler); } }; document.addEventListener('click', handler); }, 100);
   }
@@ -432,12 +497,12 @@
   const SETTINGS_ITEMS = [
     {
       section: '聊天与外观', items: [
-        { icon: 'fa-palette', bg: 'icon-bg-2', title: '外观配色', desc: '聊天界面、塔罗、信封等界面颜色自定义', action: 'theme' },
+        { icon: 'fa-palette', bg: 'icon-bg-2', title: '外观配色', desc: '聊天界面主题内容、塔罗、信封等主题颜色自定义', action: 'theme' },
         { icon: 'fa-image', bg: 'icon-bg-5', title: '背景和字体', desc: '聊天背景图、字体大小', action: 'font-bg' },
         { icon: 'fa-comment', bg: 'icon-bg-7', title: '气泡和CSS', desc: '气泡样式、自定义CSS', action: 'bubble-css' },
         { icon: 'fa-user-circle', bg: 'icon-bg-3', title: '聊天头像', desc: '头像、头像框设置', action: 'avatar' },
-        { icon: 'fa-comments', bg: 'icon-bg-6', title: '聊天设置', desc: '消息气泡、回执、输入框', action: 'chat-style' },
-        { icon: 'fa-book-open', bg: 'icon-bg-1', title: '字卡回复库', desc: '字卡、表情、拍一拍', action: 'library' },
+        { icon: 'fa-comments', bg: 'icon-bg-6', title: '聊天设置', desc: '消息回执、时间戳、回复节奏、消息音效、昵称修改', action: 'chat-style' },
+        { icon: 'fa-book-open', bg: 'icon-bg-1', title: '字卡回复库', desc: '字卡、表情、状态、拍一拍、公告自定义', action: 'library' },
         { icon: 'fa-icons', bg: 'icon-bg-9', title: '功能图标自定义', desc: '为每个功能上传自定义图标', action: 'icon-customize' }
       ]
     },
@@ -532,19 +597,33 @@
     const targetId = panels[panel];
     if (!targetId) return;
 
-    // 7. 隐藏所有子面板
-    Object.values(panels).forEach(id => {
+    // 7. 收集所有需要隐藏的面板 ID（确保一个不漏）
+    const allPanelIds = [
+      ...Object.values(panels),
+      'appearance-panel-background',
+      'appearance-panel-css'
+    ];
+    allPanelIds.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
 
-    // 8. 显示目标子面板
-    const targetPanel = document.getElementById(targetId);
-    if (targetPanel) targetPanel.style.display = 'block';
+    // 8. 根据 panel 类型决定要显示哪些子面板
+    let panelsToShow = [];
+    if (panel === 'font-bg') {
+      panelsToShow = ['appearance-panel-font', 'appearance-panel-background'];
+    } else if (panel === 'bubble-css') {
+      panelsToShow = ['appearance-panel-bubble', 'appearance-panel-css'];
+    } else {
+      // 单一面板（theme, avatar 等）
+      panelsToShow = [targetId];
+    }
 
-    // 9. 更新标题
-    const titleSpan = document.getElementById('appearance-panel-title');
-    if (titleSpan && titles[panel]) titleSpan.textContent = titles[panel];
+    // 9. 统一显示
+    panelsToShow.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'block';
+    });
 
     // 10. 重新绑定按钮（使用新的事件，完全取代旧的）
     const closeBtn = document.getElementById('close-appearance');
@@ -1070,7 +1149,6 @@
     if (target === 'me') {
       // 触发原有编辑我的头像/昵称的交互（双击头像或点击编辑名称）
       const myAvatar = document.getElementById('my-avatar');
-      if (myAvatar) myAvatar.dispatchEvent(new Event('dblclick'));  // 双击头像触发上传
       // 同时弹出昵称编辑框（复用 edit-modal）
       setTimeout(() => {
         const editModal = document.getElementById('edit-modal');
@@ -1111,7 +1189,6 @@
     } else if (target === 'partner') {
       // 编辑梦角资料
       const partnerAvatar = document.getElementById('partner-avatar');
-      if (partnerAvatar) partnerAvatar.dispatchEvent(new Event('dblclick'));
       setTimeout(() => {
         const editModal = document.getElementById('edit-modal');
         if (editModal) {
@@ -1214,7 +1291,7 @@
       if (el) new MutationObserver(() => { if (isOnHome) refreshHomeData(); }).observe(el, { attributes: true, childList: true, subtree: true, characterData: true });
     });
   }
-
+  window.backToSettings = backToSettings;
   window.homeScreen = { backToHome, backToSettings, goToFeature, refreshHomeData, openThemePanel, openSettingsScreen, openMoodCalendar, openIconCustomize };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

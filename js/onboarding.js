@@ -1,4 +1,4 @@
-(function() {
+(function () {
     var TI_AVATAR_KEY = 'tiSettings_showAvatar';
     var TI_TEXT_KEY = 'tiSettings_customText';
     var tiShowAvatar = localStorage.getItem(TI_AVATAR_KEY) !== 'false';
@@ -37,7 +37,7 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         applyTiAvatarVisibility();
     });
 
@@ -53,7 +53,7 @@
         labelEl = document.getElementById('typing-indicator-label');
         if (!labelEl || labelEl._tiObserved) return;
         labelEl._tiObserved = true;
-        var obs = new MutationObserver(function() {
+        var obs = new MutationObserver(function () {
             if (tiCustomText && labelEl.textContent !== tiCustomText) {
                 labelEl.textContent = tiCustomText;
             }
@@ -62,7 +62,7 @@
     }
     setTimeout(initLabelObserver, 1000);
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         var ti = e.target.closest('.typing-indicator');
         if (!ti) return;
         e.stopPropagation();
@@ -74,8 +74,8 @@
         syncPillUI();
         updatePreview();
         var partnerImg = document.querySelector('#partner-info .message-avatar img') ||
-                         document.querySelector('.partner-avatar img') ||
-                         document.querySelector('[id*="partner"] img');
+            document.querySelector('.partner-avatar img') ||
+            document.querySelector('[id*="partner"] img');
         var previewAvatar = document.getElementById('ti-preview-avatar');
         if (previewAvatar && partnerImg) {
             previewAvatar.innerHTML = '<img src="' + partnerImg.src + '" style="width:100%;height:100%;object-fit:cover;">';
@@ -83,19 +83,19 @@
         modal.classList.add('open');
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         var modal = document.getElementById('ti-settings-modal');
         if (!modal || !modal.classList.contains('open')) return;
         if (e.target === modal) modal.classList.remove('open');
     });
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.id === 'ti-settings-close-btn') {
             var modal = document.getElementById('ti-settings-modal');
             if (modal) modal.classList.remove('open');
         }
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         var row = e.target.closest('#ti-avatar-toggle');
         if (!row) return;
         tiShowAvatar = !tiShowAvatar;
@@ -105,7 +105,7 @@
         applyTiAvatarVisibility();
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.id !== 'ti-text-save-btn') return;
         var input = document.getElementById('ti-text-input');
         if (!input) return;
@@ -113,10 +113,10 @@
         localStorage.setItem(TI_TEXT_KEY, tiCustomText);
         updatePreview();
         e.target.textContent = '已保存 ✓';
-        setTimeout(function() { e.target.textContent = '保存'; }, 1200);
+        setTimeout(function () { e.target.textContent = '保存'; }, 1200);
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.id !== 'ti-text-reset-btn') return;
         tiCustomText = '';
         localStorage.removeItem(TI_TEXT_KEY);
@@ -125,20 +125,23 @@
         updatePreview();
     });
 
-    document.addEventListener('DOMContentLoaded', function() { syncPillUI(); });
+    document.addEventListener('DOMContentLoaded', function () { syncPillUI(); });
     setTimeout(syncPillUI, 800);
 })();
 
 
-(function() {
+(function () {
     var PLEDGE_KEY = 'splashPledgeSigned_v3';
     var TOTAL = 6;
     var PLEDGE_TEXT = '我绝不盈利、造谣、污蔑或嘲讽，并对自己的使用行为负完全责任';
     var cur = 0;
 
     function initSplash() {
+        localStorage.setItem(PLEDGE_KEY, 'true');
         var splash = document.getElementById('splash-declaration');
         if (!splash) return;
+        splash.style.display = 'none';
+        return;
 
         localStorage.removeItem('splashPledgeSigned_v2');
         localStorage.removeItem('splashPledgeSigned_v1');
@@ -158,7 +161,7 @@
                 var sz = Math.random() > 0.75 ? '3px' : '2px';
                 var del = (Math.random() * 4).toFixed(2);
                 var dur = (2 + Math.random() * 3).toFixed(1);
-                html += '<span style="left:'+x+'%;top:'+y+'%;width:'+sz+';height:'+sz+';animation-delay:'+del+'s;animation-duration:'+dur+'s;"></span>';
+                html += '<span style="left:' + x + '%;top:' + y + '%;width:' + sz + ';height:' + sz + ';animation-delay:' + del + 's;animation-duration:' + dur + 's;"></span>';
             }
             starsEl.innerHTML = html;
         }
@@ -167,36 +170,36 @@
         if (dotsEl) {
             var dhtml = '';
             for (var d = 0; d < TOTAL; d++) {
-                dhtml += '<div class="splash-dot'+(d===0?' active done':'')+'" data-dot="'+d+'"></div>';
+                dhtml += '<div class="splash-dot' + (d === 0 ? ' active done' : '') + '" data-dot="' + d + '"></div>';
             }
             dotsEl.innerHTML = dhtml;
         }
 
-        var prevBtn   = document.getElementById('splash-prev-btn');
-        var nextBtn   = document.getElementById('splash-next-btn');
-        var enterBtn  = document.getElementById('splash-enter-btn');
+        var prevBtn = document.getElementById('splash-prev-btn');
+        var nextBtn = document.getElementById('splash-next-btn');
+        var enterBtn = document.getElementById('splash-enter-btn');
         var pledgeInp = document.getElementById('splash-pledge-input');
 
         if (prevBtn) {
-            prevBtn.addEventListener('click', function(e) {
+            prevBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 if (cur > 0) goTo(cur - 1);
             });
         }
         if (nextBtn) {
-            nextBtn.addEventListener('click', function(e) {
+            nextBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 if (cur < TOTAL - 1) goTo(cur + 1);
             });
         }
         if (enterBtn) {
-            enterBtn.addEventListener('click', function(e) {
+            enterBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 if (enterBtn.classList.contains('ready')) enterSite();
             });
         }
         if (pledgeInp) {
-            pledgeInp.addEventListener('input', function() {
+            pledgeInp.addEventListener('input', function () {
                 var val = pledgeInp.value;
                 var hint = document.getElementById('splash-pledge-hint');
                 if (val === PLEDGE_TEXT) {
@@ -209,7 +212,7 @@
                     if (enterBtn) enterBtn.classList.remove('ready');
                 }
             });
-            pledgeInp.addEventListener('keydown', function(e) {
+            pledgeInp.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' && enterBtn && enterBtn.classList.contains('ready')) {
                     enterSite();
                 }
@@ -217,7 +220,7 @@
         }
 
         if (dotsEl) {
-            dotsEl.addEventListener('click', function(e) {
+            dotsEl.addEventListener('click', function (e) {
                 var dot = e.target.closest('.splash-dot');
                 if (dot) goTo(parseInt(dot.getAttribute('data-dot')));
             });
@@ -228,14 +231,14 @@
 
     function goTo(idx) {
         var slides = document.querySelectorAll('.splash-slide');
-        var dots   = document.querySelectorAll('.splash-dot');
+        var dots = document.querySelectorAll('.splash-dot');
         var prevIdx = cur;
 
         if (slides[prevIdx]) {
             slides[prevIdx].classList.remove('active');
             slides[prevIdx].classList.add('exit-left');
             var exitEl = slides[prevIdx];
-            setTimeout(function() { exitEl.classList.remove('exit-left'); }, 420);
+            setTimeout(function () { exitEl.classList.remove('exit-left'); }, 420);
         }
 
         cur = idx;
@@ -244,7 +247,7 @@
             slides[cur].classList.add('active');
         }
 
-        dots.forEach(function(dot, i) {
+        dots.forEach(function (dot, i) {
             dot.classList.toggle('active', i === cur);
             dot.classList.toggle('done', i < cur);
         });
@@ -252,7 +255,7 @@
         updateUI();
 
         if (cur === TOTAL - 1) {
-            setTimeout(function() {
+            setTimeout(function () {
                 var inp = document.getElementById('splash-pledge-input');
                 if (inp) inp.focus();
             }, 450);
@@ -260,18 +263,18 @@
     }
 
     function updateUI() {
-        var prevBtn  = document.getElementById('splash-prev-btn');
-        var nextBtn  = document.getElementById('splash-next-btn');
+        var prevBtn = document.getElementById('splash-prev-btn');
+        var nextBtn = document.getElementById('splash-next-btn');
         var enterBtn = document.getElementById('splash-enter-btn');
-        var pageNum  = document.getElementById('splash-page-num');
+        var pageNum = document.getElementById('splash-page-num');
 
         if (pageNum) pageNum.textContent = (cur + 1) + ' / ' + TOTAL;
         if (prevBtn) { prevBtn.disabled = (cur === 0); }
         if (cur === TOTAL - 1) {
-            if (nextBtn)  nextBtn.style.display  = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
             if (enterBtn) enterBtn.style.display = '';
         } else {
-            if (nextBtn)  nextBtn.style.display  = '';
+            if (nextBtn) nextBtn.style.display = '';
             if (enterBtn) enterBtn.style.display = 'none';
         }
     }
@@ -281,7 +284,7 @@
         var splash = document.getElementById('splash-declaration');
         if (splash) {
             splash.classList.add('splash-fade-out');
-            setTimeout(function() { splash.style.display = 'none'; }, 950);
+            setTimeout(function () { splash.style.display = 'none'; }, 950);
         }
     }
 
@@ -467,7 +470,7 @@ function endTour() {
     }, 300);
     localforage.setItem(APP_PREFIX + 'tour_seen', 'true');
     document.querySelectorAll('.modal').forEach(m => hideModal(m));
-    setTimeout(function() {
+    setTimeout(function () {
         if (typeof window.tryShowDailyGreeting === 'function') {
             window.tryShowDailyGreeting();
         }
@@ -577,33 +580,33 @@ async function createNewSession(switchToIt = true) {
         window.location.hash = newId;
         window.location.reload();
     }
-    
+
     return newId;
 }
 
-window.selectAnnType = function(type) {
+window.selectAnnType = function (type) {
     currentAnniversaryType = type;
-    currentAnnType = type; 
+    currentAnnType = type;
     document.querySelectorAll('.anniversary-type-btn').forEach(btn => {
-        if(btn.dataset.type === type) {
+        if (btn.dataset.type === type) {
             btn.classList.add('active');
         } else {
             btn.classList.remove('active');
         }
     });
-    
+
     const hint = document.getElementById('ann-type-desc');
-    if(hint) {
-        hint.textContent = type === 'anniversary' 
-            ? '计算从过去某一天到现在已经过了多少天 (例如: 恋爱纪念日)' 
+    if (hint) {
+        hint.textContent = type === 'anniversary'
+            ? '计算从过去某一天到现在已经过了多少天 (例如: 恋爱纪念日)'
             : '计算从现在到未来某一天还剩下多少天 (例如: 对方生日)';
     }
 };
 
-window.deleteAnniversary = function(id, event) {
-    if(event) event.stopPropagation();
-    
-    if(confirm('确定要删除这个纪念日吗？')) {
+window.deleteAnniversary = function (id, event) {
+    if (event) event.stopPropagation();
+
+    if (confirm('确定要删除这个纪念日吗？')) {
         anniversaries = anniversaries.filter(a => a.id !== id);
         throttledSaveData();
         renderAnniversariesList();
@@ -706,7 +709,7 @@ function renderAnniversariesList() {
     const listContainer = document.getElementById('ann-list-container');
     const headerCard = document.getElementById('ann-header-card');
     const toolbar = document.getElementById('ann-card-toolbar');
-    
+
     if (!listContainer) return;
     listContainer.innerHTML = '';
 
@@ -747,7 +750,7 @@ function renderAnniversariesList() {
             typeLabel = '倒数';
             dayLabel = '天后';
             diffDays = Math.ceil((targetDate - now) / (1000 * 60 * 60 * 24));
-            if(diffDays < 0) diffDays = 0;
+            if (diffDays < 0) diffDays = 0;
         } else {
             typeClass = 'type-past';
             typeLabel = '已过';
@@ -780,12 +783,12 @@ function renderAnniversariesList() {
     });
 }
 
-window.selectAnnCard = function(id) {
+window.selectAnnCard = function (id) {
     const ann = anniversaries.find(a => a.id === id);
     if (ann) fillAnnHeaderCard(ann);
 };
 
-window.clearAnnCardBg = async function() {
+window.clearAnnCardBg = async function () {
     if (!activeAnnId) return;
     await localforage.removeItem(getStorageKey(`annHeaderBg_${activeAnnId}`));
     const bgEl = document.getElementById('ann-header-card-bg');
@@ -793,7 +796,7 @@ window.clearAnnCardBg = async function() {
     showNotification('封面图已清除', 'success');
 };
 
-window.switchAnnDataTab = function(tab) {
+window.switchAnnDataTab = function (tab) {
     const panel = document.getElementById('ann-data-panel');
     const cardBtn = document.getElementById('ann-tab-card');
     const dataBtn = document.getElementById('ann-tab-data');
@@ -808,22 +811,22 @@ window.switchAnnDataTab = function(tab) {
 
 function initAnniversaryModule() {
     const entryBtn = document.getElementById('anniversary-function');
-    
+
     if (entryBtn) {
         const newBtn = entryBtn.cloneNode(true);
         entryBtn.parentNode.replaceChild(newBtn, entryBtn);
-        
+
         newBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             console.log('重要日按钮被点击');
-            
+
             const advancedModal = document.getElementById('advanced-modal');
             const annModal = document.getElementById('anniversary-modal');
-            
+
             if (advancedModal) hideModal(advancedModal);
             renderAnniversariesList();
-                if (typeof window.switchAnnDataTab === 'function') window.switchAnnDataTab('card');
+            if (typeof window.switchAnnDataTab === 'function') window.switchAnnDataTab('card');
             if (annModal) showModal(annModal);
         });
     }
@@ -838,6 +841,7 @@ function initAnniversaryModule() {
     const openAddBtn = document.getElementById('open-ann-add-btn');
     const editorSlide = document.getElementById('ann-editor-slide');
     if (openAddBtn) {
+        openAddBtn._settingsPatched = true;
         openAddBtn.onclick = () => {
             document.getElementById('ann-input-name').value = '';
             document.getElementById('ann-input-date').value = '';
@@ -848,6 +852,7 @@ function initAnniversaryModule() {
 
     const closeEditorBtn = document.getElementById('close-ann-editor');
     if (closeEditorBtn) {
+        closeEditorBtn._settingsPatched = true;
         closeEditorBtn.onclick = () => {
             if (editorSlide) editorSlide.classList.remove('active');
         };
@@ -857,9 +862,10 @@ function initAnniversaryModule() {
     if (saveBtn) {
         const newSave = saveBtn.cloneNode(true);
         saveBtn.parentNode.replaceChild(newSave, saveBtn);
-        
+        newSave._settingsPatched = true;
+
         newSave.addEventListener('click', () => {
-            addAnniversary(); 
+            addAnniversary();
             if (editorSlide) editorSlide.classList.remove('active');
         });
     }
@@ -894,7 +900,7 @@ function setupTutorialListeners() {
     tourSkipBtn.addEventListener('click', endTour);
 
     const replayBtn = document.getElementById('replay-tutorial-btn');
-    if(replayBtn) {
+    if (replayBtn) {
         replayBtn.addEventListener('click', () => {
             hideModal(DOMElements.dataModal.modal);
             setTimeout(() => {

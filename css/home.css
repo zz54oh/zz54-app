@@ -429,44 +429,6 @@ body.feature-mode {
   object-fit: cover;
 }
 
-/* 聊天图标角标脉冲 */
-.home-feature[data-feature="chat"] .home-feature-icon {
-  position: relative;
-}
-
-.home-feature[data-feature="chat"] .home-feature-icon::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 10px;
-  height: 10px;
-  background: #4cd964;
-  border: 2px solid white;
-  border-radius: 50%;
-  animation: badgePulse 2s ease-in-out infinite;
-  box-shadow: 0 0 0 0 rgba(76, 217, 100, 0.6);
-  z-index: 2;
-}
-
-[data-theme="dark"] .home-feature[data-feature="chat"] .home-feature-icon::after {
-  border-color: #1a1a2e;
-}
-
-@keyframes badgePulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(76, 217, 100, 0.6);
-  }
-
-  50% {
-    transform: scale(1.4);
-    box-shadow: 0 0 0 8px rgba(76, 217, 100, 0);
-  }
-}
-
 .home-feature-label {
   font-size: 11px;
   font-weight: 500;
@@ -1382,4 +1344,13 @@ body.pause-animations *::after {
 #back-chat {
   margin-left: auto !important;
   margin-right: 0 !important;
+}
+
+#home-screen.has-page-bg .home-feature-label,
+#home-screen.has-page-bg .home-dock-btn .home-feature-label,
+#home-screen.has-page-bg .profile-name,
+#home-screen.has-page-bg .profile-status,
+#home-screen.has-page-bg #home-love-days {
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.6);
 }
