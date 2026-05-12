@@ -156,10 +156,7 @@
         if (en) {
             t.textContent = '.header { opacity: 1 !important; }';
         } else {
-            t.textContent = [
-                '.header { opacity: 0.5 !important; transition: opacity 0.3s ease !important; }',
-                '.header:hover { opacity: 1 !important; }'
-            ].join(' ');
+            t.textContent = '.header { opacity: 1 !important; }';
         }
     }
 
