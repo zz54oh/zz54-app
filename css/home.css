@@ -115,7 +115,7 @@ body.feature-mode {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: env(safe-area-inset-top, 50px) 16px env(safe-area-inset-bottom, 16px);
+  padding: env(safe-area-inset-top, 50px) 16px env(safe-area-inset-bottom, 10px);
   box-sizing: border-box;
   gap: 16px;
   overflow-y: auto;
@@ -134,8 +134,8 @@ body.feature-mode {
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   min-height: 1px;
-  margin-top: max(env(safe-area-inset-top, 0px), 30px);
-  width: 90%;
+  margin-top: max(env(safe-area-inset-top, 0px), 27px);
+  width: 95%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -218,11 +218,11 @@ body.feature-mode {
 .home-hero-content {
   position: relative;
   z-index: 1;
-  padding: 22px 18px 18px;
+  padding: 18px 18px 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
   padding-top: 48px;
 }
@@ -462,7 +462,7 @@ body.feature-mode {
   display: flex;
   justify-content: center;
   gap: 30px;
-  margin-bottom: max(env(safe-area-inset-bottom, 0px), 5px);
+  margin-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
 }
 
 
