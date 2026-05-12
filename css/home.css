@@ -115,7 +115,7 @@ body.feature-mode {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: env(safe-area-inset-top, 50px) 16px env(safe-area-inset-bottom, 10px);
+  padding: env(safe-area-inset-top, 50px) 16px env(safe-area-inset-bottom, 5px);
   box-sizing: border-box;
   gap: 16px;
   overflow-y: auto;
