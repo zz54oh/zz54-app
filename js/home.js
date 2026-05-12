@@ -98,6 +98,8 @@
     if (!hero) return;
     const alpha = (val / 100) * 0.28;
     hero.style.background = `hsla(var(--theme-h), var(--theme-s), 99%, ${alpha})`;
+    hero.style.backdropFilter = val < 15 ? 'none' : 'blur(40px)';
+    hero.style.webkitBackdropFilter = val < 15 ? 'none' : 'blur(40px)';
     const heroBg = document.querySelector('.home-hero-bg');
     if (heroBg) heroBg.style.opacity = val / 100;
     try { if (window.localforage) localforage.setItem('home_hero_opacity', val); } catch (e) { }
@@ -1257,11 +1259,10 @@
     document.body.appendChild(progressBar);
     progressBar.style.width = '60%';
     ['splash-declaration', 'welcome-animation'].forEach(id => { const e = document.getElementById(id); if (e) { e.style.display = 'none'; e.classList.add('hidden'); } });
-    await loadStoredPrefs();
-    await loadMoodData();
     registerSW();
     const homeEl = buildHomeDOM();
     document.body.appendChild(homeEl);
+    await loadStoredPrefs();
     ensureFloatingBackBtn();
     bindEvents();
     applyCustomIcons();
