@@ -31,46 +31,46 @@ let _batchModeTarget = 'custom'; // 'custom' or 'stickers' (depends on currentSu
 let _searchVisible = false;
 let _searchQuery = '';
 let _searchDebounceTimer = null;
-let _activeGroupFilter = null; 
+let _activeGroupFilter = null;
 
 const GROUP_COLORS = [
-    '#FF6B6B','#FF8E53','#FFC542','#51CF66',
-    '#20C997','#4DABF7','#748FFC','#DA77F2',
-    '#F783AC','#FF922B','#A9E34B','#38D9A9',
-    '#339AF0','#5C7CFA','#CC5DE8','#F06595',
-    '#868E96','#212529'
+    '#FF6B6B', '#FF8E53', '#FFC542', '#51CF66',
+    '#20C997', '#4DABF7', '#748FFC', '#DA77F2',
+    '#F783AC', '#FF922B', '#A9E34B', '#38D9A9',
+    '#339AF0', '#5C7CFA', '#CC5DE8', '#F06595',
+    '#868E96', '#212529'
 ];
 
 const ICONS = {
-    reply:    `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v7a1 1 0 01-1 1H9l-3 2.5V11H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>`,
-    magic:    `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l.9 2.7L11.6 4l-1.8 2.2L12 8l-2.9-.1L8 10.8l-.9-2.9L4.4 8l1.8-2.2L4.4 4l2.7.7L8 2z" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="2" y1="14" x2="5" y2="11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
-    news:     `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><line x1="5" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="9" x2="9" y2="9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-    folder:   `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5a1 1 0 011-1h3.5l1.2 1.2H13a1 1 0 011 1V12a1 1 0 01-1 1H3a1 1 0 01-1-1V5z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>`,
-    search:   `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.3"/><line x1="9.5" y1="9.5" x2="13" y2="13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
-    batch:    `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2" opacity=".6"/><rect x="1.5" y="8.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2" opacity=".6"/><rect x="8.5" y="8.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2" opacity=".4"/></svg>`,
-    plus:     `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="7.5" y1="2" x2="7.5" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="2" y1="7.5" x2="13" y2="7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-    close:    `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-    check:    `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    trash:    `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="2" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 3V2.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V3"/><path d="M3.5 3.5l.5 7h5l.5-7" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
-    edit:     `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M8.5 2l2.5 2.5L4 11.5H1.5V9L8.5 2z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
-    eye:      `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 6.5s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z" stroke="currentColor" stroke-width="1.2"/><circle cx="6.5" cy="6.5" r="1.5" fill="currentColor"/></svg>`,
-    eyeOff:   `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="2" y1="2" x2="11" y2="11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 3.5C5.1 3.2 5.7 3 6.5 3c3 0 5 3.5 5 3.5s-.5 1-1.5 2M2 5s-.5.8-.5 1.5c0 .6.2 1.1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-    tag:      `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 1.5h5l5 5-5 5-5-5v-5z" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="4" cy="4" r="1" fill="currentColor"/></svg>`,
-    filter:   `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="2" y1="4" x2="13" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4" y1="7.5" x2="11" y2="7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="6" y1="11" x2="9" y2="11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
-    dedup:    `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 4h11M4.5 7h6M7 10h1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
-    import:   `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 9.5V2M4 6.5l3.5 3L11 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="12.5" x2="13" y2="12.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
-    export:   `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 5V12M4 7.5l3.5-3L11 7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="2.5" x2="13" y2="2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+    reply: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v7a1 1 0 01-1 1H9l-3 2.5V11H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>`,
+    magic: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l.9 2.7L11.6 4l-1.8 2.2L12 8l-2.9-.1L8 10.8l-.9-2.9L4.4 8l1.8-2.2L4.4 4l2.7.7L8 2z" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="2" y1="14" x2="5" y2="11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+    news: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><line x1="5" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="9" x2="9" y2="9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+    folder: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5a1 1 0 011-1h3.5l1.2 1.2H13a1 1 0 011 1V12a1 1 0 01-1 1H3a1 1 0 01-1-1V5z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>`,
+    search: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.3"/><line x1="9.5" y1="9.5" x2="13" y2="13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+    batch: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2" opacity=".6"/><rect x="1.5" y="8.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2" opacity=".6"/><rect x="8.5" y="8.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2" opacity=".4"/></svg>`,
+    plus: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="7.5" y1="2" x2="7.5" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="2" y1="7.5" x2="13" y2="7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    close: `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    check: `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    trash: `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="2" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 3V2.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V3"/><path d="M3.5 3.5l.5 7h5l.5-7" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
+    edit: `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M8.5 2l2.5 2.5L4 11.5H1.5V9L8.5 2z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
+    eye: `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 6.5s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z" stroke="currentColor" stroke-width="1.2"/><circle cx="6.5" cy="6.5" r="1.5" fill="currentColor"/></svg>`,
+    eyeOff: `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="2" y1="2" x2="11" y2="11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 3.5C5.1 3.2 5.7 3 6.5 3c3 0 5 3.5 5 3.5s-.5 1-1.5 2M2 5s-.5.8-.5 1.5c0 .6.2 1.1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+    tag: `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 1.5h5l5 5-5 5-5-5v-5z" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="4" cy="4" r="1" fill="currentColor"/></svg>`,
+    filter: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="2" y1="4" x2="13" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4" y1="7.5" x2="11" y2="7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="6" y1="11" x2="9" y2="11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+    dedup: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 4h11M4.5 7h6M7 10h1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+    import: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 9.5V2M4 6.5l3.5 3L11 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="12.5" x2="13" y2="12.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+    export: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 5V12M4 7.5l3.5-3L11 7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="2.5" x2="13" y2="2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
     chevronD: `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
     chevronR: `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
-    comment:  `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 3.5A1.5 1.5 0 013.5 2h11A1.5 1.5 0 0116 3.5v8A1.5 1.5 0 0114.5 13H10l-3 3v-3H3.5A1.5 1.5 0 012 11.5v-8z" stroke="currentColor" stroke-width="1.3"/></svg>`,
-    hand:     `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v8M6 5v5M3 8v3a6 6 0 0012 0V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
-    dot:      `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3" fill="currentColor"/><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.3"/></svg>`,
-    quote:    `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 6.5C3 5.4 3.9 4.5 5 4.5h2v5H5A2 2 0 013 7.5V6.5zM10 6.5c0-1.1.9-2 2-2h2v5h-2a2 2 0 01-2-2V6.5z" fill="currentColor" opacity=".7"/></svg>`,
-    play:     `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M7 6.5l5 2.5-5 2.5V6.5z" fill="currentColor"/></svg>`,
-    smile:    `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/><circle cx="6.5" cy="7.5" r="1" fill="currentColor"/><circle cx="11.5" cy="7.5" r="1" fill="currentColor"/><path d="M6 11.5s1 2 3 2 3-2 3-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-    sticker:  `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="4" stroke="currentColor" stroke-width="1.3"/><circle cx="6.5" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/><path d="M6 11s1 2.5 3 2.5S12 11 12 11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-    folderBig:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5a1 1 0 011-1h4l1.5 1.5H15a1 1 0 011 1V14a1 1 0 01-1 1H3a1 1 0 01-1-1V5z" stroke="currentColor" stroke-width="1.3"/></svg>`,
-    palette:  `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5a6 6 0 100 12 2.5 2.5 0 010-5 2.5 2.5 0 000-7z" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="7.5" cy="3.5" r="1" fill="currentColor"/><circle cx="11" cy="6" r="1" fill="currentColor"/></svg>`,
+    comment: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 3.5A1.5 1.5 0 013.5 2h11A1.5 1.5 0 0116 3.5v8A1.5 1.5 0 0114.5 13H10l-3 3v-3H3.5A1.5 1.5 0 012 11.5v-8z" stroke="currentColor" stroke-width="1.3"/></svg>`,
+    hand: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v8M6 5v5M3 8v3a6 6 0 0012 0V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+    dot: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3" fill="currentColor"/><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.3"/></svg>`,
+    quote: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 6.5C3 5.4 3.9 4.5 5 4.5h2v5H5A2 2 0 013 7.5V6.5zM10 6.5c0-1.1.9-2 2-2h2v5h-2a2 2 0 01-2-2V6.5z" fill="currentColor" opacity=".7"/></svg>`,
+    play: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M7 6.5l5 2.5-5 2.5V6.5z" fill="currentColor"/></svg>`,
+    smile: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/><circle cx="6.5" cy="7.5" r="1" fill="currentColor"/><circle cx="11.5" cy="7.5" r="1" fill="currentColor"/><path d="M6 11.5s1 2 3 2 3-2 3-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+    sticker: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="4" stroke="currentColor" stroke-width="1.3"/><circle cx="6.5" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/><path d="M6 11s1 2.5 3 2.5S12 11 12 11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+    folderBig: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5a1 1 0 011-1h4l1.5 1.5H15a1 1 0 011 1V14a1 1 0 01-1 1H3a1 1 0 01-1-1V5z" stroke="currentColor" stroke-width="1.3"/></svg>`,
+    palette: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5a6 6 0 100 12 2.5 2.5 0 010-5 2.5 2.5 0 000-7z" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="7.5" cy="3.5" r="1" fill="currentColor"/><circle cx="11" cy="6" r="1" fill="currentColor"/></svg>`,
 };
 
 
@@ -304,15 +304,15 @@ function _renderModernToolbar() {
                     未分组 <span class="gfp-count">${ungroupedCount}</span>
                 </button>
                 ${ctx.groups.map(g => {
-                    const cnt = (g.items || []).filter(item => ctx.items.includes(item)).length;
-                    return `<button class="gfp-btn ${_activeGroupFilter === g.id ? 'gfp-active' : ''} ${g.disabled ? 'gfp-disabled' : ''}"
+            const cnt = (g.items || []).filter(item => ctx.items.includes(item)).length;
+            return `<button class="gfp-btn ${_activeGroupFilter === g.id ? 'gfp-active' : ''} ${g.disabled ? 'gfp-disabled' : ''}"
                         data-filter="${g.id}"
                         style="${_activeGroupFilter === g.id ? `background:${g.color}22;border-color:${g.color};color:${g.color};` : ''}">
                         <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${g.color || '#aaa'};margin-right:4px;flex-shrink:0;vertical-align:middle;"></span>
                         ${g.name} <span class="gfp-count">${cnt}</span>
                         ${g.disabled ? `<span style="font-size:9px;opacity:0.7;margin-left:2px;">${ICONS.eyeOff}</span>` : ''}
                     </button>`;
-                }).join('')}
+        }).join('')}
             </div>
         `;
     }
@@ -617,17 +617,17 @@ function _renderGroupBlock(list, group, groupItems, disabledSet, isUngrouped = f
             </div>
             <span style="font-size:11px;color:var(--text-secondary);">${groupItems.length} 条</span>
             ${_batchModeActive && groupItems.length > 0 ? (() => {
-                const allSel = groupItems.every(x => _batchSelectedIndices.has(x.idx));
-                const someSel = !allSel && groupItems.some(x => _batchSelectedIndices.has(x.idx));
-                return `<button class="grp-select-all-btn" data-gid="${group.id}" title="${allSel ? '取消本组全选' : '全选本组'}" style="
+            const allSel = groupItems.every(x => _batchSelectedIndices.has(x.idx));
+            const someSel = !allSel && groupItems.some(x => _batchSelectedIndices.has(x.idx));
+            return `<button class="grp-select-all-btn" data-gid="${group.id}" title="${allSel ? '取消本组全选' : '全选本组'}" style="
                     margin-left:auto;flex-shrink:0;padding:3px 9px;border-radius:20px;cursor:pointer;
                     font-size:11px;font-weight:700;font-family:var(--font-family);
                     transition:all 0.15s;
                     border:1.5px solid ${allSel ? 'var(--accent-color)' : someSel ? colorDot : 'var(--border-color)'};
                     background:${allSel ? 'var(--accent-color)' : someSel ? colorDot + '22' : 'var(--primary-bg)'};
                     color:${allSel ? '#fff' : someSel ? colorDot : 'var(--text-secondary)'};
-                ">${allSel ? '✓ 全选' : someSel ? `已选${groupItems.filter(x=>_batchSelectedIndices.has(x.idx)).length}` : '全选'}</button>`;
-            })() : `<div style="flex:1;"></div>`}
+                ">${allSel ? '✓ 全选' : someSel ? `已选${groupItems.filter(x => _batchSelectedIndices.has(x.idx)).length}` : '全选'}</button>`;
+        })() : `<div style="flex:1;"></div>`}
             ${!isUngrouped ? `
             <button class="grp-edit-btn" title="编辑分组" style="
                 ${_batchModeActive ? '' : 'margin-left:auto;'}width:26px;height:26px;border-radius:8px;border:1px solid var(--border-color);
@@ -799,10 +799,10 @@ function _renderAtmosphereList(list, items) {
     const disabledSet = _getDisabledItemsSet();
     // 预建各数组的索引 Map，避免 O(n²)
     const indexMaps = {
-        pokes:    new Map(customPokes.map((r,i)   => [r, i])),
-        statuses: new Map(customStatuses.map((r,i) => [r, i])),
-        mottos:   new Map(customMottos.map((r,i)   => [r, i])),
-        intros:   new Map(customIntros.map((r,i)   => [r, i])),
+        pokes: new Map(customPokes.map((r, i) => [r, i])),
+        statuses: new Map(customStatuses.map((r, i) => [r, i])),
+        mottos: new Map(customMottos.map((r, i) => [r, i])),
+        intros: new Map(customIntros.map((r, i) => [r, i])),
     };
     const frag = document.createDocumentFragment();
     items.forEach((item, idx) => {
@@ -810,7 +810,7 @@ function _renderAtmosphereList(list, items) {
         const div = document.createElement('div');
         div.className = 'custom-reply-item';
         div.innerHTML = `
-            <span class="custom-reply-text">${item.replace('|','<br><small style="opacity:.65">')}</span>
+            <span class="custom-reply-text">${item.replace('|', '<br><small style="opacity:.65">')}</span>
             <div class="custom-reply-actions">
                 <button class="reply-action-mini edit-btn" title="编辑">${ICONS.edit}</button>
                 <button class="reply-action-mini delete-btn" title="删除">${ICONS.trash}</button>
@@ -997,9 +997,9 @@ function _showGroupManager() {
                     background:var(--primary-bg);${g.disabled ? 'opacity:0.55;' : ''}
                     transition:all 0.15s;
                 ">
-                    <span style="width:12px;height:12px;border-radius:50%;background:${g.color||'#868E96'};flex-shrink:0;box-shadow:0 0 0 2px ${g.color||'#868E96'}30;"></span>
+                    <span style="width:12px;height:12px;border-radius:50%;background:${g.color || '#868E96'};flex-shrink:0;box-shadow:0 0 0 2px ${g.color || '#868E96'}30;"></span>
                     <span style="flex:1;font-size:13px;color:var(--text-primary);font-weight:600;">${g.name}</span>
-                    <span style="font-size:11px;color:var(--text-secondary);">${(g.items||[]).filter(t=>sourceItems.includes(t)).length} 条</span>
+                    <span style="font-size:11px;color:var(--text-secondary);">${(g.items || []).filter(t => sourceItems.includes(t)).length} 条</span>
                     <button data-action="toggle" data-i="${i}" style="
                         width:28px;height:28px;border-radius:8px;border:1px solid var(--border-color);
                         background:${g.disabled ? 'var(--accent-color)' : 'transparent'};
@@ -1242,9 +1242,9 @@ function _showSingleItemGroupPicker(itemText, ctx) {
             ${groups.map((g, i) => `
                 <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border-radius:11px;border:1.5px solid ${currentGroup?.id === g.id ? g.color : 'var(--border-color)'};background:${currentGroup?.id === g.id ? g.color + '10' : 'var(--primary-bg)'};">
                     <input type="radio" name="sgp" value="${i}" ${currentGroup?.id === g.id ? 'checked' : ''} style="accent-color:${g.color};">
-                    <span style="width:9px;height:9px;border-radius:50%;background:${g.color||'#aaa'};flex-shrink:0;"></span>
+                    <span style="width:9px;height:9px;border-radius:50%;background:${g.color || '#aaa'};flex-shrink:0;"></span>
                     <span style="flex:1;font-size:13px;color:var(--text-primary);font-weight:600;">${g.name}</span>
-                    <span style="font-size:11px;color:var(--text-secondary);">${(g.items||[]).length} 条</span>
+                    <span style="font-size:11px;color:var(--text-secondary);">${(g.items || []).length} 条</span>
                 </label>
             `).join('')}
         </div>
@@ -1304,9 +1304,9 @@ function _showBatchGroupPicker() {
             ${groups.map((g, i) => `
                 <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border-radius:11px;border:1.5px solid var(--border-color);background:var(--primary-bg);">
                     <input type="radio" name="bgp" value="${i}" style="accent-color:${g.color};">
-                    <span style="width:9px;height:9px;border-radius:50%;background:${g.color||'#aaa'};flex-shrink:0;"></span>
+                    <span style="width:9px;height:9px;border-radius:50%;background:${g.color || '#aaa'};flex-shrink:0;"></span>
                     <span style="flex:1;font-size:13px;color:var(--text-primary);font-weight:600;">${g.name}</span>
-                    <span style="font-size:11px;color:var(--text-secondary);">${(g.items||[]).length} 条</span>
+                    <span style="font-size:11px;color:var(--text-secondary);">${(g.items || []).length} 条</span>
                 </label>
             `).join('')}
         </div>
@@ -1399,46 +1399,46 @@ function _showExportUI() {
     // 读取公告数据（localStorage）
     let _annCustomData = {};
     let _annStatusPool = [];
-    try { _annCustomData = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch(e) {}
-    try { _annStatusPool = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch(e) {}
+    try { _annCustomData = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch (e) { }
+    try { _annStatusPool = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch (e) { }
     const _annTextCount = (_annCustomData.titles || []).length + (_annCustomData.notes || []).length;
     const _annPoolCount = _annStatusPool.length;
     const _annTotalCount = _annTextCount + _annPoolCount;
 
     const modules = [
-        { id: '_re_replies',  icon: ICONS.comment,   label: '主字卡',        count: customReplies.length,                     key: 'customReplies' },
-        { id: '_re_pokes',    icon: ICONS.hand,      label: '拍一拍',        count: customPokes.length,                       key: 'customPokes' },
-        { id: '_re_statuses', icon: ICONS.dot,       label: '对方状态',      count: customStatuses.length,                    key: 'customStatuses' },
-        { id: '_re_mottos',   icon: ICONS.quote,     label: '顶部格言',      count: customMottos.length,                      key: 'customMottos' },
-        { id: '_re_intros',   icon: ICONS.play,      label: '开场动画',      count: customIntros.length,                      key: 'customIntros' },
-        { id: '_re_emojis',   icon: ICONS.smile,     label: 'Emoji 库',      count: customEmojis.length,                      key: 'customEmojis' },
-        { id: '_re_ann',      icon: ICONS.folderBig, label: '今日公告配置',  count: _annTotalCount,                           key: 'announcementConfig' },
-        { id: '_re_groups',   icon: ICONS.folderBig, label: '字卡分组',      count: (customReplyGroups||[]).length,            key: 'customReplyGroups',  extra: true },
-        { id: '_re_pokg',     icon: ICONS.folderBig, label: '拍一拍分组',    count: (window.customPokeGroups||[]).length,     key: 'customPokeGroups',   extra: true },
-        { id: '_re_statg',    icon: ICONS.folderBig, label: '对方状态分组',  count: (window.customStatusGroups||[]).length,   key: 'customStatusGroups', extra: true },
+        { id: '_re_replies', icon: ICONS.comment, label: '主字卡', count: customReplies.length, key: 'customReplies' },
+        { id: '_re_pokes', icon: ICONS.hand, label: '拍一拍', count: customPokes.length, key: 'customPokes' },
+        { id: '_re_statuses', icon: ICONS.dot, label: '对方状态', count: customStatuses.length, key: 'customStatuses' },
+        { id: '_re_mottos', icon: ICONS.quote, label: '顶部格言', count: customMottos.length, key: 'customMottos' },
+        { id: '_re_intros', icon: ICONS.play, label: '开场动画', count: customIntros.length, key: 'customIntros' },
+        { id: '_re_emojis', icon: ICONS.smile, label: 'Emoji 库', count: customEmojis.length, key: 'customEmojis' },
+        { id: '_re_ann', icon: ICONS.folderBig, label: '今日公告配置', count: _annTotalCount, key: 'announcementConfig' },
+        { id: '_re_groups', icon: ICONS.folderBig, label: '字卡分组', count: (customReplyGroups || []).length, key: 'customReplyGroups', extra: true },
+        { id: '_re_pokg', icon: ICONS.folderBig, label: '拍一拍分组', count: (window.customPokeGroups || []).length, key: 'customPokeGroups', extra: true },
+        { id: '_re_statg', icon: ICONS.folderBig, label: '对方状态分组', count: (window.customStatusGroups || []).length, key: 'customStatusGroups', extra: true },
     ];
 
     // 检测当前 tab 决定哪个分组有「按分组导出」选项
-    const replyGroupsExist  = customReplyGroups        && customReplyGroups.length > 0;
-    const pokeGroupsExist   = window.customPokeGroups  && window.customPokeGroups.length > 0;
+    const replyGroupsExist = customReplyGroups && customReplyGroups.length > 0;
+    const pokeGroupsExist = window.customPokeGroups && window.customPokeGroups.length > 0;
     const statusGroupsExist = window.customStatusGroups && window.customStatusGroups.length > 0;
-    const onAnnTab          = currentMajorTab === 'announcement';
-    const anyGroupExists    = replyGroupsExist || pokeGroupsExist || statusGroupsExist || onAnnTab;
+    const onAnnTab = currentMajorTab === 'announcement';
+    const anyGroupExists = replyGroupsExist || pokeGroupsExist || statusGroupsExist || onAnnTab;
 
     // 根据当前 tab 决定「按分组导出」对应哪个类型
-    const onPokeTab   = currentMajorTab === 'atmosphere' && currentSubTab === 'pokes';
+    const onPokeTab = currentMajorTab === 'atmosphere' && currentSubTab === 'pokes';
     const onStatusTab = currentMajorTab === 'atmosphere' && currentSubTab === 'statuses';
     let groupExportType = null;
-    if (onAnnTab)                          groupExportType = 'announcement';
-    if (onPokeTab   && pokeGroupsExist)    groupExportType = 'pokes';
-    if (onStatusTab && statusGroupsExist)  groupExportType = 'statuses';
+    if (onAnnTab) groupExportType = 'announcement';
+    if (onPokeTab && pokeGroupsExist) groupExportType = 'pokes';
+    if (onStatusTab && statusGroupsExist) groupExportType = 'statuses';
     // 只有在字卡 tab（非拍一拍/状态/公告 tab）时才 fallback 到字卡分组
     if (!groupExportType && !onPokeTab && !onStatusTab && !onAnnTab && replyGroupsExist) groupExportType = 'replies';
 
     const groupDescMap = {
-        replies:      '仅导出指定分组的字卡内容',
-        pokes:        '仅导出指定分组的拍一拍内容',
-        statuses:     '仅导出指定分组的对方状态内容',
+        replies: '仅导出指定分组的字卡内容',
+        pokes: '仅导出指定分组的拍一拍内容',
+        statuses: '仅导出指定分组的对方状态内容',
         announcement: '选择要导出的公告内容模块',
     };
 
@@ -1525,24 +1525,24 @@ function _showExportUI() {
 function _doExport(selectedModules) {
     const libraryData = { exportDate: new Date().toISOString(), modules: [] };
     selectedModules.forEach(m => {
-        if (m.key === 'customReplies')         { libraryData.customReplies      = customReplies;                  libraryData.modules.push('replies'); }
-        else if (m.key === 'customPokes')      { libraryData.customPokes        = customPokes;                    libraryData.modules.push('pokes'); }
-        else if (m.key === 'customStatuses')   { libraryData.customStatuses     = customStatuses;                 libraryData.modules.push('statuses'); }
-        else if (m.key === 'customMottos')     { libraryData.customMottos       = customMottos;                   libraryData.modules.push('mottos'); }
-        else if (m.key === 'customIntros')     { libraryData.customIntros       = customIntros;                   libraryData.modules.push('intros'); }
-        else if (m.key === 'customEmojis')     { libraryData.customEmojis       = customEmojis;                   libraryData.modules.push('emojis'); }
-        else if (m.key === 'customReplyGroups')  { libraryData.customReplyGroups  = window.customReplyGroups  || []; libraryData.modules.push('groups'); }
-        else if (m.key === 'customPokeGroups')   { libraryData.customPokeGroups   = window.customPokeGroups   || []; libraryData.modules.push('pokeGroups'); }
+        if (m.key === 'customReplies') { libraryData.customReplies = customReplies; libraryData.modules.push('replies'); }
+        else if (m.key === 'customPokes') { libraryData.customPokes = customPokes; libraryData.modules.push('pokes'); }
+        else if (m.key === 'customStatuses') { libraryData.customStatuses = customStatuses; libraryData.modules.push('statuses'); }
+        else if (m.key === 'customMottos') { libraryData.customMottos = customMottos; libraryData.modules.push('mottos'); }
+        else if (m.key === 'customIntros') { libraryData.customIntros = customIntros; libraryData.modules.push('intros'); }
+        else if (m.key === 'customEmojis') { libraryData.customEmojis = customEmojis; libraryData.modules.push('emojis'); }
+        else if (m.key === 'customReplyGroups') { libraryData.customReplyGroups = window.customReplyGroups || []; libraryData.modules.push('groups'); }
+        else if (m.key === 'customPokeGroups') { libraryData.customPokeGroups = window.customPokeGroups || []; libraryData.modules.push('pokeGroups'); }
         else if (m.key === 'customStatusGroups') { libraryData.customStatusGroups = window.customStatusGroups || []; libraryData.modules.push('statusGroups'); }
         else if (m.key === 'announcementConfig') {
             let _acd = {}; let _asp = [];
-            try { _acd = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch(e) {}
-            try { _asp = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch(e) {}
+            try { _acd = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch (e) { }
+            try { _asp = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch (e) { }
             libraryData.announcementConfig = { customData: _acd, statusPool: _asp };
             libraryData.modules.push('announcementConfig');
         }
     });
-    const fileName = `reply-library-${libraryData.modules.join('+')}-${new Date().toISOString().slice(0,10)}.json`;
+    const fileName = `reply-library-${libraryData.modules.join('+')}-${new Date().toISOString().slice(0, 10)}.json`;
     exportDataToMobileOrPC(JSON.stringify(libraryData, null, 2), fileName);
     showNotification('✓ 字卡导出成功', 'success');
 }
@@ -1552,9 +1552,9 @@ function _showGroupExportPicker(type) {
     type = type || 'replies';
 
     const cfgMap = {
-        replies:  { groups: window.customReplyGroups  || [], items: customReplies,   groupKey: 'customReplyGroups',  itemKey: 'customReplies',  moduleTag: ['replies','groups'],       filePrefix: 'reply-groups',  label: '字卡',    successUnit: '条字卡' },
-        pokes:    { groups: window.customPokeGroups   || [], items: customPokes,      groupKey: 'customPokeGroups',   itemKey: 'customPokes',    moduleTag: ['pokes','pokeGroups'],     filePrefix: 'poke-groups',   label: '拍一拍',  successUnit: '条拍一拍' },
-        statuses: { groups: window.customStatusGroups || [], items: customStatuses,   groupKey: 'customStatusGroups', itemKey: 'customStatuses', moduleTag: ['statuses','statusGroups'],filePrefix: 'status-groups', label: '对方状态',successUnit: '条状态' },
+        replies: { groups: window.customReplyGroups || [], items: customReplies, groupKey: 'customReplyGroups', itemKey: 'customReplies', moduleTag: ['replies', 'groups'], filePrefix: 'reply-groups', label: '字卡', successUnit: '条字卡' },
+        pokes: { groups: window.customPokeGroups || [], items: customPokes, groupKey: 'customPokeGroups', itemKey: 'customPokes', moduleTag: ['pokes', 'pokeGroups'], filePrefix: 'poke-groups', label: '拍一拍', successUnit: '条拍一拍' },
+        statuses: { groups: window.customStatusGroups || [], items: customStatuses, groupKey: 'customStatusGroups', itemKey: 'customStatuses', moduleTag: ['statuses', 'statusGroups'], filePrefix: 'status-groups', label: '对方状态', successUnit: '条状态' },
     };
     const cfg = cfgMap[type] || cfgMap.replies;
 
@@ -1591,7 +1591,7 @@ function _showGroupExportPicker(type) {
         row.style.cssText = `display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:13px;border:1.5px solid var(--border-color);background:var(--primary-bg);cursor:pointer;transition:border-color 0.15s;`;
         row.innerHTML = `
             <input type="checkbox" value="${i}" style="width:16px;height:16px;accent-color:${g.color};flex-shrink:0;" checked>
-            <span style="width:10px;height:10px;border-radius:50%;background:${g.color||'#aaa'};flex-shrink:0;"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:${g.color || '#aaa'};flex-shrink:0;"></span>
             <span style="flex:1;font-size:13px;font-weight:600;color:var(--text-primary);">${g.name}</span>
             <span style="font-size:11px;color:var(--text-secondary);">${cnt} 条</span>
         `;
@@ -1617,13 +1617,13 @@ function _showGroupExportPicker(type) {
         const libraryData = {
             exportDate: new Date().toISOString(),
             modules: cfg.moduleTag,
-            [cfg.itemKey]:  [...allItems],
+            [cfg.itemKey]: [...allItems],
             [cfg.groupKey]: exportGroups,
             _groupExport: true,
             _groupExportType: type
         };
         const groupNames = selectedGroups.map(g => g.name).join('+');
-        const fileName = `${cfg.filePrefix}-${groupNames}-${new Date().toISOString().slice(0,10)}.json`;
+        const fileName = `${cfg.filePrefix}-${groupNames}-${new Date().toISOString().slice(0, 10)}.json`;
         exportDataToMobileOrPC(JSON.stringify(libraryData, null, 2), fileName);
         overlay.remove();
         showNotification(`✓ 已导出 ${checked.length} 个分组，共 ${allItems.size} ${cfg.successUnit}`, 'success');
@@ -1633,8 +1633,8 @@ function _showGroupExportPicker(type) {
 function _showAnnouncementExportPicker() {
     let annCustomData = {};
     let annStatusPool = [];
-    try { annCustomData = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch(e) {}
-    try { annStatusPool = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch(e) {}
+    try { annCustomData = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch (e) { }
+    try { annStatusPool = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch (e) { }
     const textCount = (annCustomData.titles || []).length + (annCustomData.notes || []).length;
     const poolCount = annStatusPool.length;
 
@@ -1696,7 +1696,7 @@ function _showAnnouncementExportPicker() {
                 libraryData.modules.push('announcementStatusPool');
             }
         });
-        const fileName = `announcement-${libraryData.modules.join('+')}-${new Date().toISOString().slice(0,10)}.json`;
+        const fileName = `announcement-${libraryData.modules.join('+')}-${new Date().toISOString().slice(0, 10)}.json`;
         exportDataToMobileOrPC(JSON.stringify(libraryData, null, 2), fileName);
         overlay.remove();
         showNotification(`✓ 已导出 ${selected.map(o => o.label).join('、')}`, 'success');
@@ -1704,24 +1704,24 @@ function _showAnnouncementExportPicker() {
 }
 
 function _parseFlexibleJSON(text) {
-    try { return JSON.parse(text); } catch (_) {}
+    try { return JSON.parse(text); } catch (_) { }
     let repaired = text
-        .replace(/,\s*([}\]])/g, '$1')  
-        .replace(/(["\d\w}])\s*\n\s*"/g, (m, p1) => { 
+        .replace(/,\s*([}\]])/g, '$1')
+        .replace(/(["\d\w}])\s*\n\s*"/g, (m, p1) => {
             if (p1 === '}' || p1 === ']') return m;
             return p1 + ',\n"';
         });
-    try { return JSON.parse(repaired); } catch (_) {}
+    try { return JSON.parse(repaired); } catch (_) { }
     repaired = text.replace(/("(?:[^"\\]|\\.)*")\s*\n(\s*")/g, '$1,\n$2')
-                   .replace(/,\s*([}\]])/g, '$1');
+        .replace(/,\s*([}\]])/g, '$1');
     return JSON.parse(repaired);
 }
 
 function _normalizeImportData(data) {
     if (!data || typeof data !== 'object') return data;
-    const knownKeys = ['customReplies','customPokes','customStatuses','customMottos','customIntros','customEmojis',
-                       'customReplyGroups','customPokeGroups','customStatusGroups','disabledDefaultReplies',
-                       'announcementConfig','announcementText','announcementStatusPool'];
+    const knownKeys = ['customReplies', 'customPokes', 'customStatuses', 'customMottos', 'customIntros', 'customEmojis',
+        'customReplyGroups', 'customPokeGroups', 'customStatusGroups', 'disabledDefaultReplies',
+        'announcementConfig', 'announcementText', 'announcementStatusPool'];
     const hasNewFormat = knownKeys.some(k => data[k] !== undefined && data[k] !== null);
     if (hasNewFormat) return data;
     if (Array.isArray(data)) {
@@ -1731,9 +1731,9 @@ function _normalizeImportData(data) {
 }
 
 function _showImportUI(data) {
-    const knownFields = ['customReplies','customPokes','customStatuses','customMottos','customIntros','customEmojis',
-                         'customReplyGroups','customPokeGroups','customStatusGroups',
-                         'announcementConfig','announcementText','announcementStatusPool'];
+    const knownFields = ['customReplies', 'customPokes', 'customStatuses', 'customMottos', 'customIntros', 'customEmojis',
+        'customReplyGroups', 'customPokeGroups', 'customStatusGroups',
+        'announcementConfig', 'announcementText', 'announcementStatusPool'];
     const hasValid = knownFields.some(f => data[f] !== undefined && data[f] !== null);
     if (!hasValid) { showNotification('无效的字卡备份文件', 'error'); return; }
 
@@ -1742,24 +1742,24 @@ function _showImportUI(data) {
     const _annText = data.announcementText;
     const _annPool = data.announcementStatusPool;
     const _annCfgCount = _annCfg
-        ? ((_annCfg.customData?.titles||[]).length + (_annCfg.customData?.notes||[]).length + (_annCfg.statusPool||[]).length)
+        ? ((_annCfg.customData?.titles || []).length + (_annCfg.customData?.notes || []).length + (_annCfg.statusPool || []).length)
         : undefined;
-    const _annTextCount = _annText ? ((_annText.titles||[]).length + (_annText.notes||[]).length) : undefined;
+    const _annTextCount = _annText ? ((_annText.titles || []).length + (_annText.notes || []).length) : undefined;
     const _annPoolCount = Array.isArray(_annPool) ? _annPool.length : undefined;
 
     const modules = [
-        { id: '_ri_replies',  icon: ICONS.comment,   label: '主字卡',        data: data.customReplies,       key: 'customReplies' },
-        { id: '_ri_pokes',    icon: ICONS.hand,      label: '拍一拍',        data: data.customPokes,         key: 'customPokes' },
-        { id: '_ri_statuses', icon: ICONS.dot,       label: '对方状态',      data: data.customStatuses,      key: 'customStatuses' },
-        { id: '_ri_mottos',   icon: ICONS.quote,     label: '顶部格言',      data: data.customMottos,        key: 'customMottos' },
-        { id: '_ri_intros',   icon: ICONS.play,      label: '开场动画',      data: data.customIntros,        key: 'customIntros' },
-        { id: '_ri_emojis',   icon: ICONS.smile,     label: 'Emoji 库',      data: data.customEmojis,        key: 'customEmojis' },
-        { id: '_ri_ann',      icon: ICONS.folderBig, label: '今日公告配置',  data: [_annCfg],                key: 'announcementConfig',    displayCount: _annCfgCount },
-        { id: '_ri_anntext',  icon: ICONS.comment,   label: '公告文案',      data: [_annText],               key: 'announcementText',      displayCount: _annTextCount },
-        { id: '_ri_annpool',  icon: ICONS.dot,       label: '状态随机库',    data: _annPool,                 key: 'announcementStatusPool', displayCount: _annPoolCount },
-        { id: '_ri_groups',   icon: ICONS.folderBig, label: '字卡分组',      data: data.customReplyGroups,   key: 'customReplyGroups',  extra: true },
-        { id: '_ri_pokg',     icon: ICONS.folderBig, label: '拍一拍分组',    data: data.customPokeGroups,    key: 'customPokeGroups',   extra: true },
-        { id: '_ri_statg',    icon: ICONS.folderBig, label: '对方状态分组',  data: data.customStatusGroups,  key: 'customStatusGroups', extra: true },
+        { id: '_ri_replies', icon: ICONS.comment, label: '主字卡', data: data.customReplies, key: 'customReplies' },
+        { id: '_ri_pokes', icon: ICONS.hand, label: '拍一拍', data: data.customPokes, key: 'customPokes' },
+        { id: '_ri_statuses', icon: ICONS.dot, label: '对方状态', data: data.customStatuses, key: 'customStatuses' },
+        { id: '_ri_mottos', icon: ICONS.quote, label: '顶部格言', data: data.customMottos, key: 'customMottos' },
+        { id: '_ri_intros', icon: ICONS.play, label: '开场动画', data: data.customIntros, key: 'customIntros' },
+        { id: '_ri_emojis', icon: ICONS.smile, label: 'Emoji 库', data: data.customEmojis, key: 'customEmojis' },
+        { id: '_ri_ann', icon: ICONS.folderBig, label: '今日公告配置', data: [_annCfg], key: 'announcementConfig', displayCount: _annCfgCount },
+        { id: '_ri_anntext', icon: ICONS.comment, label: '公告文案', data: [_annText], key: 'announcementText', displayCount: _annTextCount },
+        { id: '_ri_annpool', icon: ICONS.dot, label: '状态随机库', data: _annPool, key: 'announcementStatusPool', displayCount: _annPoolCount },
+        { id: '_ri_groups', icon: ICONS.folderBig, label: '字卡分组', data: data.customReplyGroups, key: 'customReplyGroups', extra: true },
+        { id: '_ri_pokg', icon: ICONS.folderBig, label: '拍一拍分组', data: data.customPokeGroups, key: 'customPokeGroups', extra: true },
+        { id: '_ri_statg', icon: ICONS.folderBig, label: '对方状态分组', data: data.customStatusGroups, key: 'customStatusGroups', extra: true },
     ].filter(m => m.data !== undefined && m.data !== null && (Array.isArray(m.data) ? m.data.length > 0 && m.data[0] !== undefined : true));
 
     _showIOSheet(`导入字卡`, `文件中包含 ${modules.length} 个模块`, modules, ICONS.import, (selected, mode) => {
@@ -1769,21 +1769,21 @@ function _showImportUI(data) {
             let totalAdded = 0;
             if (overwrite) {
                 selected.forEach(m => {
-                    if (m.key === 'customReplies')         { customReplies               = data.customReplies;       totalAdded += data.customReplies.length; }
-                    else if (m.key === 'customPokes')      { customPokes                 = data.customPokes;         totalAdded += data.customPokes.length; }
-                    else if (m.key === 'customStatuses')   { customStatuses              = data.customStatuses;      totalAdded += data.customStatuses.length; }
-                    else if (m.key === 'customMottos')     { customMottos                = data.customMottos;        totalAdded += data.customMottos.length; }
-                    else if (m.key === 'customIntros')     { customIntros                = data.customIntros;        totalAdded += data.customIntros.length; }
-                    else if (m.key === 'customEmojis')     { customEmojis                = data.customEmojis; }
-                    else if (m.key === 'customReplyGroups')  { window.customReplyGroups  = data.customReplyGroups; }
-                    else if (m.key === 'customPokeGroups')   { window.customPokeGroups   = data.customPokeGroups; }
+                    if (m.key === 'customReplies') { customReplies = data.customReplies; totalAdded += data.customReplies.length; }
+                    else if (m.key === 'customPokes') { customPokes = data.customPokes; totalAdded += data.customPokes.length; }
+                    else if (m.key === 'customStatuses') { customStatuses = data.customStatuses; totalAdded += data.customStatuses.length; }
+                    else if (m.key === 'customMottos') { customMottos = data.customMottos; totalAdded += data.customMottos.length; }
+                    else if (m.key === 'customIntros') { customIntros = data.customIntros; totalAdded += data.customIntros.length; }
+                    else if (m.key === 'customEmojis') { customEmojis = data.customEmojis; }
+                    else if (m.key === 'customReplyGroups') { window.customReplyGroups = data.customReplyGroups; }
+                    else if (m.key === 'customPokeGroups') { window.customPokeGroups = data.customPokeGroups; }
                     else if (m.key === 'customStatusGroups') { window.customStatusGroups = data.customStatusGroups; }
                     else if (m.key === 'announcementConfig') {
                         if (_annCfg.customData) localStorage.setItem('dg_custom_data', JSON.stringify(_annCfg.customData));
                         if (_annCfg.statusPool) localStorage.setItem('dg_status_pool', JSON.stringify(_annCfg.statusPool));
                     }
                     else if (m.key === 'announcementText') {
-                        let cur = {}; try { cur = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch(e) {}
+                        let cur = {}; try { cur = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch (e) { }
                         cur.titles = _annText.titles || []; cur.notes = _annText.notes || [];
                         localStorage.setItem('dg_custom_data', JSON.stringify(cur));
                     }
@@ -1832,25 +1832,25 @@ function _showImportUI(data) {
                         });
                     } else if (m.key === 'announcementConfig') {
                         // 追加：合并 titles/notes，pool 去重追加
-                        let cur = {}; try { cur = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch(e) {}
+                        let cur = {}; try { cur = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch (e) { }
                         if (_annCfg.customData) {
-                            cur.titles = [...new Set([...(cur.titles||[]), ...(_annCfg.customData.titles||[])])];
-                            cur.notes  = [...new Set([...(cur.notes||[]),  ...(_annCfg.customData.notes||[])])];
+                            cur.titles = [...new Set([...(cur.titles || []), ...(_annCfg.customData.titles || [])])];
+                            cur.notes = [...new Set([...(cur.notes || []), ...(_annCfg.customData.notes || [])])];
                             localStorage.setItem('dg_custom_data', JSON.stringify(cur));
                         }
                         if (_annCfg.statusPool) {
-                            let pool = []; try { pool = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch(e) {}
+                            let pool = []; try { pool = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch (e) { }
                             const existStatuses = new Set(pool.map(p => p.status));
                             _annCfg.statusPool.forEach(p => { if (!existStatuses.has(p.status)) pool.push(p); });
                             localStorage.setItem('dg_status_pool', JSON.stringify(pool));
                         }
                     } else if (m.key === 'announcementText') {
-                        let cur = {}; try { cur = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch(e) {}
-                        cur.titles = [...new Set([...(cur.titles||[]), ...(_annText.titles||[])])];
-                        cur.notes  = [...new Set([...(cur.notes||[]),  ...(_annText.notes||[])])];
+                        let cur = {}; try { cur = JSON.parse(localStorage.getItem('dg_custom_data') || '{}'); } catch (e) { }
+                        cur.titles = [...new Set([...(cur.titles || []), ...(_annText.titles || [])])];
+                        cur.notes = [...new Set([...(cur.notes || []), ...(_annText.notes || [])])];
                         localStorage.setItem('dg_custom_data', JSON.stringify(cur));
                     } else if (m.key === 'announcementStatusPool') {
-                        let pool = []; try { pool = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch(e) {}
+                        let pool = []; try { pool = JSON.parse(localStorage.getItem('dg_status_pool') || '[]'); } catch (e) { }
                         const existStatuses = new Set(pool.map(p => p.status));
                         _annPool.forEach(p => { if (!existStatuses.has(p.status)) pool.push(p); });
                         localStorage.setItem('dg_status_pool', JSON.stringify(pool));
@@ -2097,7 +2097,7 @@ function _showBatchAddDialog() {
         });
     }
 
-    let _selectedGroupIdx = -1; 
+    let _selectedGroupIdx = -1;
     const pillContainer = panel.querySelector('#ba-group-list');
     if (pillContainer) {
         pillContainer.addEventListener('click', e => {
@@ -2143,10 +2143,10 @@ function _showBatchAddDialog() {
             const isDup = currentSubTab === 'custom'
                 ? (customReplies.some(r => normalizeStringStrict(r) === norm) || CONSTANTS.REPLY_MESSAGES.some(r => normalizeStringStrict(r) === norm))
                 : currentSubTab === 'pokes'
-                ? customPokes.some(r => normalizeStringStrict(r) === norm)
-                : currentSubTab === 'statuses'
-                ? customStatuses.some(r => normalizeStringStrict(r) === norm)
-                : false;
+                    ? customPokes.some(r => normalizeStringStrict(r) === norm)
+                    : currentSubTab === 'statuses'
+                        ? customStatuses.some(r => normalizeStringStrict(r) === norm)
+                        : false;
             if (isDup) { skipped++; return; }
             if (currentSubTab === 'custom') { customReplies.push(val); newItems.push(val); }
             else if (currentSubTab === 'pokes') { customPokes.push(val); newItems.push(val); }
@@ -2187,14 +2187,14 @@ function initReplyLibraryListeners() {
             // 确保公告面板隐藏、列表区域显示
             const annPanel = document.getElementById('announcement-panel');
             const listArea = document.getElementById('custom-replies-list');
-            const subTabs  = document.getElementById('cr-sub-tabs');
-            const addBtn2  = document.getElementById('add-custom-reply');
-            const batchTb  = document.getElementById('batch-ops-toolbar');
-            if (annPanel)  annPanel.style.display = 'none';
-            if (listArea)  listArea.style.display = '';
-            if (subTabs)   subTabs.style.display = '';
-            if (addBtn2)   addBtn2.style.display = '';
-            if (batchTb)   batchTb.style.display = '';
+            const subTabs = document.getElementById('cr-sub-tabs');
+            const addBtn2 = document.getElementById('add-custom-reply');
+            const batchTb = document.getElementById('batch-ops-toolbar');
+            if (annPanel) annPanel.style.display = 'none';
+            if (listArea) listArea.style.display = '';
+            if (subTabs) subTabs.style.display = '';
+            if (addBtn2) addBtn2.style.display = '';
+            if (batchTb) batchTb.style.display = '';
             document.querySelectorAll('.sidebar-btn').forEach(b => {
                 b.classList.toggle('active', b.dataset.major === 'reply');
             });
@@ -2343,7 +2343,7 @@ function updateTabUI() {
 }
 
 function initRippleFeedback() {
-    const targets = ['.input-btn','.action-btn','.modal-btn','.settings-item','.batch-action-btn','.coin-btn-action','.import-export-btn','.reply-tab-btn','.anniversary-type-btn','.reply-tool-btn','.session-action-btn','.fav-action-btn'];
+    const targets = ['.input-btn', '.action-btn', '.modal-btn', '.settings-item', '.batch-action-btn', '.coin-btn-action', '.import-export-btn', '.reply-tab-btn', '.anniversary-type-btn', '.reply-tool-btn', '.session-action-btn', '.fav-action-btn'];
     document.addEventListener('mousedown', e => {
         const target = e.target.closest(targets.join(','));
         if (target) createRipple(e, target);
@@ -2356,7 +2356,7 @@ function initRippleFeedback() {
         const rect = button.getBoundingClientRect();
         const cx = event.clientX || (event.touches ? event.touches[0].clientX : 0);
         const cy = event.clientY || (event.touches ? event.touches[0].clientY : 0);
-        circle.style.cssText = `width:${diameter}px;height:${diameter}px;left:${cx-rect.left-radius}px;top:${cy-rect.top-radius}px;`;
+        circle.style.cssText = `width:${diameter}px;height:${diameter}px;left:${cx - rect.left - radius}px;top:${cy - rect.top - radius}px;`;
         circle.classList.add('ripple-wave');
         button.getElementsByClassName('ripple-wave')[0]?.remove();
         button.appendChild(circle);
@@ -2384,6 +2384,8 @@ function applyAvatarFrame(avatarContainer, frameSettings) {
 }
 
 function setupAvatarFrameSettings() {
+    if (window._avatarFrameInitialized) return;
+    window._avatarFrameInitialized = true;
     const setupControlsFor = (type) => {
         const preview = document.getElementById(`${type}-frame-preview-2`);
         const uploadBtn = document.getElementById(`${type}-frame-upload-btn-2`);

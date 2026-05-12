@@ -234,6 +234,8 @@
 
   function backToHome() {
     closeAllFeatureModals();
+    const dgModal = document.getElementById('daily-greeting-modal');
+    if (dgModal) dgModal.classList.add('hidden');
     ['settings-list-screen', 'mood-calendar-screen', 'icon-customize-screen'].forEach(id => {
       const s = document.getElementById(id);
       if (s) s.classList.remove('visible');
@@ -245,12 +247,13 @@
     exitFeatureMode();
     const home = document.getElementById('home-screen');
     if (home) {
+      home.style.transition = 'none';
       home.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        exitFeatureMode();
+        setTimeout(() => { home.style.transition = ''; }, 50);
+      });
     }
-    refreshHomeData();
-    isOnHome = true;
-    setContext('home');
-    hideBackBtn();
   }
 
   function backToSettings() {
@@ -954,6 +957,7 @@
       case 'send-settings':
       case 'chat-style':
         openModalWithSettingsBack('chat-modal');
+        setTimeout(() => { if (typeof setupAvatarFrameSettings === 'function') setupAvatarFrameSettings(); }, 300);
         break;
 
       // ========== 纪念日 ==========

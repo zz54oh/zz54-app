@@ -696,6 +696,7 @@ function renderThemeSchemesList() {
     });
 }
 
+window.setupAppearancePanelFrameSettings = setupAppearancePanelFrameSettings;
 window.applyThemeScheme = function (id) {
     const scheme = themeSchemes.find(s => s.id === id);
     if (!scheme) return;
