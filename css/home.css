@@ -133,8 +133,11 @@ body.feature-mode {
   -webkit-backdrop-filter: blur(40px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
-  min-height: 180px;
+  min-height: 140px;
   margin-top: max(env(safe-area-inset-top, 0px), 34px);
+  width: 85%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 [data-theme="dark"] .home-hero {
@@ -348,7 +351,7 @@ body.feature-mode {
   background: transparent;
   border: none;
   box-shadow: none;
-  margin-top: 8px;
+  margin-top: 5px;
 }
 
 /* ============ 功能图标（iOS 风格小图标）============ */
@@ -458,8 +461,8 @@ body.feature-mode {
   padding: 10px 20px;
   display: flex;
   justify-content: center;
-  gap: 50px;
-  margin-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+  gap: 30px;
+  margin-bottom: max(env(safe-area-inset-bottom, 0px), 10px);
 }
 
 
