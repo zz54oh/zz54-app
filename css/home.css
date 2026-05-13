@@ -250,8 +250,8 @@ body.feature-mode {
   border-radius: 50%;
   padding: 2.5px;
   background: linear-gradient(135deg,
-      hsla(var(--theme-h), 60%, 75%, 0.95),
-      hsla(calc(var(--theme-h) + 40), 55%, 80%, 0.95));
+      hsla(var(--theme-h), var(--theme-s), 75%, 0.95),
+      hsla(calc(var(--theme-h) + 40), var(--theme-s), 80%, 0.95));
   box-shadow: 0 6px 18px hsla(var(--theme-h), 50%, 50%, 0.25);
   position: relative;
 }
