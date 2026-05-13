@@ -503,9 +503,9 @@
     const homeTextDark = panel.querySelector('#home-text-dark-btn');
     const homeTextLight = panel.querySelector('#home-text-light-btn');
     const homeTextReset = panel.querySelector('#home-text-reset-btn');
-    homeTextDark.addEventListener('click', () => { document.documentElement.style.setProperty('--home-text', '#1a1a1a'); document.documentElement.style.setProperty('--home-text-shadow', 'none'); localforage?.setItem('home_text_color', 'dark'); });
-    homeTextLight.addEventListener('click', () => { document.documentElement.style.setProperty('--home-text', '#ffffff'); document.documentElement.style.setProperty('--home-text-shadow', '0 1px 4px rgba(0,0,0,0.6)'); localforage?.setItem('home_text_color', 'light'); });
-    homeTextReset.addEventListener('click', () => { document.documentElement.style.removeProperty('--home-text'); document.documentElement.style.removeProperty('--home-text-shadow'); localforage?.setItem('home_text_color', 'auto'); });
+    homeTextDark.addEventListener('click', () => { const hs = document.getElementById('home-screen'); if(hs){hs.style.setProperty('--home-text', '#1a1a1a'); hs.style.setProperty('--home-text-shadow', 'none');} localforage?.setItem('home_text_color', 'dark'); });
+    homeTextLight.addEventListener('click', () => { document.documentElement.style.setProperty('--home-text', '#ffffff'); document.documentElement.style.setProperty('--home-text-shadow', '0 1px 4px rgba(0,0,0,0.3)'); localforage?.setItem('home_text_color', 'light'); });
+    homeTextReset.addEventListener('click', () => { const hs = document.getElementById('home-screen'); if(hs){hs.style.removeProperty('--home-text'); hs.style.removeProperty('--home-text-shadow');} localforage?.setItem('home_text_color', 'auto'); });
     panel.querySelector('#open-icon-customize-btn').addEventListener('click', () => { panel.remove(); openIconCustomize(); });
     setTimeout(() => { const handler = (ev) => { if (!panel.contains(ev.target) && ev.target.id !== 'dock-theme') { panel.remove(); document.removeEventListener('click', handler); } }; document.addEventListener('click', handler); }, 100);
   }
