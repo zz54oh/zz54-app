@@ -529,6 +529,7 @@ function initHeaderAndSettingsListeners() {
             });
         }
         showModal(DOMElements.chatModal.modal);
+        setTimeout(() => { const _ts2 = {'#reply-toggle':'replyEnabled','#sound-toggle':'soundEnabled','#read-receipts-toggle':'readReceiptsEnabled','#typing-indicator-toggle':'typingIndicatorEnabled','#read-no-reply-toggle':'allowReadNoReply','#emoji-mix-toggle':'emojiMixEnabled'}; for (const [sel, prop] of Object.entries(_ts2)) { const el = document.querySelector(sel); if (el) el.classList.toggle('active', prop==='emojiMixEnabled'?(settings[prop]!==false):!!settings[prop]); } }, 50);
         setupAvatarFrameSettings();
     });
     const _advancedEl = document.getElementById('advanced-settings');
