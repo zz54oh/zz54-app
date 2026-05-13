@@ -448,7 +448,7 @@ body.feature-mode {
 .home-dock {
   margin-top: auto;
   flex-shrink: 0;
-  background: hsla(var(--theme-h), var(--theme-s), 99%, 0.18);
+  background: hsla(var(--theme-h), var(--theme-s), 99%, 0.08);
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
   border: 1px solid var(--glass-border);
@@ -461,7 +461,7 @@ body.feature-mode {
   padding: 10px 20px;
   display: flex;
   justify-content: center;
-  gap: 30px;
+  gap: 26px;
   margin-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
 }
 
@@ -918,7 +918,7 @@ body.feature-mode {
 }
 
 .icon-bg-4 {
-  background: linear-gradient(135deg, #ffecd2, #fcb69f);
+  background: linear-gradient(135deg, hsla(var(--theme-h), calc(var(--theme-s) * 0.9), 88%, 0.85), hsla(var(--theme-h), var(--theme-s), 72%, 0.9));
 }
 
 .icon-bg-5 {
@@ -926,11 +926,11 @@ body.feature-mode {
 }
 
 .icon-bg-6 {
-  background: linear-gradient(135deg, #d4fc79, #96e6a1);
+  background: linear-gradient(135deg, hsla(var(--theme-h), var(--theme-s), 82%, 0.85), hsla(var(--theme-h), var(--theme-s), 68%, 0.9));
 }
 
 .icon-bg-7 {
-  background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+  background: linear-gradient(135deg, hsla(var(--theme-h), var(--theme-s), 85%, 0.85), hsla(var(--theme-h), var(--theme-s), 70%, 0.9));
 }
 
 .icon-bg-8 {
@@ -950,7 +950,7 @@ body.feature-mode {
 }
 
 .icon-bg-12 {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, hsla(var(--theme-h), var(--theme-s), 60%, 0.85), hsla(var(--theme-h), var(--theme-s), 45%, 0.9));
 }
 
 /* ============ 心情日历 ============ */
