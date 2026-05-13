@@ -1358,6 +1358,6 @@ body.pause-animations *::after {
 #home-screen.has-page-bg .home-feature-label,
 #home-screen.has-page-bg .home-dock-btn .home-feature-label,
 #home-screen.has-page-bg #home-love-days {
-  color: var(--home-text, #fff);
-  text-shadow: var(--home-text-shadow, 0 1px 4px rgba(0, 0, 0, 0.8));
+  color: var(--home-text);
+  text-shadow: var(--home-text-shadow, 0 1px 4px rgba(0, 0, 0, 0.5));
 }
