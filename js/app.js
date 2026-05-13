@@ -55,6 +55,8 @@
         if (window.updateAvatarSettingsUI) window.updateAvatarSettingsUI();
         if (window.updateDelayUI) window.updateDelayUI();
         if (window.updateAutoSendUI) window.updateAutoSendUI();
+        // 恢复主页文字颜色设置
+        localforage?.getItem('home_text_color').then(v => { if (v === 'dark') { document.documentElement.style.setProperty('--home-text', '#1a1a1a'); document.documentElement.style.setProperty('--home-text-shadow', 'none'); } else if (v === 'light') { document.documentElement.style.setProperty('--home-text', '#ffffff'); document.documentElement.style.setProperty('--home-text-shadow', '0 1px 4px rgba(0,0,0,0.6)'); } }).catch(()=>{});
         // 字体大小slider
         const _fs = document.getElementById('font-size-slider'); const _fv = document.getElementById('font-size-value');
         if (_fs && settings.fontSize) { _fs.value = settings.fontSize; if (_fv) _fv.textContent = settings.fontSize + 'px'; document.documentElement.style.setProperty('--font-size', settings.fontSize + 'px'); }

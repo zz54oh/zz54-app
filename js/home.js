@@ -455,6 +455,7 @@
         <button id="home-font-apply-btn" style="padding:6px 10px;border-radius:8px;background:var(--accent-color);color:#fff;border:none;font-size:12px;cursor:pointer;">应用</button>
         <button id="home-font-reset-btn" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);font-size:12px;cursor:pointer;">重置</button>
       </div>
+      <div class="theme-section-label">主页文字颜色</div><div class="theme-hue-row" style="gap:8px;"><button id="home-text-dark-btn" style="padding:6px 14px;border-radius:8px;background:#222;color:#fff;border:none;font-size:12px;cursor:pointer;">炭黑</button><button id="home-text-light-btn" style="padding:6px 14px;border-radius:8px;background:#fff;color:#222;border:1px solid #ddd;font-size:12px;cursor:pointer;">纯白</button><button id="home-text-reset-btn" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);font-size:12px;cursor:pointer;">跟随主题</button></div>
       <div class="theme-section-label">主页设置</div><div class="bg-upload-row"><button class="bg-upload-btn" id="open-icon-customize-btn"><i class="fas fa-icons"></i> 自定义功能图标</button></div>
     `;
     document.body.appendChild(panel);
@@ -499,6 +500,12 @@
     localforage.getItem('home_custom_font').then(v => { if (v && homeFontInput) homeFontInput.value = v; }).catch(() => { });
     homeFontApply.addEventListener('click', () => applyHomeFont(homeFontInput.value.trim()));
     homeFontReset.addEventListener('click', () => { homeFontInput.value = ''; applyHomeFont(''); });
+    const homeTextDark = panel.querySelector('#home-text-dark-btn');
+    const homeTextLight = panel.querySelector('#home-text-light-btn');
+    const homeTextReset = panel.querySelector('#home-text-reset-btn');
+    homeTextDark.addEventListener('click', () => { document.documentElement.style.setProperty('--home-text', '#1a1a1a'); document.documentElement.style.setProperty('--home-text-shadow', 'none'); localforage?.setItem('home_text_color', 'dark'); });
+    homeTextLight.addEventListener('click', () => { document.documentElement.style.setProperty('--home-text', '#ffffff'); document.documentElement.style.setProperty('--home-text-shadow', '0 1px 4px rgba(0,0,0,0.6)'); localforage?.setItem('home_text_color', 'light'); });
+    homeTextReset.addEventListener('click', () => { document.documentElement.style.removeProperty('--home-text'); document.documentElement.style.removeProperty('--home-text-shadow'); localforage?.setItem('home_text_color', 'auto'); });
     panel.querySelector('#open-icon-customize-btn').addEventListener('click', () => { panel.remove(); openIconCustomize(); });
     setTimeout(() => { const handler = (ev) => { if (!panel.contains(ev.target) && ev.target.id !== 'dock-theme') { panel.remove(); document.removeEventListener('click', handler); } }; document.addEventListener('click', handler); }, 100);
   }
