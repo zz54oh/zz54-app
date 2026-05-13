@@ -195,7 +195,7 @@
                 <div class="profile-name" id="home-partner-name">梦角</div><div class="profile-status" id="home-partner-status">在线</div>
               </div>
             </div>
-            <div class="home-love-pill"><i class="fas fa-heart"></i><span id="home-love-days">记录我们的故事</span></div>
+            <div class="home-love-pill"><i class="fas fa-heart" style="color: var(--theme-primary-deep)"></i><span id="home-love-days">记录我们的故事</span></div>
           </div>
         </div>
         <div class="home-grid">${featuresHTML}</div>
@@ -503,9 +503,9 @@
     const homeTextDark = panel.querySelector('#home-text-dark-btn');
     const homeTextLight = panel.querySelector('#home-text-light-btn');
     const homeTextReset = panel.querySelector('#home-text-reset-btn');
-    homeTextDark.addEventListener('click', () => { const hs = document.getElementById('home-screen'); if(hs){hs.style.setProperty('--home-text', '#1a1a1a'); hs.style.setProperty('--home-text-shadow', 'none');} localforage?.setItem('home_text_color', 'dark'); });
-    homeTextLight.addEventListener('click', () => { const hs = document.getElementById('home-screen'); if(hs){hs.style.setProperty('--home-text', '#ffffff'); hs.style.setProperty('--home-text-shadow', '0 1px 4px rgba(0,0,0,0.6)');} localforage?.setItem('home_text_color', 'light'); });
-    homeTextReset.addEventListener('click', () => { const hs = document.getElementById('home-screen'); if(hs){hs.style.removeProperty('--home-text'); hs.style.removeProperty('--home-text-shadow');} localforage?.setItem('home_text_color', 'auto'); });
+    homeTextDark.addEventListener('click', () => { const hs = document.getElementById('home-screen'); if (hs) { hs.style.setProperty('--home-text', '#1a1a1a'); hs.style.setProperty('--home-text-shadow', 'none'); } localforage?.setItem('home_text_color', 'dark'); });
+    homeTextLight.addEventListener('click', () => { const hs = document.getElementById('home-screen'); if (hs) { hs.style.setProperty('--home-text', '#ffffff'); hs.style.setProperty('--home-text-shadow', '0 1px 4px rgba(0,0,0,0.6)'); } localforage?.setItem('home_text_color', 'light'); });
+    homeTextReset.addEventListener('click', () => { const hs = document.getElementById('home-screen'); if (hs) { hs.style.removeProperty('--home-text'); hs.style.removeProperty('--home-text-shadow'); } localforage?.setItem('home_text_color', 'auto'); });
     panel.querySelector('#open-icon-customize-btn').addEventListener('click', () => { panel.remove(); openIconCustomize(); });
     setTimeout(() => { const handler = (ev) => { if (!panel.contains(ev.target) && ev.target.id !== 'dock-theme') { panel.remove(); document.removeEventListener('click', handler); } }; document.addEventListener('click', handler); }, 100);
   }
