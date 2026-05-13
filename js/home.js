@@ -266,7 +266,7 @@
     if (home) home.classList.add('hidden');
     if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
     const sl = document.getElementById('settings-list-screen');
-    if (sl) sl.classList.add('visible');
+    if (sl) { sl.style.transition = 'none'; sl.classList.add('visible'); sl.offsetHeight; sl.style.transition = ''; }
     setContext('settings');
     showBackBtn(backToHome);
   }
@@ -551,11 +551,11 @@
     buildSettingsScreen();
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
+    const sl = document.getElementById('settings-list-screen');
+    if (sl) { sl.style.transition = 'none'; sl.classList.add('visible'); sl.offsetHeight; sl.style.transition = ''; }
     enterFeatureMode();
     isOnHome = false;
     setContext('settings');
-    const sl = document.getElementById('settings-list-screen');
-    if (sl) { sl.classList.remove('visible'); requestAnimationFrame(() => sl.classList.add('visible')); }
     showBackBtn(backToHome);
   }
 
