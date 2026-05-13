@@ -818,6 +818,9 @@ function initHeaderAndSettingsListeners() {
 
     function updateAvatarSettingsUI() {
         const enabled = settings.inChatAvatarEnabled;
+        const avatarSizeControl = document.getElementById('in-chat-avatar-size-control-2');
+        const avatarPositionControl = document.getElementById('in-chat-avatar-position-control-2');
+        const avatarPreview = document.getElementById('avatar-bubble-preview');
         const pill = document.getElementById('avatar-toggle-pill-2');
         const knob = document.getElementById('avatar-toggle-knob-2');
         const statusText = document.getElementById('avatar-toggle-status-2');
