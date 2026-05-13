@@ -634,6 +634,7 @@
       const el = document.getElementById(id);
       if (el) el.style.display = 'block';
     });
+    if (panel === 'avatar' && window.updateAvatarSettingsUI) window.updateAvatarSettingsUI();
 
     // 10. 重新绑定按钮（使用新的事件，完全取代旧的）
     const closeBtn = document.getElementById('close-appearance');

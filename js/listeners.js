@@ -892,6 +892,7 @@ function initHeaderAndSettingsListeners() {
 
         updateAvatarPreview();
     }
+    window.updateAvatarSettingsUI = updateAvatarSettingsUI;
     updateAvatarSettingsUI();
 
     if (avatarToggle) {
