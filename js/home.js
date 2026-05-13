@@ -635,6 +635,7 @@
       if (el) el.style.display = 'block';
     });
     if (panel === 'avatar' && window.updateAvatarSettingsUI) window.updateAvatarSettingsUI();
+    if (panel === 'font-bg') { const _fs=document.getElementById('font-size-slider'),_fv=document.getElementById('font-size-value'); if(_fs&&settings&&settings.fontSize){_fs.value=settings.fontSize;if(_fv)_fv.textContent=settings.fontSize+'px';document.documentElement.style.setProperty('--font-size',settings.fontSize+'px');} if(typeof renderBackgroundGallery==='function') renderBackgroundGallery(); }
 
     // 10. 重新绑定按钮（使用新的事件，完全取代旧的）
     const closeBtn = document.getElementById('close-appearance');

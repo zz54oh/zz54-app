@@ -55,6 +55,9 @@
         if (window.updateAvatarSettingsUI) window.updateAvatarSettingsUI();
         if (window.updateDelayUI) window.updateDelayUI();
         if (window.updateAutoSendUI) window.updateAutoSendUI();
+        // 字体大小slider
+        const _fs = document.getElementById('font-size-slider'); const _fv = document.getElementById('font-size-value');
+        if (_fs && settings.fontSize) { _fs.value = settings.fontSize; if (_fv) _fv.textContent = settings.fontSize + 'px'; document.documentElement.style.setProperty('--font-size', settings.fontSize + 'px'); }
         // 音量slider
         const _svs = document.getElementById('sound-volume-slider');
         const _svv = document.getElementById('sound-volume-value');
