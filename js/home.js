@@ -17,7 +17,7 @@
   const PRESET_COLORS = [
     { name: '紫罗兰', h: 285 }, { name: '玫瑰粉', h: 340 }, { name: '樱花', h: 355 },
     { name: '天空', h: 210 }, { name: '薄荷', h: 155 }, { name: '蜜桃', h: 20 },
-    { name: '星空', h: 240 }, { name: '灰', h: 220, s: 8 }, { name: '纯白', h: 0, s: 0, l: 97 }, { name: '纯黑', h: 0, s: 0, l: 15 }
+    { name: '星空', h: 240 }, { name: '灰', h: 220, s: 8 }
   ];
 
   const FEATURES = [
@@ -460,12 +460,10 @@
     document.body.appendChild(panel);
     panel.querySelector('#theme-panel-close').addEventListener('click', () => panel.remove());
     panel.querySelectorAll('.theme-swatch').forEach(s => s.addEventListener('click', () => {
-      const h = parseInt(s.dataset.hue); const sat = s.dataset.sat; const l = s.dataset.l; applyHue(h);
-      if (sat !== '') { document.documentElement.style.setProperty('--theme-s', sat + '%'); const ss = panel.querySelector('#theme-sat-slider'); const sv = panel.querySelector('#theme-sat-value'); if(ss) ss.value = sat; if(sv) sv.textContent = sat + '%'; localforage?.setItem('home_theme_sat', sat); }
-      if (l !== '') { document.documentElement.style.setProperty('--theme-l-override', l + '%'); } else { document.documentElement.style.removeProperty('--theme-l-override'); }
+      const h = parseInt(s.dataset.hue); applyHue(h);
       panel.querySelectorAll('.theme-swatch').forEach(x => x.classList.remove('active')); s.classList.add('active');
       panel.querySelector('#theme-hue-slider').value = h;
-      panel.querySelector('#theme-hue-preview').style.background = (sat === '0') ? ('hsl(0,0%,' + (l||70) + '%)') : ('hsl(' + h + ',55%,70%)');
+      panel.querySelector('#theme-hue-preview').style.background = `hsl(${h},55%,70%)`;
     }));
     const hueSlider = panel.querySelector('#theme-hue-slider');
     hueSlider.addEventListener('input', () => { const h = parseInt(hueSlider.value); applyHue(h); panel.querySelector('#theme-hue-preview').style.background = `hsl(${h},55%,70%)`; panel.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active')); });
