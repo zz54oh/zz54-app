@@ -953,6 +953,13 @@ body.feature-mode {
   background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
+.home-grid .home-feature-icon.icon-bg-4,
+.home-grid .home-feature-icon.icon-bg-6,
+.home-grid .home-feature-icon.icon-bg-7,
+.home-grid .home-feature-icon.icon-bg-12 {
+  background: linear-gradient(135deg, hsla(var(--theme-h), var(--theme-s), 82%, 0.85), hsla(var(--theme-h), var(--theme-s), 67%, 0.9));
+}
+
 /* ============ 心情日历 ============ */
 .mood-calendar-wrap {
   background: var(--glass-bg);
