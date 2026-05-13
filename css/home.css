@@ -448,7 +448,7 @@ body.feature-mode {
 .home-dock {
   margin-top: auto;
   flex-shrink: 0;
-  background: hsla(var(--theme-h), var(--theme-s), 99%, 0.18);
+  background: hsla(var(--theme-h), var(--theme-s), 99%, 0.10);
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
   border: 1px solid var(--glass-border);
@@ -462,7 +462,7 @@ body.feature-mode {
   display: flex;
   justify-content: center;
   gap: 25px;
-  margin-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+  margin-bottom: -8px;
 }
 
 

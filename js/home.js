@@ -23,7 +23,7 @@
   const FEATURES = [
     { id: 'chat', icon: 'fa-comment-dots', label: '聊天', bg: 'icon-bg-7' },
     { id: 'group', icon: 'fa-user-group', label: '群聊', bg: 'icon-bg-6' },
-    { id: 'tarot', icon: 'fa-star-and-crescent', label: '塔罗占卜', bg: 'icon-bg-12' },
+    { id: 'tarot', icon: 'fa-star-and-crescent', label: '塔罗', bg: 'icon-bg-12' },
     { id: 'envelope', icon: 'fa-envelope', label: '信箱', bg: 'icon-bg-4' },
   ];
 
@@ -635,7 +635,7 @@
       if (el) el.style.display = 'block';
     });
     if (panel === 'avatar' && window.updateAvatarSettingsUI) window.updateAvatarSettingsUI();
-    if (panel === 'font-bg') { const _fs=document.getElementById('font-size-slider'),_fv=document.getElementById('font-size-value'); if(_fs&&settings&&settings.fontSize){_fs.value=settings.fontSize;if(_fv)_fv.textContent=settings.fontSize+'px';document.documentElement.style.setProperty('--font-size',settings.fontSize+'px');} if(typeof renderBackgroundGallery==='function') renderBackgroundGallery(); }
+    if (panel === 'font-bg') { const _fs = document.getElementById('font-size-slider'), _fv = document.getElementById('font-size-value'); if (_fs && settings && settings.fontSize) { _fs.value = settings.fontSize; if (_fv) _fv.textContent = settings.fontSize + 'px'; document.documentElement.style.setProperty('--font-size', settings.fontSize + 'px'); } if (typeof renderBackgroundGallery === 'function') renderBackgroundGallery(); }
 
     // 10. 重新绑定按钮（使用新的事件，完全取代旧的）
     const closeBtn = document.getElementById('close-appearance');
