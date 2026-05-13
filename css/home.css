@@ -13,7 +13,7 @@
   --theme-primary-soft: hsl(var(--theme-h), 35%, 92%);
 
   --glass-bg: hsla(var(--theme-h), var(--theme-s), 99%, 0.55);
-  --glass-bg-strong: hsla(var(--theme-h), var(--theme-s), 99%, 0.78);
+  --glass-bg-strong: hsla(var(--theme-h), var(--theme-s), 99%, 0.80);
   --glass-bg-icon: hsla(var(--theme-h), var(--theme-s), 99%, 0.7);
   --glass-border: hsla(var(--theme-h), var(--theme-s), 85%, 0.55);
   --glass-shadow: 0 8px 26px hsla(var(--theme-h), var(--theme-s), 35%, 0.12);
@@ -448,7 +448,7 @@ body.feature-mode {
 .home-dock {
   margin-top: auto;
   flex-shrink: 0;
-  background: hsla(var(--theme-h), var(--theme-s), 99%, 0.10);
+  background: hsla(var(--theme-h), var(--theme-s), 99%, 0.2);
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
   border: 1px solid var(--glass-border);
@@ -461,7 +461,7 @@ body.feature-mode {
   padding: 10px 20px;
   display: flex;
   justify-content: center;
-  gap: 25px;
+  gap: 24px;
   margin-bottom: -8px;
 }
 

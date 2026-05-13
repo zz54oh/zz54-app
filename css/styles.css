@@ -1919,7 +1919,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, hsla(var(--theme-h, 280), 45%, 90%, 0.90) 0%, hsla(calc(var(--theme-h, 280) + 30), 40%, 88%, 0.90) 100%);
+            background: linear-gradient(135deg, hsla(var(--theme-h, 280), 45%, 90%, 1.0) 0%, hsla(calc(var(--theme-h, 280) + 30), 40%, 88%, 1.0) 100%);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             z-index: 2000;
