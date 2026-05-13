@@ -53,9 +53,19 @@
         await safeAwait(loadData());
 
         if (window.updateAvatarSettingsUI) window.updateAvatarSettingsUI();
+        if (window.updateDelayUI) window.updateDelayUI();
+        if (window.updateAutoSendUI) window.updateAutoSendUI();
+        // 音量slider
+        const _svs = document.getElementById('sound-volume-slider');
+        const _svv = document.getElementById('sound-volume-value');
+        if (_svs) { _svs.value = Math.round((settings.soundVolume || 0.15) * 100); if (_svv) _svv.textContent = _svs.value + '%'; }
+        // 音效preset
+        [['sound-my-send-preset', 'mySendSoundPreset'], ['sound-partner-message-preset', 'partnerMessageSoundPreset'], ['sound-my-poke-preset', 'myPokeSoundPreset'], ['sound-partner-poke-preset', 'partnerPokeSoundPreset']].forEach(([id, key]) => { const el = document.getElementById(id); if (el) el.value = settings[key] || 'tone_default'; });
+        // 时间戳
+        document.querySelectorAll('.time-fmt-opt').forEach(opt => { opt.classList.toggle('active', opt.dataset.fmt === (settings.timeFormat || 'HH:mm')); });
         // loadData后同步聊天设置toggle状态
-        const _ts = {'#reply-toggle':'replyEnabled','#sound-toggle':'soundEnabled','#read-receipts-toggle':'readReceiptsEnabled','#typing-indicator-toggle':'typingIndicatorEnabled','#read-no-reply-toggle':'allowReadNoReply','#emoji-mix-toggle':'emojiMixEnabled'};
-        for (const [sel, prop] of Object.entries(_ts)) { const el = document.querySelector(sel); if (el) el.classList.toggle('active', prop==='emojiMixEnabled' ? (settings[prop]!==false) : !!settings[prop]); }
+        const _ts = { '#reply-toggle': 'replyEnabled', '#sound-toggle': 'soundEnabled', '#read-receipts-toggle': 'readReceiptsEnabled', '#typing-indicator-toggle': 'typingIndicatorEnabled', '#read-no-reply-toggle': 'allowReadNoReply', '#emoji-mix-toggle': 'emojiMixEnabled' };
+        for (const [sel, prop] of Object.entries(_ts)) { const el = document.querySelector(sel); if (el) el.classList.toggle('active', prop === 'emojiMixEnabled' ? (settings[prop] !== false) : !!settings[prop]); }
         updateLoader('正在渲染我们的世界...', '70%');
 
         await Promise.allSettled([
