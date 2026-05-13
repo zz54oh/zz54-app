@@ -1,4 +1,4 @@
-/*核心应用逻辑：数据加载保存、消息渲染、会话管理等*/
+﻿/*核心应用逻辑：数据加载保存、消息渲染、会话管理等*/
 
 function clearAllAppData() {
     const overlay = document.createElement('div');
@@ -580,7 +580,7 @@ const saveData = async () => {
         { key: 'myStickerLibrary', val: () => localforage.setItem(getStorageKey('myStickerLibrary'), myStickerLibrary) },
         { key: 'customThemes', val: () => localforage.setItem(`${APP_PREFIX}customThemes`, customThemes) },
         { key: 'themeSchemes', val: () => localforage.setItem(`${APP_PREFIX}themeSchemes`, themeSchemes) },
-        { key: 'chatMessages', val: () => localforage.setItem(getStorageKey('chatMessages'), messages) },
+        { key: 'chatMessages', val: () => localforage.setItem(getStorageKey(window.chatMode === 'group' ? 'groupChatMessages' : 'chatMessages'), messages) },
     ];
 
     const partnerAvatarSrc = (() => {
@@ -2323,3 +2323,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+
+window.switchChatMode = async function(mode) {
+    if (window.chatMode === mode) return;
+    // 先保存当前消息
+    if (SESSION_ID) await saveData();
+    // 切换mode
+    window.chatMode = mode;
+    // 加载新模式的消息
+    const msgKey = mode === 'group' ? 'groupChatMessages' : 'chatMessages';
+    try {
+        const savedMsgs = await localforage.getItem(getStorageKey(msgKey));
+        messages = Array.isArray(savedMsgs) && savedMsgs.length > 0 ? savedMsgs : [];
+        window.messages = messages;
+        displayedMessageCount = HISTORY_BATCH_SIZE;
+        if (typeof renderMessages === 'function') renderMessages();
+    } catch(e) {
+        console.error('[switchChatMode] 加载消息失败:', e);
+    }
+};

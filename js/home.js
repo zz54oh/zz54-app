@@ -302,7 +302,7 @@
       if (home) home.classList.add('hidden');
       isOnHome = false;
       setContext('home');
-      showBackBtn(backToHome);
+      if (window.switchChatMode) window.switchChatMode('single');
       exitFeatureMode();
       return;
     }
@@ -365,7 +365,7 @@
             m.style.animation = 'none';
             const c = m.querySelector('.modal-content');
             if (c) { c.style.animation = 'none'; c.style.opacity = '1'; c.style.transform = 'none'; }
-          }
+          if (window.switchChatMode) window.switchChatMode('group');
           document.getElementById('group-chat-btn')?.click();
         },
         call: () => { if (window.callFeature?.startCall) window.callFeature.startCall(false); else document.querySelector('#collapsed-call-btn')?.click(); },
