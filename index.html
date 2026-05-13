@@ -1413,11 +1413,12 @@
                             <div class="cs-rr-style-row" id="read-receipt-style-row">
                                 <span class="cs-rr-style-label">样式</span>
                                 <button id="rr-style-icon" class="modal-btn modal-btn-primary"
-                                    style="padding:5px 12px;font-size:12px;" onclick="setReadReceiptStyle('icon')"><i
+                                    style="padding:5px 12px;font-size:12px;"
+                                    onclick="setReadReceiptStyle('icon');event.stopPropagation()"><i
                                         class="fas fa-check-double"></i> 图形</button>
                                 <button id="rr-style-text" class="modal-btn modal-btn-secondary"
                                     style="padding:5px 12px;font-size:12px;"
-                                    onclick="setReadReceiptStyle('text')">文字</button>
+                                    onclick="setReadReceiptStyle('text');event.stopPropagation()">文字</button>
                             </div>
                             <div class="setting-pill-row" id="read-no-reply-toggle">
                                 <span class="setting-pill-icon"><i class="fas fa-comment-slash"></i></span>
