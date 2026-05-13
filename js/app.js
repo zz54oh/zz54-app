@@ -53,6 +53,9 @@
         await safeAwait(loadData());
 
         if (window.updateAvatarSettingsUI) window.updateAvatarSettingsUI();
+        // loadData后同步聊天设置toggle状态
+        const _ts = {'#reply-toggle':'replyEnabled','#sound-toggle':'soundEnabled','#read-receipts-toggle':'readReceiptsEnabled','#typing-indicator-toggle':'typingIndicatorEnabled','#read-no-reply-toggle':'allowReadNoReply','#emoji-mix-toggle':'emojiMixEnabled'};
+        for (const [sel, prop] of Object.entries(_ts)) { const el = document.querySelector(sel); if (el) el.classList.toggle('active', prop==='emojiMixEnabled' ? (settings[prop]!==false) : !!settings[prop]); }
         updateLoader('正在渲染我们的世界...', '70%');
 
         await Promise.allSettled([
