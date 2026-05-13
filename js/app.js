@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', async () => {
+﻿document.addEventListener('DOMContentLoaded', async () => {
     const loaderBar = document.getElementById('loader-tech-bar');
     const welcomeSubtitle = document.querySelector('.welcome-subtitle-scramble');
     const welcomeScreen = document.getElementById('welcome-animation');
@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateLoader('正在读取记忆存档...', '40%');
         await safeAwait(loadData());
 
+        if (window.updateAvatarSettingsUI) window.updateAvatarSettingsUI();
         updateLoader('正在渲染我们的世界...', '70%');
 
         await Promise.allSettled([
