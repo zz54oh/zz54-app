@@ -170,6 +170,26 @@
 
   // ---------- 主页 DOM ----------
   function buildHomeDOM() {
+  function initHeroStars() {
+    const container = document.getElementById('hero-stars');
+    if (!container) return;
+    container.innerHTML = '';
+    const count = 22;
+    for (let i = 0; i < count; i++) {
+      const star = document.createElement('div');
+      star.className = 'hero-star';
+      const size = Math.random() * 3 + 1.5;
+      star.style.cssText = 
+        width: px; height: px;
+        left: %;
+        top: %;
+        --duration: s;
+        --delay: s;
+      ;
+      container.appendChild(star);
+    }
+  }
+
     const el = document.createElement('div');
     el.id = 'home-screen';
     const featuresHTML = FEATURES.map(f => `
@@ -182,7 +202,7 @@
       <div id="home-bg"><div id="home-bg-image"></div><div id="home-bg-overlay"></div></div>
       <div id="home-content">
         <div class="home-hero">
-          <div class="home-hero-bg"></div><div class="home-hero-overlay"></div>
+      <div class="home-hero-bg"></div><div class="home-hero-overlay"></div><div class="hero-stars" id="hero-stars"></div>
           <div class="home-hero-content">
             <div class="dual-profile">
               <div class="profile-side me">
@@ -1296,7 +1316,8 @@
           modal.style.animation = 'none';
           const content = modal.querySelector('.modal-content');
           if (content) {
-            content.style.animation = 'none';
+  const homeEl = buildHomeDOM();
+  initHeroStars();
             content.style.transition = 'none';
             content.style.transform = 'scale(1)';
             content.style.opacity = '1';
