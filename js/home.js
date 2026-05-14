@@ -257,13 +257,13 @@
   }
 
   function backToSettings() {
+    const home = document.getElementById('home-screen');
+    if (home) home.classList.add('hidden');
     document.querySelectorAll('.modal').forEach(m => {
       m.style.display = 'none';
       if (m._hideTimeout) clearTimeout(m._hideTimeout);
     });
     buildSettingsScreen();
-    const home = document.getElementById('home-screen');
-    if (home) home.classList.add('hidden');
     if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
     const sl = document.getElementById('settings-list-screen');
     if (sl) { sl.style.transition = 'none'; sl.classList.add('visible'); sl.offsetHeight; sl.style.transition = ''; }
