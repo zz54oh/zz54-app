@@ -257,7 +257,6 @@
   }
 
   function backToSettings() {
-    var _m=document.getElementById('_tmask');if(!_m){_m=document.createElement('div');_m.id='_tmask';_m.style.cssText='position:fixed;inset:0;z-index:99998;background:hsl(var(--theme-h,285),30%,96%);pointer-events:none;';document.body.appendChild(_m);}_m.style.opacity='1';
     document.querySelectorAll('.modal').forEach(m => {
       m.style.display = 'none';
       if (m._hideTimeout) clearTimeout(m._hideTimeout);
@@ -270,7 +269,6 @@
     if (sl) { sl.style.transition = 'none'; sl.classList.add('visible'); sl.offsetHeight; sl.style.transition = ''; }
     setContext('settings');
     showBackBtn(backToHome);
-    requestAnimationFrame(function(){requestAnimationFrame(function(){var _m2=document.getElementById('_tmask');if(_m2){_m2.style.transition='opacity 0.18s';_m2.style.opacity='0';setTimeout(function(){if(_m2.parentNode)_m2.parentNode.removeChild(_m2);},220);}});});
   }
 
   function closeAllFeatureModals() {
@@ -557,7 +555,6 @@
   }
 
   function openSettingsScreen() {
-    var _m=document.getElementById('_tmask');if(!_m){_m=document.createElement('div');_m.id='_tmask';_m.style.cssText='position:fixed;inset:0;z-index:99998;background:hsl(var(--theme-h,285),30%,96%);pointer-events:none;';document.body.appendChild(_m);}_m.style.opacity='1';
     buildSettingsScreen();
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
@@ -567,9 +564,7 @@
     isOnHome = false;
     setContext('settings');
     showBackBtn(backToHome);
-    requestAnimationFrame(function(){requestAnimationFrame(function(){var _m2=document.getElementById('_tmask');if(_m2){_m2.style.transition='opacity 0.18s';_m2.style.opacity='0';setTimeout(function(){if(_m2.parentNode)_m2.parentNode.removeChild(_m2);},220);}});});
   }
-
 
   // ***** 核心修复：使用全局 showAppearancePanel 确保内容显示 *****
   // ========== 设置子功能面板显示（修复空白）==========
