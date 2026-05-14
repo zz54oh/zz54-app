@@ -903,9 +903,6 @@
     const homeScreen = document.getElementById('home-screen');
     if (homeScreen) homeScreen.classList.add('hidden');
 
-    // 确保不在 feature-mode（避免干扰模态框）
-    document.body.classList.remove('feature-mode');
-
     // 设置上下文和返回按钮
     setContext('settings');
     showBackBtn(backToSettings);
