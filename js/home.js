@@ -650,6 +650,7 @@
 
     // 定义统一返回设置页的函数
     const returnToSettings = () => {
+      enterFeatureMode();
       modal.style.display = 'none';
       if (typeof backToSettings === 'function') backToSettings();
       else if (window.homeScreen && window.homeScreen.backToSettings) window.homeScreen.backToSettings();
@@ -1115,6 +1116,7 @@
       const oldClick = btn.onclick;
       btn.onclick = (e) => {
         e.stopPropagation();
+        enterFeatureMode();
         // 隐藏当前模态框
         modal.style.display = 'none';
         // 回到设置列表页
@@ -1131,6 +1133,7 @@
     if (backAppearance) {
       backAppearance.onclick = (e) => {
         e.stopPropagation();
+        enterFeatureMode();
         modal.style.display = 'none';
         backToSettings();
       };
@@ -1139,6 +1142,7 @@
     if (closeAppearance) {
       closeAppearance.onclick = (e) => {
         e.stopPropagation();
+        enterFeatureMode();
         modal.style.display = 'none';
         backToSettings();
       };
