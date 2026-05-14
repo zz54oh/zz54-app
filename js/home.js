@@ -865,7 +865,7 @@
     isOnHome = false;
     setContext(fromSettings ? 'settings' : 'home');
     const screen = document.getElementById('icon-customize-screen');
-    if (screen) { screen.classList.remove('visible'); requestAnimationFrame(() => screen.classList.add('visible')); }
+    if (screen) { screen.style.animation = 'none'; screen.classList.add('visible'); }
     showBackBtn(() => getBackTarget()());
   }
 
