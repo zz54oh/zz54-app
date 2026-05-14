@@ -17,7 +17,7 @@
   const PRESET_COLORS = [
     { name: '紫罗兰', h: 285 }, { name: '玫瑰粉', h: 340 }, { name: '樱花', h: 355 },
     { name: '天空', h: 210 }, { name: '薄荷', h: 155 }, { name: '蜜桃', h: 20 },
-    { name: '星空', h: 240 }, { name: '灰', h: 220, s: 8 }
+    { name: '星空', h: 240 }
   ];
 
   const FEATURES = [

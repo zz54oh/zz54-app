@@ -437,7 +437,7 @@ body.feature-mode {
   font-weight: 500;
   color: var(--home-text);
   letter-spacing: 0.4px;
-  text-shadow: var(--home-text-shadow, 0 1px 2px rgba(255, 255, 255, 0.4));
+  text-shadow: var(--home-text-shadow, 0 1px 2px rgba(255, 255, 255, 0.5));
 }
 
 [data-theme="dark"] .home-feature-label {
@@ -448,7 +448,7 @@ body.feature-mode {
 .home-dock {
   margin-top: auto;
   flex-shrink: 0;
-  background: hsla(var(--theme-h), var(--theme-s), 99%, 0.2);
+  background: hsla(var(--theme-h), var(--theme-s), 99%, 0.5);
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
   border: 1px solid var(--glass-border);
