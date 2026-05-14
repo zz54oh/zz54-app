@@ -230,15 +230,7 @@
 
   // ---------- 主页进出及上下文 ----------
   function enterFeatureMode() { document.body.classList.add('feature-mode'); }
-  function exitFeatureMode() {
-    document.body.classList.remove('feature-mode');
-    const _h = document.querySelector('.header');
-    const _m = document.querySelector('.main-chat-area');
-    const _i = document.querySelector('.input-area-wrapper');
-    if (_h) _h.style.removeProperty('display');
-    if (_m) _m.style.removeProperty('display');
-    if (_i) _i.style.removeProperty('display');
-  }
+  function exitFeatureMode() { document.body.classList.remove('feature-mode'); }
 
   function backToHome() {
     closeAllFeatureModals();
@@ -265,13 +257,6 @@
   }
 
   function backToSettings() {
-    // 强制锁住聊天界面，防止闪屏
-    const _h = document.querySelector('.header');
-    const _m = document.querySelector('.main-chat-area');
-    const _i = document.querySelector('.input-area-wrapper');
-    if (_h) _h.style.setProperty('display', 'none', 'important');
-    if (_m) _m.style.setProperty('display', 'none', 'important');
-    if (_i) _i.style.setProperty('display', 'none', 'important');
     document.querySelectorAll('.modal').forEach(m => {
       m.style.display = 'none';
       if (m._hideTimeout) clearTimeout(m._hideTimeout);
