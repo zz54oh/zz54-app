@@ -40,14 +40,6 @@
   display: none !important;
 }
 
-/* 聊天界面默认隐藏，防止切换时闪现 */
-.header, .main-chat-area, .input-area-wrapper, #typing-indicator-wrapper {
-  visibility: hidden;
-}
-body.feature-mode .header, body.feature-mode .main-chat-area, body.feature-mode .input-area-wrapper, body.feature-mode #typing-indicator-wrapper {
-  visibility: visible;
-}
-
 /* ============ feature-mode：进入功能时隐藏聊天 ============ */
 body.feature-mode .header,
 body.feature-mode .main-chat-area,
