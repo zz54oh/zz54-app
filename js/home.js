@@ -266,7 +266,7 @@
     if (home) home.classList.add('hidden');
     if (!document.body.classList.contains('feature-mode')) enterFeatureMode();
     const sl = document.getElementById('settings-list-screen');
-    if (sl) { sl.style.transition = 'none'; sl.classList.add('visible'); sl.offsetHeight; sl.style.transition = ''; }
+    if (sl) { sl.style.transition = 'none'; sl.style.animation = 'none'; sl.classList.add('visible'); sl.offsetHeight; sl.style.transition = ''; }
     setContext('settings');
     showBackBtn(backToHome);
   }
@@ -296,7 +296,7 @@
   }
 
   // ---------- 主页功能跳转 ----------
-  function goToFeature(featureName) {
+  async function goToFeature(featureName) {
     if (featureName === 'chat') {
       const home = document.getElementById('home-screen');
       if (home) home.classList.add('hidden');
@@ -313,6 +313,9 @@
     isOnHome = false;
     setContext('home');
     showBackBtn(backToHome);
+    if (featureName === 'tarot' || featureName === 'envelope') {
+      try { await document.fonts.load('900 16px "Font Awesome 5 Free"'); } catch (e) { }
+    }
     requestAnimationFrame(() => {
       const handlers = {
         tarot: () => {
@@ -559,7 +562,7 @@
     const home = document.getElementById('home-screen');
     if (home) home.classList.add('hidden');
     const sl = document.getElementById('settings-list-screen');
-    if (sl) { sl.style.transition = 'none'; sl.classList.add('visible'); sl.offsetHeight; sl.style.transition = ''; }
+    if (sl) { sl.style.transition = 'none'; sl.style.animation = 'none'; sl.classList.add('visible'); sl.offsetHeight; sl.style.transition = ''; }
     enterFeatureMode();
     isOnHome = false;
     setContext('settings');
@@ -942,11 +945,14 @@
         openIconCustomize(true);
         break;
       case 'mood':
-        // 打开心晴手帐模态框（mood-modal），而不是全屏心情日历
         openModalWithSettingsBack('mood-modal');
+        if (typeof window.resetAndRenderMoodCalendar === 'function') window.resetAndRenderMoodCalendar();
         break;
       case 'library':
         openModalWithSettingsBack('custom-replies-modal');
+        setTimeout(() => {
+          document.getElementById('custom-replies-function')?.click();
+        }, 50);
         break;
       case 'tarot':
         openModalWithSettingsBack('fortune-lenormand-modal');
@@ -975,6 +981,8 @@
       // ========== 纪念日 ==========
       case 'anniversary':
         openModalWithSettingsBack('anniversary-modal');
+        if (typeof renderAnniversariesList === 'function') renderAnniversariesList();
+        if (typeof window.switchAnnDataTab === 'function') window.switchAnnDataTab('card');
         break;
 
       // ========== 个人资料 ==========

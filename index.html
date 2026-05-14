@@ -23,6 +23,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2"
+        as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2"
+        as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/svg+xml" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -40,6 +44,9 @@
 </head>
 
 <body>
+    <span style="position:fixed;top:-9999px;left:-9999px;font-size:1px;opacity:0;pointer-events:none">
+        <i class="fas fa-star"></i><i class="fas fa-envelope"></i><i class="fas fa-moon"></i>
+    </span>
     <div id="splash-declaration">
         <div class="splash-bg-stars" id="splash-stars"></div>
         <div class="splash-glow-1"></div>

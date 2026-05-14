@@ -1,40 +1,40 @@
 function toggleBatchFavoriteMode() {
-            isBatchFavoriteMode = !isBatchFavoriteMode;
-            selectedMessages = [];
+    isBatchFavoriteMode = !isBatchFavoriteMode;
+    selectedMessages = [];
 
-            if (isBatchFavoriteMode) {
-                document.body.classList.add('batch-favorite-mode');
-                showBatchFavoriteActions();
-                showNotification('批量收藏模式已开启，点击消息进行选择', 'info');
-            } else {
-                document.body.classList.remove('batch-favorite-mode');
-                hideBatchFavoriteActions();
-                showNotification('批量收藏模式已关闭', 'info');
-            }
+    if (isBatchFavoriteMode) {
+        document.body.classList.add('batch-favorite-mode');
+        showBatchFavoriteActions();
+        showNotification('批量收藏模式已开启，点击消息进行选择', 'info');
+    } else {
+        document.body.classList.remove('batch-favorite-mode');
+        hideBatchFavoriteActions();
+        showNotification('批量收藏模式已关闭', 'info');
+    }
 
-            renderMessages(true);
-        }
+    renderMessages(true);
+}
 
-        function hideBatchFavoriteActions() {
-            const actions = document.querySelector('.batch-favorite-actions');
-            if (actions) {
+function hideBatchFavoriteActions() {
+    const actions = document.querySelector('.batch-favorite-actions');
+    if (actions) {
 
-                actions.style.animation = 'floatUpAction 0.3s reverse forwards';
-                setTimeout(() => {
-                    actions.remove();
-                }, 300);
-            }
-        }
+        actions.style.animation = 'floatUpAction 0.3s reverse forwards';
+        setTimeout(() => {
+            actions.remove();
+        }, 300);
+    }
+}
 
 
-        function showBatchFavoriteActions() {
+function showBatchFavoriteActions() {
 
-            if (document.querySelector('.batch-favorite-actions')) return;
+    if (document.querySelector('.batch-favorite-actions')) return;
 
-            const actions = document.createElement('div');
-            actions.className = 'batch-favorite-actions';
+    const actions = document.createElement('div');
+    actions.className = 'batch-favorite-actions';
 
-            actions.innerHTML = `
+    actions.innerHTML = `
         <button class="batch-action-btn-pill batch-btn-cancel" id="cancel-batch-favorite">
         <i class="fas fa-times"></i> 取消
         </button>
@@ -42,42 +42,42 @@ function toggleBatchFavoriteMode() {
         <i class="fas fa-check"></i> 确认收藏 (0)
         </button>
         `;
-            document.body.appendChild(actions);
+    document.body.appendChild(actions);
 
-            document.getElementById('confirm-batch-favorite').addEventListener('click', confirmBatchFavorite);
-            document.getElementById('cancel-batch-favorite').addEventListener('click', toggleBatchFavoriteMode);
+    document.getElementById('confirm-batch-favorite').addEventListener('click', confirmBatchFavorite);
+    document.getElementById('cancel-batch-favorite').addEventListener('click', toggleBatchFavoriteMode);
+}
+
+
+function confirmBatchFavorite() {
+    if (selectedMessages.length === 0) {
+        showNotification('请先选择要收藏的消息', 'warning');
+        return;
+    }
+
+
+    const count = selectedMessages.length;
+
+
+    selectedMessages.forEach(msgId => {
+        const message = messages.find(m => m.id === msgId);
+        if (message) {
+            message.favorited = true;
         }
+    });
 
 
-        function confirmBatchFavorite() {
-            if (selectedMessages.length === 0) {
-                showNotification('请先选择要收藏的消息', 'warning');
-                return;
-            }
+    throttledSaveData();
 
 
-            const count = selectedMessages.length;
+    toggleBatchFavoriteMode();
 
 
-            selectedMessages.forEach(msgId => {
-                const message = messages.find(m => m.id === msgId);
-                if (message) {
-                    message.favorited = true;
-                }
-            });
+    showNotification(`已成功收藏 ${count} 条消息`, 'success');
+}
 
 
-            throttledSaveData();
-
-
-            toggleBatchFavoriteMode();
-
-
-            showNotification(`已成功收藏 ${count} 条消息`, 'success');
-        }
-
-
-        function renderAnniversaries() {
+function renderAnniversaries() {
     const list = DOMElements.anniversaryModal.list;
     if (anniversaries.length === 0) {
         list.innerHTML = '<div class="no-favorites" style="padding:20px 0;"><i class="fas fa-heart" style="font-size:24px;margin-bottom:10px;"></i><p>还没有记录纪念日</p></div>';
@@ -88,10 +88,10 @@ function toggleBatchFavoriteMode() {
         const startDate = new Date(anniversary.date);
         const now = new Date();
         let diffDays;
-        
+
         if (anniversary.type === 'countdown') {
             diffDays = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
-            if (diffDays < 0) diffDays = 0; 
+            if (diffDays < 0) diffDays = 0;
         } else {
             diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
         }
@@ -123,10 +123,10 @@ function toggleBatchFavoriteMode() {
     }).join('');
 }
 
-        function addAnniversary() {
+function addAnniversary() {
     const nameInput = document.getElementById('ann-input-name');
     const dateInput = document.getElementById('ann-input-date');
-    
+
     const name = (nameInput ? nameInput.value : (DOMElements.anniversaryModal.nameInput ? DOMElements.anniversaryModal.nameInput.value : '')).trim();
     const date = dateInput ? dateInput.value : (DOMElements.anniversaryModal.dateInput ? DOMElements.anniversaryModal.dateInput.value : '');
 
@@ -135,8 +135,8 @@ function toggleBatchFavoriteMode() {
         return;
     }
 
-    const type = (typeof currentAnnType !== 'undefined' ? currentAnnType : null) 
-              || (typeof currentAnniversaryType !== 'undefined' ? currentAnniversaryType : 'anniversary');
+    const type = (typeof currentAnnType !== 'undefined' ? currentAnnType : null)
+        || (typeof currentAnniversaryType !== 'undefined' ? currentAnniversaryType : 'anniversary');
 
     const newAnniversary = {
         id: Date.now(),
@@ -148,7 +148,7 @@ function toggleBatchFavoriteMode() {
     anniversaries.push(newAnniversary);
     throttledSaveData();
     renderAnniversariesList();
-    
+
     if (nameInput) nameInput.value = '';
     if (dateInput) dateInput.value = '';
     if (DOMElements.anniversaryModal.nameInput) DOMElements.anniversaryModal.nameInput.value = '';
@@ -163,43 +163,43 @@ function toggleBatchFavoriteMode() {
     if (typeof playSound === 'function') playSound('anniversary');
 }
 
-        function showAnniversaryAnimation(anniversary) {
-            const startDate = new Date(anniversary.date);
-            const now = new Date();
-            let diffDays;
-            let title, message;
+function showAnniversaryAnimation(anniversary) {
+    const startDate = new Date(anniversary.date);
+    const now = new Date();
+    let diffDays;
+    let title, message;
 
-            if (anniversary.type === 'countdown') {
+    if (anniversary.type === 'countdown') {
 
-                diffDays = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
-                title = "倒数日";
-                message = `即将到来`;
-            } else {
+        diffDays = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
+        title = "倒数日";
+        message = `即将到来`;
+    } else {
 
-                diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-                title = "纪念日快乐！";
-                message = `相伴至今`;
-            }
+        diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+        title = "纪念日快乐！";
+        message = `相伴至今`;
+    }
 
-            DOMElements.anniversaryAnimation.title.textContent = title;
-            DOMElements.anniversaryAnimation.days.textContent = diffDays;
-            DOMElements.anniversaryAnimation.message.textContent = message;
+    DOMElements.anniversaryAnimation.title.textContent = title;
+    DOMElements.anniversaryAnimation.days.textContent = diffDays;
+    DOMElements.anniversaryAnimation.message.textContent = message;
 
-            DOMElements.anniversaryAnimation.modal.classList.add('active');
-        }
+    DOMElements.anniversaryAnimation.modal.classList.add('active');
+}
 
-        function updateAnniversaryDisplay(dateString) {
-            if (!dateString) return;
+function updateAnniversaryDisplay(dateString) {
+    if (!dateString) return;
 
-            const start = new Date(dateString);
-            const now = new Date();
-            const diffTime = Math.abs(now - start);
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const start = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - start);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-            DOMElements.anniversaryModal.daysElement.textContent = diffDays;
-            DOMElements.anniversaryModal.dateShowElement.textContent = `起始日：${start.toLocaleDateString()}`;
-            DOMElements.anniversaryModal.displayArea.style.display = 'block';
-        }
+    DOMElements.anniversaryModal.daysElement.textContent = diffDays;
+    DOMElements.anniversaryModal.dateShowElement.textContent = `起始日：${start.toLocaleDateString()}`;
+    DOMElements.anniversaryModal.displayArea.style.display = 'block';
+}
 
 
 
@@ -213,21 +213,21 @@ const MOOD_OPTIONS = [
     { key: 'love', kaomoji: '🥰', label: '想你', color: '#FF9A8B' },
     { key: 'busy', kaomoji: '😵‍💫', label: '忙碌', color: '#A8D8EA' },
     { key: 'sleepy', kaomoji: '😴', label: '困困', color: '#E0C3FC' },
-{ key: 'lonely', kaomoji: '🥹', label: '孤单', color: '#B8A9C9' }, 
-{ key: 'cool', kaomoji: '😎', label: '潇洒', color: '#2C3E50' },
+    { key: 'lonely', kaomoji: '🥹', label: '孤单', color: '#B8A9C9' },
+    { key: 'cool', kaomoji: '😎', label: '潇洒', color: '#2C3E50' },
     { key: 'cute', kaomoji: '🥺', label: '撒娇', color: '#FFB6C1' }
 ];
 
-let moodData = {}; 
+let moodData = {};
 let moodTrash = [];
 let currentCalendarDate = new Date();
 window.selectedDateStr = null;
 let selectedDateStr = null;
-let currentMoodPage = 1; 
-let currentMoodEditTarget = 'me'; 
-let customMoodOptions = []; 
+let currentMoodPage = 1;
+let currentMoodEditTarget = 'me';
+let customMoodOptions = [];
 let customMoodSelectedColor = '#FFD93D';
-const CUSTOM_MOOD_COLORS = ['#FFD93D','#FF6B6B','#6BCB77','#4D96FF','#8D9EFF','#FF9A8B','#A8D8EA','#E0C3FC','#B8A9C9','#2C3E50'];
+const CUSTOM_MOOD_COLORS = ['#FFD93D', '#FF6B6B', '#6BCB77', '#4D96FF', '#8D9EFF', '#FF9A8B', '#A8D8EA', '#E0C3FC', '#B8A9C9', '#2C3E50'];
 
 async function initMoodData() {
     const savedMoods = await localforage.getItem(getStorageKey('moodCalendar'));
@@ -243,7 +243,7 @@ async function initMoodData() {
 function checkPartnerDailyMood() {
     const today = new Date();
     const dateStr = formatDateStr(today);
-    
+
     if (!moodData[dateStr]) {
         moodData[dateStr] = {};
     }
@@ -268,7 +268,7 @@ function checkPartnerDailyMood() {
                 }
                 moodData[dateStr].partnerNote = chosen.join('　');
             }
-        } catch(e) {  }
+        } catch (e) { }
         saveMoodData();
     }
 }
@@ -285,7 +285,7 @@ function saveCustomMoodOptions() {
 }
 
 function saveMoodTrash() {
-    localforage.setItem(getStorageKey('moodTrash'), moodTrash).catch(() => {});
+    localforage.setItem(getStorageKey('moodTrash'), moodTrash).catch(() => { });
     window.moodTrash = moodTrash;
 }
 function getAllMoodOptions() {
@@ -299,24 +299,24 @@ function formatDateStr(date) {
 }
 
 
-let currentMoodSelection = null; 
+let currentMoodSelection = null;
 function renderMoodCalendar() {
     const grid = document.getElementById('calendar-grid');
     const monthLabel = document.getElementById('calendar-month-label');
-    
+
     if (!grid || !monthLabel) return;
 
     grid.innerHTML = '';
-    
+
     const year = currentCalendarDate.getFullYear();
     const month = currentCalendarDate.getMonth();
-    
+
     monthLabel.textContent = `${year}年 ${month + 1}月`;
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
-    const startDayOfWeek = firstDay.getDay(); 
+    const startDayOfWeek = firstDay.getDay();
 
     let stats = {
         me: { total: 0, counts: {} },
@@ -334,10 +334,10 @@ function renderMoodCalendar() {
     for (let d = 1; d <= daysInMonth; d++) {
         const dayDiv = document.createElement('div');
         dayDiv.className = 'calendar-day';
-        
+
         const dateObj = new Date(year, month, d);
         const dateStr = formatDateStr(dateObj);
-        
+
         if (dateStr === todayStr) {
             dayDiv.classList.add('today');
             dayDiv.style.borderColor = 'var(--accent-color)';
@@ -351,7 +351,7 @@ function renderMoodCalendar() {
         dotsContainer.className = 'mood-dots-container';
 
         const dayData = moodData[dateStr];
-        
+
         if (dayData) {
             if (dayData.user) {
                 const moodObj = getAllMoodOptions().find(m => m.key === dayData.user);
@@ -367,7 +367,7 @@ function renderMoodCalendar() {
                 if (moodObj) {
                     stats.partner.counts[moodObj.key] = (stats.partner.counts[moodObj.key] || 0) + 1;
                     stats.partner.total++;
-                    const dot = createMoodDot(moodObj, dayData.partnerNote, true); 
+                    const dot = createMoodDot(moodObj, dayData.partnerNote, true);
                     dotsContainer.appendChild(dot);
                 }
             }
@@ -394,7 +394,7 @@ function createMoodDot(moodObj, note, isPartner) {
     const dot = document.createElement('div');
     dot.className = `mood-detail-dot ${isPartner ? 'partner-mood' : ''}`;
     dot.style.backgroundColor = moodObj.color;
-    
+
     if (isPartner) {
         dot.innerHTML = `
             <span class="mood-kaomoji-span">${moodObj.kaomoji}</span>
@@ -418,7 +418,7 @@ function updateDualMoodStats(stats) {
 
     const myTotal = stats.me.total;
     const partnerTotal = stats.partner.total;
-    
+
     const daysInMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0).getDate();
     const myPercent = daysInMonth > 0 ? (myTotal / daysInMonth) * 100 : 0;
     const partnerPercent = daysInMonth > 0 ? (partnerTotal / daysInMonth) * 100 : 0;
@@ -442,7 +442,7 @@ function updateDualMoodStats(stats) {
             if (m) partnerDominant = m;
         }
     });
-    
+
     const createMoodBarHTML = (moodCounts, totalCount) => {
         if (totalCount <= 0) {
             return `<div class="mood-bar-container" style="justify-content: center; align-items: center; font-size: 10px; color: var(--text-secondary); background: var(--message-received-bg);">无数据</div>`;
@@ -456,9 +456,9 @@ function updateDualMoodStats(stats) {
                     const percentage = (count / totalCount) * 100;
                     return `<div class="mood-bar-segment" style="width: ${percentage}%; background-color: ${moodObj.color};" title="${moodObj.label}: ${count}天"></div>`;
                 }
-                return ''; 
+                return '';
             })
-            .join(''); 
+            .join('');
         return `<div class="mood-bar-container">${segments}</div>`;
     };
 
@@ -524,7 +524,7 @@ function updateDualMoodStats(stats) {
     `;
 }
 
-window.editStatsWeather = function(el, who) {
+window.editStatsWeather = function (el, who) {
     if (el.querySelector('input')) return;
     var todayStr = formatDateStr(new Date());
     if (!moodData[todayStr]) moodData[todayStr] = {};
@@ -546,13 +546,13 @@ window.editStatsWeather = function(el, who) {
         el.innerHTML = val ? `<span>${val}</span>` : `<span style="opacity:0.4;">+ 天气</span>`;
     }
     input.addEventListener('blur', save);
-    input.addEventListener('keydown', function(e) {
+    input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); save(); }
         if (e.key === 'Escape') { el.innerHTML = current ? `<span>${current}</span>` : `<span style="opacity:0.4;">+ 天气</span>`; }
     });
 };
 
-window.deleteDailyMood = function(dateStr, who) {
+window.deleteDailyMood = function (dateStr, who) {
     if (!moodData[dateStr]) return;
     const src = moodData[dateStr];
     const trashItem = {
@@ -654,7 +654,7 @@ function renderMoodTrashList() {
     }).join('');
 }
 
-window.restoreMoodTrashItem = function(trashId) {
+window.restoreMoodTrashItem = function (trashId) {
     const idStr = String(trashId);
     const item = (moodTrash || []).find(t => String(t.id) === idStr);
     if (!item) return;
@@ -679,7 +679,7 @@ window.restoreMoodTrashItem = function(trashId) {
     if (typeof playSound === 'function') playSound('mood');
 };
 
-window.deleteMoodTrashItem = function(trashId) {
+window.deleteMoodTrashItem = function (trashId) {
     const idStr = String(trashId);
     const item = (moodTrash || []).find(t => String(t.id) === idStr);
     if (!item) return;
@@ -894,7 +894,7 @@ function switchMoodEditTarget(target) {
     currentMoodSelection = currentKey;
     document.getElementById('mood-note-input').value = noteVal;
     renderMoodOptionsGrid(currentKey);
-    switchMoodPage(0); 
+    switchMoodPage(0);
 }
 window.switchMoodEditTarget = switchMoodEditTarget;
 
@@ -916,7 +916,7 @@ function openMoodSelector(dateStr, editTarget) {
     }
 
     overlay.classList.remove('active');
-    
+
     editorView.style.display = 'block';
     if (detailView) detailView.style.display = 'none';
 
@@ -961,11 +961,11 @@ function openMoodSelector(dateStr, editTarget) {
     });
 }
 
-window.editPartnerMoodRecord = function() {
+window.editPartnerMoodRecord = function () {
     openMoodSelector(selectedDateStr, 'partner');
 };
 
-window.tempSelectMood = function(key) {
+window.tempSelectMood = function (key) {
     currentMoodSelection = key;
     renderMoodOptionsGrid(key);
 }
@@ -987,7 +987,7 @@ document.getElementById('confirm-mood-save').addEventListener('click', () => {
         moodData[selectedDateStr].partnerNote = document.getElementById('mood-note-input').value.trim();
         moodData[selectedDateStr].partnerWeather = weatherVal.trim();
     }
-    
+
     saveMoodData();
     closeMoodOverlay();
     showNotification('记录已保存 ✦', 'success');
@@ -1000,7 +1000,7 @@ function showDayDetails(dateStr, data) {
     const overlay = document.getElementById('mood-selector-overlay');
     const editorView = document.getElementById('mood-editor-view');
     const detailView = document.getElementById('mood-detail-view');
-    
+
     const allMoods = getAllMoodOptions();
     const moodObj = allMoods.find(m => m.key === data.user);
 
@@ -1062,13 +1062,13 @@ document.getElementById('edit-existing-mood').addEventListener('click', () => {
     detailView.style.display = 'none';
 });
 
-window.closeMoodOverlay = function() {
+window.closeMoodOverlay = function () {
     if (window._moodOverlayRafId) {
         cancelAnimationFrame(window._moodOverlayRafId);
         window._moodOverlayRafId = null;
     }
     const overlay = document.getElementById('mood-selector-overlay');
-    if(overlay) {
+    if (overlay) {
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.25s ease';
         setTimeout(() => {
@@ -1076,38 +1076,38 @@ window.closeMoodOverlay = function() {
             overlay.style.opacity = '';
             overlay.style.transition = '';
             const customDialog = document.getElementById('custom-mood-dialog');
-            if(customDialog) customDialog.style.display = 'none';
+            if (customDialog) customDialog.style.display = 'none';
         }, 250);
     }
 };
-window.viewMoodDetailFromEditor = function() {
+window.viewMoodDetailFromEditor = function () {
     if (!selectedDateStr || !moodData[selectedDateStr]) return;
     showDayDetails(selectedDateStr, moodData[selectedDateStr]);
 };
 document.getElementById('cancel-mood-edit').addEventListener('click', closeMoodOverlay);
 
-window.openCustomMoodDialog = function() {
+window.openCustomMoodDialog = function () {
     const dialog = document.getElementById('custom-mood-dialog');
     document.getElementById('custom-mood-emoji').value = '';
     document.getElementById('custom-mood-label').value = '';
     customMoodSelectedColor = CUSTOM_MOOD_COLORS[0];
     const colorsEl = document.getElementById('custom-mood-colors');
-    colorsEl.innerHTML = CUSTOM_MOOD_COLORS.map((c,i) => 
-        `<div class="custom-mood-color-dot ${i===0?'selected':''}" style="background:${c};" onclick="selectCustomColor('${c}',this)"></div>`
+    colorsEl.innerHTML = CUSTOM_MOOD_COLORS.map((c, i) =>
+        `<div class="custom-mood-color-dot ${i === 0 ? 'selected' : ''}" style="background:${c};" onclick="selectCustomColor('${c}',this)"></div>`
     ).join('');
     const saveBtn = dialog.querySelector('.modal-btn-primary');
     saveBtn.onclick = window.saveCustomMood;
     dialog.style.display = 'block';
 };
-window.selectCustomColor = function(color, el) {
+window.selectCustomColor = function (color, el) {
     customMoodSelectedColor = color;
     document.querySelectorAll('.custom-mood-color-dot').forEach(d => d.classList.remove('selected'));
     el.classList.add('selected');
 };
-window.closeCustomMoodDialog = function() {
+window.closeCustomMoodDialog = function () {
     document.getElementById('custom-mood-dialog').style.display = 'none';
 };
-window.saveCustomMood = function() {
+window.saveCustomMood = function () {
     const emoji = document.getElementById('custom-mood-emoji').value.trim();
     const label = document.getElementById('custom-mood-label').value.trim();
     if (!emoji || !label) { showNotification('请填写表情和名称', 'warning'); return; }
@@ -1120,7 +1120,7 @@ window.saveCustomMood = function() {
     if (typeof playSound === 'function') playSound('mood');
 };
 
-window.deleteCustomMood = function(key) {
+window.deleteCustomMood = function (key) {
     customMoodOptions = customMoodOptions.filter(m => m.key !== key);
     saveCustomMoodOptions();
     renderMoodOptionsGrid(currentMoodSelection);
@@ -1128,7 +1128,7 @@ window.deleteCustomMood = function(key) {
     if (typeof playSound === 'function') playSound('mood');
 };
 
-window.editCustomMood = function(key) {
+window.editCustomMood = function (key) {
     const mood = customMoodOptions.find(m => m.key === key);
     if (!mood) return;
     const dialog = document.getElementById('custom-mood-dialog');
@@ -1136,13 +1136,13 @@ window.editCustomMood = function(key) {
     document.getElementById('custom-mood-label').value = mood.label;
     customMoodSelectedColor = mood.color;
     const colorsEl = document.getElementById('custom-mood-colors');
-    colorsEl.innerHTML = CUSTOM_MOOD_COLORS.map((c) => 
-        `<div class="custom-mood-color-dot ${c===mood.color?'selected':''}" style="background:${c};" onclick="selectCustomColor('${c}',this)"></div>`
+    colorsEl.innerHTML = CUSTOM_MOOD_COLORS.map((c) =>
+        `<div class="custom-mood-color-dot ${c === mood.color ? 'selected' : ''}" style="background:${c};" onclick="selectCustomColor('${c}',this)"></div>`
     ).join('');
     dialog.style.display = 'block';
     dialog._editingKey = key;
     const saveBtn = dialog.querySelector('.modal-btn-primary');
-    saveBtn.onclick = function() {
+    saveBtn.onclick = function () {
         const emoji = document.getElementById('custom-mood-emoji').value.trim();
         const label = document.getElementById('custom-mood-label').value.trim();
         if (!emoji || !label) { showNotification('请填写表情和名称', 'warning'); return; }
@@ -1155,6 +1155,11 @@ window.editCustomMood = function(key) {
         showNotification('自定义心情已更新 ✦', 'success');
         if (typeof playSound === 'function') playSound('mood');
     };
+};
+
+window.resetAndRenderMoodCalendar = function () {
+    currentCalendarDate = new Date();
+    renderMoodCalendar();
 };
 
 function initMoodListeners() {
@@ -1186,7 +1191,7 @@ function initMoodListeners() {
             viewCalendar.classList.add('hidden-view');
             btnTrash && btnTrash.classList.remove('active');
             viewTrash && viewTrash.classList.add('hidden-view');
-            renderMoodCalendar(); 
+            renderMoodCalendar();
         });
     }
 
@@ -1205,20 +1210,20 @@ function initMoodListeners() {
 
     const entryBtn = document.getElementById('mood-function');
     const modal = document.getElementById('mood-modal');
-    
+
     if (entryBtn && !entryBtn.dataset.initialized) {
         entryBtn.dataset.initialized = 'true';
         const newBtn = entryBtn.cloneNode(true);
         entryBtn.parentNode.replaceChild(newBtn, entryBtn);
-        
+
         newBtn.addEventListener('click', () => {
             if (typeof window.updateDynamicNames === 'function') window.updateDynamicNames();
             const advModal = document.getElementById('advanced-modal');
-            if (advModal) hideModal(advModal); 
+            if (advModal) hideModal(advModal);
             setTimeout(() => {
                 renderMoodCalendar();
                 showModal(modal);
-            }, 150); 
+            }, 150);
         });
     }
 
@@ -1258,7 +1263,7 @@ function initMoodListeners() {
             }
         });
     }
-    
+
     const cancelMoodBtn = document.getElementById('cancel-mood-edit');
     if (cancelMoodBtn && !cancelMoodBtn.dataset.initialized) {
         cancelMoodBtn.dataset.initialized = 'true';
@@ -1285,7 +1290,7 @@ function initMoodListeners() {
             renderMoodCalendar();
         });
     }
-    
+
     const nextMonthBtn = document.getElementById('next-month');
     if (nextMonthBtn && !nextMonthBtn.dataset.initialized) {
         nextMonthBtn.dataset.initialized = 'true';
