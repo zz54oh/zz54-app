@@ -182,6 +182,41 @@ body.feature-mode {
   }
 }
 
+.home-hero::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+      transparent 40%,
+      hsla(var(--theme-h), 50%, 90%, 0.28) 45%,
+      hsla(var(--theme-h), 50%, 90%, 0.28) 55%,
+      transparent 60%);
+  animation: heroShimmer 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-theme="dark"] .home-hero::after {
+  background: linear-gradient(45deg,
+      transparent 40%,
+      hsla(var(--theme-h), 40%, 80%, 0.12) 45%,
+      hsla(var(--theme-h), 40%, 80%, 0.12) 55%,
+      transparent 60%);
+}
+
+@keyframes heroShimmer {
+  0% {
+    transform: translateX(-30%) translateY(-30%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(30%) translateY(30%) rotate(45deg);
+  }
+}
+
 .home-hero-bg {
   position: absolute;
   inset: 0;
