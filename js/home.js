@@ -17,7 +17,7 @@
   const PRESET_COLORS = [
     { name: '紫罗兰', h: 285 }, { name: '玫瑰粉', h: 340 }, { name: '樱花', h: 355 },
     { name: '天空', h: 210 }, { name: '薄荷', h: 155 }, { name: '蜜桃', h: 20 },
-    { name: '星空', h: 240 }
+    { name: '星空', h: 240 }, { name: '灰', h: 220, s: 8 }
   ];
 
   const FEATURES = [
@@ -182,7 +182,7 @@
       <div id="home-bg"><div id="home-bg-image"></div><div id="home-bg-overlay"></div></div>
       <div id="home-content">
         <div class="home-hero">
-          <div class="home-hero-bg"></div><div class="home-hero-overlay"></div><div id="hero-stars" class="hero-stars"></div>
+          <div class="home-hero-bg"></div><div class="home-hero-overlay"></div>
           <div class="home-hero-content">
             <div class="dual-profile">
               <div class="profile-side me">
@@ -1276,7 +1276,6 @@
     ['splash-declaration', 'welcome-animation'].forEach(id => { const e = document.getElementById(id); if (e) { e.style.display = 'none'; e.classList.add('hidden'); } });
     registerSW();
     const homeEl = buildHomeDOM();
-    if (typeof window.initHeroStars === 'function') window.initHeroStars();
     document.body.appendChild(homeEl);
     await loadStoredPrefs();
     ensureFloatingBackBtn();
