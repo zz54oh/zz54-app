@@ -2330,7 +2330,6 @@ window.switchChatMode = async function(mode) {
     if (SESSION_ID) await saveData();
     // 切换mode
     window.chatMode = mode;
-    if (window.groupChatSettings) window.groupChatSettings.enabled = (mode === 'group');
     // 加载新模式的消息
     const msgKey = mode === 'group' ? 'groupChatMessages' : 'chatMessages';
     try {
