@@ -154,7 +154,7 @@ body.feature-mode {
   /* 防止光晕溢出 */
 }
 
-/* ========= 脉冲呼吸光晕（::before） ========= */
+/* ========= 流光效果（::before） ========= */
 .home-hero::after {
   content: '';
   position: absolute;
