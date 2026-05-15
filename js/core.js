@@ -1160,6 +1160,7 @@ function _updateReadReceiptsDOM() {
 }
 
 function renderMessages(preserveScroll = false) {
+    console.log('[render] renderMessages called, chatMode:', window.chatMode, 'messages:', messages.length, new Error().stack.split('\n')[1].trim());
     const container = DOMElements.chatContainer;
     const totalMessages = messages.length;
     const startIndex = Math.max(0, totalMessages - displayedMessageCount);
@@ -2329,19 +2330,24 @@ document.addEventListener('DOMContentLoaded', function () {
 window._chatModeCache = {};
 window.switchChatMode = async function(mode) {
     if (window.chatMode === mode) return;
+    console.log('[switch] 开始切换到', mode, '当前messages数量:', messages.length);
     // 缓存当前模式的消息到内存
     const currentMode = window.chatMode || 'single';
     window._chatModeCache[currentMode] = messages.slice();
     // 先切换mode，确保头像渲染用正确的状态
     window.chatMode = mode;
+    console.log('[switch] chatMode已设为', mode);
     // 保存当前消息
     if (SESSION_ID) await saveData();
+    console.log('[switch] saveData完成');
     // 优先用内存缓存，有缓存直接渲染，再异步补localforage
     if (window._chatModeCache[mode] && window._chatModeCache[mode].length > 0) {
+        console.log('[switch] 用缓存渲染', mode, '缓存数:', window._chatModeCache[mode].length, 'chatMode:', window.chatMode);
         messages = window._chatModeCache[mode];
         window.messages = messages;
         displayedMessageCount = HISTORY_BATCH_SIZE;
         if (typeof renderMessages === 'function') renderMessages();
+        console.log('[switch] 缓存渲染完成, chatMode:', window.chatMode);
         // 后台异步更新缓存
         const msgKey = mode === 'group' ? 'groupChatMessages' : 'chatMessages';
         localforage.getItem(getStorageKey(msgKey)).then(savedMsgs => {
