@@ -299,7 +299,7 @@
   async function goToFeature(featureName) {
     if (featureName === 'chat') {
       const chatContainer = document.querySelector('.main-chat-area');
-      if (chatContainer) chatContainer.style.display = 'none';
+      if (chatContainer) { chatContainer.style.opacity = '0'; chatContainer.style.pointerEvents = 'none'; }
       const home = document.getElementById('home-screen');
       if (home) home.classList.add('hidden');
       isOnHome = false;
@@ -307,7 +307,9 @@
       showBackBtn(backToHome);
       if (window.switchChatMode) await window.switchChatMode('single');
       exitFeatureMode();
-      if (chatContainer) chatContainer.style.display = '';
+      requestAnimationFrame(() => {
+        if (chatContainer) { chatContainer.style.opacity = ''; chatContainer.style.pointerEvents = ''; }
+      });
       return;
     }
     if (featureName === 'mood') { openMoodCalendar(); return; }
