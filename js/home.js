@@ -307,9 +307,7 @@
       showBackBtn(backToHome);
       if (window.switchChatMode) await window.switchChatMode('single');
       exitFeatureMode();
-      requestAnimationFrame(() => {
-        if (chatContainer) { chatContainer.style.opacity = ''; chatContainer.style.pointerEvents = ''; }
-      });
+      if (chatContainer) { chatContainer.style.opacity = ''; chatContainer.style.pointerEvents = ''; }
       return;
     }
     if (featureName === 'mood') { openMoodCalendar(); return; }
