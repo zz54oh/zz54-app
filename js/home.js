@@ -298,13 +298,16 @@
   // ---------- 主页功能跳转 ----------
   async function goToFeature(featureName) {
     if (featureName === 'chat') {
+      const chatContainer = document.querySelector('.main-chat-area');
+      if (chatContainer) chatContainer.style.display = 'none';
       const home = document.getElementById('home-screen');
       if (home) home.classList.add('hidden');
       isOnHome = false;
       setContext('home');
       showBackBtn(backToHome);
-      if (window.switchChatMode) window.switchChatMode('single');
+      if (window.switchChatMode) await window.switchChatMode('single');
       exitFeatureMode();
+      if (chatContainer) chatContainer.style.display = '';
       return;
     }
     if (featureName === 'mood') { openMoodCalendar(); return; }
