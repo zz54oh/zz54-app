@@ -2325,6 +2325,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 window._chatModeCache = {};
+// 页面初始化时预加载单聊消息到缓存
+(function() {
+    var _preloadKey = typeof getStorageKey === 'function' ? getStorageKey('chatMessages') : 'chatMessages';
+    localforage.getItem(_preloadKey).then(function(msgs) {
+        if (Array.isArray(msgs) && msgs.length > 0) {
+            window._chatModeCache['single'] = msgs;
+        }
+    });
+})();
 window.switchChatMode = async function(mode) {
     if (window.chatMode === mode) return;
     // 缓存当前模式的消息到内存
