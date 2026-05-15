@@ -1,10 +1,10 @@
-window.switchStatsTab = function(tab) {
+window.switchStatsTab = function (tab) {
     var statsPanel = document.getElementById('stats-panel');
     var favoritesPanel = document.getElementById('favorites-panel');
     var searchPanel = document.getElementById('search-panel');
     var wordcloudPanel = document.getElementById('wordcloud-panel');
     var allBtns = document.querySelectorAll('.stats-nav-btn');
-    allBtns.forEach(function(b) { b.classList.remove('active'); });
+    allBtns.forEach(function (b) { b.classList.remove('active'); });
     var activeBtn = document.querySelector('.stats-nav-btn[data-tab="' + tab + '"]');
     if (activeBtn) activeBtn.classList.add('active');
 
@@ -17,13 +17,13 @@ window.switchStatsTab = function(tab) {
         if (statsPanel) statsPanel.style.display = 'block';
     } else if (tab === 'search') {
         if (searchPanel) searchPanel.style.display = 'block';
-        setTimeout(function() {
+        setTimeout(function () {
             var inp = document.getElementById('msg-search-input');
             if (inp) inp.focus();
         }, 100);
     } else if (tab === 'wordcloud') {
         if (wordcloudPanel) wordcloudPanel.style.display = 'block';
-        requestAnimationFrame(function() {
+        requestAnimationFrame(function () {
             if (typeof renderWordCloud === 'function') renderWordCloud();
         });
     } else {
@@ -32,25 +32,25 @@ window.switchStatsTab = function(tab) {
     }
 };
 
-var groupChatSettings = (function() {
+var groupChatSettings = (function () {
     try {
         var saved = JSON.parse(localStorage.getItem('groupChatSettings') || 'null');
         if (!saved) return { enabled: false, showAvatar: true, showName: true, members: [] };
         if (!saved.members) saved.members = [];
         return saved;
-    } catch(e) { return { enabled: false, showAvatar: true, showName: true, members: [] }; }
+    } catch (e) { return { enabled: false, showAvatar: true, showName: true, members: [] }; }
 })();
 (function loadGroupAvatars() {
     if (!window.localforage) return;
     var members = groupChatSettings.members || [];
     if (members.length === 0) return;
-    var promises = members.map(function(m, i) {
+    var promises = members.map(function (m, i) {
         var ref = m.avatarRef || (m.id ? 'gca_' + m.id : 'gca_' + i);
-        return localforage.getItem(ref).then(function(avatar) {
+        return localforage.getItem(ref).then(function (avatar) {
             m.avatar = avatar || null;
-        }).catch(function() { m.avatar = null; });
+        }).catch(function () { m.avatar = null; });
     });
-    Promise.all(promises).then(function() {
+    Promise.all(promises).then(function () {
         if (typeof renderGroupMembersList === 'function') renderGroupMembersList();
     });
 })();
@@ -62,20 +62,20 @@ function saveGroupChatSettings() {
         enabled: groupChatSettings.enabled,
         showAvatar: groupChatSettings.showAvatar,
         showName: groupChatSettings.showName,
-        members: members.map(function(m) {
-            if (!m.id) m.id = 'gcm_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+        members: members.map(function (m) {
+            if (!m.id) m.id = 'gcm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
             return { name: m.name, id: m.id, avatarRef: 'gca_' + m.id };
         })
     };
     try {
         localStorage.setItem('groupChatSettings', JSON.stringify(toSave));
-    } catch(e) {
+    } catch (e) {
         console.warn('groupChatSettings localStorage保存失败:', e);
     }
     if (window.localforage) {
-        members.forEach(function(m) {
-            if (!m.id) m.id = 'gcm_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-            localforage.setItem('gca_' + m.id, m.avatar || null).catch(function(e) {
+        members.forEach(function (m) {
+            if (!m.id) m.id = 'gcm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            localforage.setItem('gca_' + m.id, m.avatar || null).catch(function (e) {
                 console.warn('头像存储失败 id=' + m.id, e);
             });
         });
@@ -89,13 +89,13 @@ function renderGroupMembersList() {
         list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">暂无成员，点击添加按钮添加</div>';
         return;
     }
-    list.innerHTML = groupChatSettings.members.map(function(m, i) {
+    list.innerHTML = groupChatSettings.members.map(function (m, i) {
         var avatarHtml = m.avatar
             ? '<img src="' + m.avatar + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">'
             : '<div style="width:36px;height:36px;border-radius:50%;background:rgba(var(--accent-color-rgb),0.15);display:flex;align-items:center;justify-content:center;"><i class="fas fa-user" style="font-size:14px;color:var(--accent-color);"></i></div>';
         return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--primary-bg);border:1px solid var(--border-color);border-radius:10px;">'
             + avatarHtml
-            + '<span style="flex:1;font-size:13px;font-weight:500;">' + (m.name || '成员' + (i+1)) + '</span>'
+            + '<span style="flex:1;font-size:13px;font-weight:500;">' + (m.name || '成员' + (i + 1)) + '</span>'
             + '<button onclick="openEditGroupMember(' + i + ')" style="background:none;border:none;cursor:pointer;color:var(--accent-color);font-size:14px;padding:4px 8px;"><i class="fas fa-edit"></i></button>'
             + '<button onclick="deleteGroupMember(' + i + ')" style="background:none;border:none;cursor:pointer;color:#ff4757;font-size:14px;padding:4px 8px;"><i class="fas fa-trash-alt"></i></button>'
             + '</div>';
@@ -137,10 +137,10 @@ function updateGroupModeUI() {
     renderGroupMembersList();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     var groupModeToggle = document.getElementById('group-mode-toggle');
     if (groupModeToggle) {
-        groupModeToggle.addEventListener('click', function() {
+        groupModeToggle.addEventListener('click', function () {
             groupChatSettings.enabled = !groupChatSettings.enabled;
             saveGroupChatSettings();
             updateGroupModeUI();
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     var showAvatarToggle = document.getElementById('group-show-avatar-toggle');
     if (showAvatarToggle) {
-        showAvatarToggle.addEventListener('click', function() {
+        showAvatarToggle.addEventListener('click', function () {
             groupChatSettings.showAvatar = !groupChatSettings.showAvatar;
             saveGroupChatSettings();
             updateGroupModeUI();
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     var showNameToggle = document.getElementById('group-show-name-toggle');
     if (showNameToggle) {
-        showNameToggle.addEventListener('click', function() {
+        showNameToggle.addEventListener('click', function () {
             groupChatSettings.showName = !groupChatSettings.showName;
             saveGroupChatSettings();
             updateGroupModeUI();
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     var closeGroupChat = document.getElementById('close-group-chat');
     if (closeGroupChat) {
-        closeGroupChat.addEventListener('click', function() {
+        closeGroupChat.addEventListener('click', function () {
             var m = document.getElementById('group-chat-modal');
             if (m && typeof hideModal === 'function') hideModal(m);
         });
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updateGroupModeUI, 200);
 });
 
-window.openAddGroupMember = function() {
+window.openAddGroupMember = function () {
     _groupMemberAvatarDataUrl = null;
     document.getElementById('group-member-edit-title').textContent = '添加成员';
     document.getElementById('group-member-name-input').value = '';
@@ -183,7 +183,7 @@ window.openAddGroupMember = function() {
     if (m && typeof showModal === 'function') showModal(m);
 };
 
-window.openEditGroupMember = function(idx) {
+window.openEditGroupMember = function (idx) {
     var member = groupChatSettings.members[idx];
     if (!member) return;
     _groupMemberAvatarDataUrl = member.avatar || null;
@@ -200,16 +200,16 @@ window.openEditGroupMember = function(idx) {
     if (m && typeof showModal === 'function') showModal(m);
 };
 
-window.closeGroupMemberEdit = function() {
+window.closeGroupMemberEdit = function () {
     var m = document.getElementById('group-member-edit-modal');
     if (m && typeof hideModal === 'function') hideModal(m);
 };
 
-window.previewGroupMemberAvatar = function(input) {
+window.previewGroupMemberAvatar = function (input) {
     var file = input.files[0];
     if (!file) return;
     var reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         _groupMemberAvatarDataUrl = e.target.result;
         var preview = document.getElementById('group-member-avatar-preview');
         preview.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
@@ -217,7 +217,7 @@ window.previewGroupMemberAvatar = function(input) {
     reader.readAsDataURL(file);
 };
 
-window.saveGroupMember = function() {
+window.saveGroupMember = function () {
     var name = (document.getElementById('group-member-name-input').value || '').trim();
     if (!name) { alert('请输入成员名字'); return; }
     var idxVal = document.getElementById('group-member-edit-index').value;
@@ -233,14 +233,14 @@ window.saveGroupMember = function() {
     window.closeGroupMemberEdit();
 };
 
-window.deleteGroupMember = function(idx) {
+window.deleteGroupMember = function (idx) {
     if (!confirm('确定删除该成员吗？')) return;
     groupChatSettings.members.splice(idx, 1);
     saveGroupChatSettings();
     renderGroupMembersList();
 };
 
-window.getGroupMemberForMessage = function(msgId) {
+window.getGroupMemberForMessage = function (msgId) {
     if (window.chatMode !== 'group' || !groupChatSettings.members || groupChatSettings.members.length === 0) return null;
     var seed = 0;
     var idStr = String(msgId);
@@ -248,11 +248,11 @@ window.getGroupMemberForMessage = function(msgId) {
     return groupChatSettings.members[seed % groupChatSettings.members.length];
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     var exportAllBtn = document.getElementById('export-all-settings');
     var importAllBtn = document.getElementById('import-all-settings');
-if (exportAllBtn) {
-        exportAllBtn.addEventListener('click', async function() {
+    if (exportAllBtn) {
+        exportAllBtn.addEventListener('click', async function () {
             const overlay = document.createElement('div');
             overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease;';
             overlay.innerHTML = `
@@ -313,13 +313,13 @@ if (exportAllBtn) {
             const bkConfirmBtn = document.getElementById('_bk_confirm');
             if (bkCancelBtn) bkCancelBtn.onclick = closeBkDialog;
 
-            if (bkConfirmBtn) bkConfirmBtn.onclick = async function() {
-                const inclMsgs    = document.getElementById('_bk_msgs').checked;
-                const inclSet     = document.getElementById('_bk_settings').checked;
-                const inclCustom  = document.getElementById('_bk_custom').checked;
-                const inclAnn     = document.getElementById('_bk_ann').checked;
-                const inclThemes  = document.getElementById('_bk_themes').checked;
-                const inclDg      = document.getElementById('_bk_dg').checked;
+            if (bkConfirmBtn) bkConfirmBtn.onclick = async function () {
+                const inclMsgs = document.getElementById('_bk_msgs').checked;
+                const inclSet = document.getElementById('_bk_settings').checked;
+                const inclCustom = document.getElementById('_bk_custom').checked;
+                const inclAnn = document.getElementById('_bk_ann').checked;
+                const inclThemes = document.getElementById('_bk_themes').checked;
+                const inclDg = document.getElementById('_bk_dg').checked;
                 const inclStickers = document.getElementById('_bk_stickers') && document.getElementById('_bk_stickers').checked;
 
                 if (!inclMsgs && !inclSet && !inclCustom && !inclAnn && !inclThemes && !inclDg && !inclStickers) {
@@ -348,19 +348,19 @@ if (exportAllBtn) {
                     } else {
                         if (typeof showNotification === 'function') showNotification('备份模块或函数未加载，请刷新页面', 'error');
                     }
-                } catch(e) {
+                } catch (e) {
                     console.error('全量备份导出失败:', e);
                     if (typeof showNotification === 'function') showNotification('导出失败，请重试', 'error');
                 }
             };
         });
     }
-if (importAllBtn) {
-        importAllBtn.addEventListener('click', function() {
+    if (importAllBtn) {
+        importAllBtn.addEventListener('click', function () {
             var input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json,.zip,application/json,application/zip';
-            input.onchange = async function(e) {
+            input.onchange = async function (e) {
                 var file = e.target.files[0];
                 if (!file) return;
 
@@ -389,7 +389,7 @@ if (importAllBtn) {
                     await ChatBackup.applyBackupToStorage(backup, { selective: false });
 
                     if (typeof showNotification === 'function') showNotification('数据恢复成功，即将刷新页面应用更改', 'success', 2000);
-                    setTimeout(function() { location.reload(); }, 2000);
+                    setTimeout(function () { location.reload(); }, 2000);
                 } catch (err) {
                     var msg = err && err.message ? err.message : '未知错误';
                     if (typeof showNotification === 'function') showNotification('导入失败：' + msg, 'error', 5000);
@@ -403,7 +403,7 @@ if (importAllBtn) {
     }
 });
 
-window.startEditDgWeather = function(el) {
+window.startEditDgWeather = function (el) {
     var current = el.textContent.trim();
     var input = document.createElement('input');
     input.type = 'text';
@@ -420,27 +420,27 @@ window.startEditDgWeather = function(el) {
         el.style.display = '';
         input.remove();
         var now = new Date();
-        var dateKey = 'customWeather_' + now.getFullYear() + '_' + (now.getMonth()+1) + '_' + now.getDate();
+        var dateKey = 'customWeather_' + now.getFullYear() + '_' + (now.getMonth() + 1) + '_' + now.getDate();
         localStorage.setItem(dateKey, val);
     }
     input.addEventListener('blur', saveWeather);
-    input.addEventListener('keydown', function(e) {
+    input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); saveWeather(); }
         if (e.key === 'Escape') { el.style.display = ''; input.remove(); }
     });
 };
 
-    document.addEventListener('focusin', function(e) {
-        if (e.target && (e.target.classList.contains('message-input') || e.target.tagName === 'TEXTAREA')) {
-            setTimeout(function() {
-                var chat = document.querySelector('.chat-container');
-                if (chat) chat.scrollTop = chat.scrollHeight;
-            }, 100);
-        }
-    });
+document.addEventListener('focusin', function (e) {
+    if (e.target && (e.target.classList.contains('message-input') || e.target.tagName === 'TEXTAREA')) {
+        setTimeout(function () {
+            var chat = document.querySelector('.chat-container');
+            if (chat) chat.scrollTop = chat.scrollHeight;
+        }, 100);
+    }
+});
 
 
-window._runMsgSearch = function() {
+window._runMsgSearch = function () {
     var input = document.getElementById('msg-search-input');
     var dateFrom = document.getElementById('msg-search-date-from');
     var dateTo = document.getElementById('msg-search-date-to');
@@ -452,9 +452,9 @@ window._runMsgSearch = function() {
     var to = dateTo && dateTo.value ? new Date(dateTo.value + 'T23:59:59') : null;
 
     var allMessages = (typeof messages !== 'undefined' ? messages : [])
-        .filter(function(m) { return m.type !== 'system'; });
+        .filter(function (m) { return m.type !== 'system'; });
 
-    var filtered = allMessages.filter(function(m) {
+    var filtered = allMessages.filter(function (m) {
         var matchText = !q || (m.text && m.text.toLowerCase().includes(q)) || (m.image && !q);
         if (q && m.image && !m.text) matchText = false;
         if (q) matchText = m.text && m.text.toLowerCase().includes(q);
@@ -482,19 +482,19 @@ window._runMsgSearch = function() {
     var partnerName = (typeof settings !== 'undefined' && settings.partnerName) || '对方';
 
     function highlight(text) {
-        if (!q || !text) return (text || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        var safe = text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        if (!q || !text) return (text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        var safe = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
         var safeQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return safe.replace(new RegExp('(' + safeQ + ')', 'gi'), '<mark style="background:rgba(var(--accent-color-rgb,180,140,100),0.3);border-radius:2px;padding:0 1px;">$1</mark>');
     }
 
-    resultsEl.innerHTML = filtered.map(function(msg) {
+    resultsEl.innerHTML = filtered.map(function (msg) {
         var isUser = msg.sender === 'user';
         var name = isUser ? myName : partnerName;
         var avatar = isUser ? myAvatar : partnerAvatar;
 
         if (!isUser && typeof groupChatSettings !== 'undefined' && groupChatSettings.enabled && groupChatSettings.members) {
-            var member = groupChatSettings.members.find(function(m) { return m.name === msg.sender; });
+            var member = groupChatSettings.members.find(function (m) { return m.name === msg.sender; });
             if (member) {
                 name = member.name;
                 avatar = member.avatar || '';
@@ -502,7 +502,7 @@ window._runMsgSearch = function() {
         }
 
         var ts = msg.timestamp ? new Date(msg.timestamp).toLocaleString('zh-CN', {
-            month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'
+            month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
         }) : '';
 
         var avatarHtml = avatar
@@ -511,7 +511,7 @@ window._runMsgSearch = function() {
 
         var contentHtml = '';
         if (msg.text) contentHtml += '<div style="font-size:13px;color:var(--text-primary);line-height:1.5;word-break:break-word;margin-top:3px;">' + highlight(msg.text) + '</div>';
-        if (msg.image) contentHtml += '<img src="' + msg.image + '" style="max-width:120px;max-height:90px;border-radius:8px;display:block;margin-top:5px;cursor:pointer;" onclick="if(typeof viewImage===\'function\')viewImage(\'' + msg.image.replace(/'/g,"\\'") + '\')" loading="lazy">';
+        if (msg.image) contentHtml += '<img src="' + msg.image + '" style="max-width:120px;max-height:90px;border-radius:8px;display:block;margin-top:5px;cursor:pointer;" onclick="if(typeof viewImage===\'function\')viewImage(\'' + msg.image.replace(/'/g, "\\'") + '\')" loading="lazy">';
 
         return '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;background:var(--primary-bg);border:1px solid var(--border-color);margin-bottom:8px;cursor:pointer;" onclick="if(typeof scrollToMessage===\'function\')scrollToMessage(' + msg.id + ')">'
             + avatarHtml
@@ -529,12 +529,68 @@ window._runMsgSearch = function() {
     );
 };
 
-window.scrollToMessage = function(msgId) {
+window.scrollToMessage = function (msgId) {
     var el = document.querySelector('[data-id="' + msgId + '"]');
     if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         el.style.transition = 'background 0.3s';
         el.style.background = 'rgba(var(--accent-color-rgb,180,140,100),0.18)';
-        setTimeout(function() { el.style.background = ''; }, 1500);
+        setTimeout(function () { el.style.background = ''; }, 1500);
     }
 };
+
+// 修复群聊设置模态框关闭时闪现纯色背景的问题
+(function patchGroupChatModalClose() {
+    const closeBtn = document.getElementById('close-group-chat');
+    if (!closeBtn) {
+        // 如果按钮还没加载，稍后再试
+        setTimeout(patchGroupChatModalClose, 200);
+        return;
+    }
+    // 移除所有内联 onclick 属性（防止冲突）
+    closeBtn.removeAttribute('onclick');
+
+    // 克隆替换，彻底移除旧的事件监听器
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+
+    newCloseBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const modal = document.getElementById('group-chat-modal');
+        if (!modal) return;
+
+        // 1. 临时禁用所有过渡和动画
+        modal.style.transition = 'none';
+        modal.style.animation = 'none';
+        const content = modal.querySelector('.modal-content');
+        if (content) {
+            content.style.transition = 'none';
+            content.style.animation = 'none';
+            content.style.opacity = '';   // 清除可能的内联 opacity
+            content.style.transform = '';
+        }
+
+        // 2. 立即隐藏模态框（无任何延迟）
+        modal.style.display = 'none';
+
+        // 3. 清理临时样式（延迟恢复，不影响下次打开）
+        setTimeout(() => {
+            modal.style.transition = '';
+            modal.style.animation = '';
+            if (content) {
+                content.style.transition = '';
+                content.style.animation = '';
+            }
+        }, 50);
+
+        // 4. 可选：强制聊天区域重绘，消除任何残留的闪烁
+        const chatArea = document.querySelector('.main-chat-area');
+        if (chatArea) {
+            // 微小强制重绘技巧
+            chatArea.style.transform = 'translateZ(0)';
+            requestAnimationFrame(() => {
+                chatArea.style.transform = '';
+            });
+        }
+    });
+})();
