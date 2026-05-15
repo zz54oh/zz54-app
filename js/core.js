@@ -363,6 +363,8 @@ const loadData = async () => {
             messages = savedMessages.map(m => ({
                 ...m, timestamp: new Date(m.timestamp)
             }));
+            // 预加载单聊消息到缓存
+            if (window._chatModeCache) window._chatModeCache['single'] = messages.slice();
         } else {
             const backup = _tryRecoverFromBackup();
             if (backup && Array.isArray(backup.messages) && backup.messages.length > 0) {
