@@ -241,7 +241,7 @@ window.deleteGroupMember = function(idx) {
 };
 
 window.getGroupMemberForMessage = function(msgId) {
-    if (!groupChatSettings.enabled || !groupChatSettings.members || groupChatSettings.members.length === 0) return null;
+    if (window.chatMode !== 'group' || !groupChatSettings.enabled || !groupChatSettings.members || groupChatSettings.members.length === 0) return null;
     var seed = 0;
     var idStr = String(msgId);
     for (var i = 0; i < idStr.length; i++) seed += idStr.charCodeAt(i) * (i + 1);
