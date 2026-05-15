@@ -2324,13 +2324,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+window._chatModeCache = {};
 window.switchChatMode = async function(mode) {
     if (window.chatMode === mode) return;
+    // 缓存当前模式的消息到内存
+    const currentMode = window.chatMode || 'single';
+    window._chatModeCache[currentMode] = messages.slice();
     // 先保存当前消息
     if (SESSION_ID) await saveData();
     // 切换mode
     window.chatMode = mode;
-    // 加载新模式的消息
+    // 优先用内存缓存，有缓存直接渲染，再异步补localforage
+    if (window._chatModeCache[mode] && window._chatModeCache[mode].length > 0) {
+        messages = window._chatModeCache[mode];
+        window.messages = messages;
+        displayedMessageCount = HISTORY_BATCH_SIZE;
+        if (typeof renderMessages === 'function') renderMessages();
+        // 后台异步更新缓存
+        const msgKey = mode === 'group' ? 'groupChatMessages' : 'chatMessages';
+        localforage.getItem(getStorageKey(msgKey)).then(savedMsgs => {
+            if (Array.isArray(savedMsgs) && savedMsgs.length > 0) {
+                window._chatModeCache[mode] = savedMsgs;
+            }
+        });
+        return;
+    }
+    // 没有缓存时走原来的逻辑
     const msgKey = mode === 'group' ? 'groupChatMessages' : 'chatMessages';
     try {
         const savedMsgs = await localforage.getItem(getStorageKey(msgKey));
