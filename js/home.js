@@ -303,7 +303,7 @@
       isOnHome = false;
       setContext('home');
       showBackBtn(backToHome);
-      if (window.switchChatMode) await window.switchChatMode('single');
+      if (window.switchChatMode) window.switchChatMode('single');
       exitFeatureMode();
       return;
     }
