@@ -2330,10 +2330,10 @@ window.switchChatMode = async function(mode) {
     // 缓存当前模式的消息到内存
     const currentMode = window.chatMode || 'single';
     window._chatModeCache[currentMode] = messages.slice();
-    // 先切换mode，确保头像渲染用正确的状态
-    window.chatMode = mode;
-    // 保存当前消息
+    // 先保存当前消息
     if (SESSION_ID) await saveData();
+    // 切换mode
+    window.chatMode = mode;
     // 优先用内存缓存，有缓存直接渲染，再异步补localforage
     if (window._chatModeCache[mode] && window._chatModeCache[mode].length > 0) {
         messages = window._chatModeCache[mode];
