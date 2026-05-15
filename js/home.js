@@ -298,9 +298,6 @@
   // ---------- 主页功能跳转 ----------
   async function goToFeature(featureName) {
     if (featureName === 'chat') {
-      // 先遮住chat-container，防止group旧DOM在切换过程中漏出来
-      const chatContainer = document.querySelector('.main-chat-area');
-      if (chatContainer) chatContainer.style.visibility = 'hidden';
       const home = document.getElementById('home-screen');
       if (home) home.classList.add('hidden');
       isOnHome = false;
@@ -308,7 +305,6 @@
       showBackBtn(backToHome);
       if (window.switchChatMode) await window.switchChatMode('single');
       exitFeatureMode();
-      if (chatContainer) chatContainer.style.visibility = '';
       return;
     }
     if (featureName === 'mood') { openMoodCalendar(); return; }
